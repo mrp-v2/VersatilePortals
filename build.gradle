@@ -149,12 +149,10 @@ publishing {
 
 processResources {
 	inputs.property 'version', project.version
-	inputs.property 'modid', project.modid
 	
 	from(sourceSets.main.resources.srcDirs) {
 		include 'META-INF/mods.toml'
 		expand 'version': project.version
-		expand 'modid': project.modid
 	}
 	
 	from(sourceSets.main.resources.srcDirs) {

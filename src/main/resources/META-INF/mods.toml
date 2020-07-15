@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="[32,)"
 [[mods]]
-	modId="${modid}"
+	modId="randomdimensions"
 	version="${version}"
 	displayName="Random Dimensions"
 	#logoFile="RandomDimensionsLogo.png"
