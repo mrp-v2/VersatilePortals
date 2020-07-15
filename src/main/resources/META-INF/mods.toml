@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[32,)"
+[[mods]]
+	modId="${modid}"
+	version="${version}"
+	displayName="Random Dimensions"
+	#logoFile="RandomDimensionsLogo.png"
+	updateJSONURL="https://raw.githubusercontent.com/mrp-v2/ModUpdateFiles/master/RandomDimensionsLogo.json"
+	issueTrackerURL="https://www.curseforge.com/minecraft/mc-mods/random-dimensions/issues"
+	displayURL="https://minecraft.curseforge.com/projects/random-dimensions"
+	authors="mrp_v2"
+	description='''Adds simple machines for automating conversion of concrete powder into concrete.'''
+[[dependencies.randomdimensions]]
+    modId="forge"
+    mandatory=true
+    versionRange="[32,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.randomdimensions]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.1]"
+    ordering="NONE"
+    side="BOTH"

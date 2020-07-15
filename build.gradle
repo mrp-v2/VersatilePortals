@@ -14,8 +14,9 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.16.1-1.0.0.0'
-group = 'mrp_v2.randomdimensions' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'randomdimensions'
+modid = 'randomdimensions'
+group = "mrp_v2.${modid}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "${modid}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -148,10 +149,12 @@ publishing {
 
 processResources {
 	inputs.property 'version', project.version
+	inputs.property 'modid', project.modid
 	
 	from(sourceSets.main.resources.srcDirs) {
 		include 'META-INF/mods.toml'
 		expand 'version': project.version
+		expand 'modid': project.modid
 	}
 	
 	from(sourceSets.main.resources.srcDirs) {
