@@ -1,0 +1,92 @@
+{
+	"template": {
+		"main_object": {
+			"type": "#rand_type",
+			"generator": "#rand_generator"
+		}
+	},
+	"randoms": {
+		"rand_type": {
+			"type": "generated_template_reference",
+			"file_template": "dimension_template.json"
+		},
+		"rand_generator": {
+			"type": "random_from_options",
+			"options": [
+				{
+					"type": "minecraft:noise",
+					"seed": "#rand_long",
+					"settings": {
+						"bedrock_roof_position": "#rand_int_-255_255",
+						"bedrock_floor_position": "#rand_int_-1_255",
+						"sea_level": "#rand_int_0_255",
+						"disable_mob_generation": "#rand_boolean",
+						"structures": {
+							"stronghold": {
+								"distance": "#rand_int",
+								"count": "#rand_int",
+								"spread": "#rand_int"
+							},
+							"structures": "#rand_structures"
+						},
+						"noise": {
+							"top_slide": "#rand_slide",
+							"bottom_slide": "#rand_slide",
+							"sampling": "#rand_sampling",
+							"size_vertical": "#rand_int",
+							"size_horizontal": "#rand_int",
+							"height": "#rand_int_1_256",
+							"density_factory": "#rand_double",
+							"density_offset": "#rand_double_-1_1",
+							"random_density_offset": "#rand_boolean",
+							"simplex_surface_noise": "#rand_boolean",
+							"island_noise_override": "#rand_boolean",
+							"amplified": "#rand_boolean"
+						},
+						"default_block": "#rand_block",
+						"default_fluid": "#rand_fluid"
+					},
+					"biome_source": {
+						"seed": "#rand_long",
+						"type": "#rand_biome_source_type"
+					}
+				},
+				{
+					"type": "minecraft:flat",
+					"settings": {
+						"layers": "#rand_superflat_layers",
+						"biome": "#rand_biome",
+						"lakes": "#rand_boolean",
+						"features": "#rand_boolean",
+						"structures": "#rand_structures"
+					}
+				},
+				{
+					"type": "minecraft:debug"
+				}
+			]
+		},
+		"rand_biome_source": {
+			"type": "random_from_options",
+			"options_global": {
+				"seed": "#rand_long"
+			}
+			"options": [
+				{
+					"type": "minecraft:checkerboard",
+					"biomes": "#rand_biomes_simple",
+					"scale": "#rand_int_min_0"
+				},
+				{
+					"type": "minecraft:fixed",
+					"biome": "#rand_biome"
+				},
+				{
+					"type": "minecraft:multi_noise",
+					"preset": "minecraft:nether",
+					"biomes": "#rand_biomes_complex"
+				}
+			]
+		}
+	}
+}

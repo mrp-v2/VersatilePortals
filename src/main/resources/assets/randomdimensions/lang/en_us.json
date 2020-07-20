@@ -1,0 +1,6 @@
+{
+	"block.randomdimensions.portal": "Portal",
+	"block.randomdimensions.portal_frame": "Portal Frame",
+	"block.randomdimensions.portal_controller": "Portal Controller",
+	"item.randomdimensions.portal_lighter": "Portal Lighter"
+}

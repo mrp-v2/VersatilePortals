@@ -1,0 +1,7 @@
+{
+	"variants": {
+		"": {
+			"model": "randomdimensions:block/portal_controller"
+		}
+	}
+}

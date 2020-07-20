@@ -1,0 +1,29 @@
+{
+	"template": {
+		"main_object": {
+			"name": "#rand_string",
+			"ultrawarm": "#rand_boolean",
+			"natural": "#rand_boolean",
+			"shrunk": "#rand_boolean",
+			"has_skylight": "#rand_boolean",
+			"has_ceiling": "#rand_boolean",
+			"ambient_light": "#rand_float",
+			"fixed_time": "#rand_fixed_time",
+			"piglin_safe": "#rand_boolean",
+			"bed_works": "#rand_boolean",
+			"respawn_anchor_works": "#rand_boolean",
+			"has_raids": "#rand_boolean",
+			"logical_height": "rand_int_0_255",
+			"infiniburn": "minecraft:infiniburn_overworld"
+		}
+	},
+	"randoms": {
+		"rand_fixed_time": {
+			"type": "random_from_options",
+			"options": [
+				false,
+				"#rand_int_0_24000"
+			]
+		}
+	}
+}
