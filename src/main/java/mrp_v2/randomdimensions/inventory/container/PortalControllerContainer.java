@@ -23,7 +23,7 @@ public class PortalControllerContainer extends Container {
 	private final PortalControllerItemStackHandler inventory;
 	private final int color;
 	private final BlockPos pos;
-	public static final int Y_SIZE = 193;
+	public static final int Y_SIZE = 252;
 
 	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn) {
 		this(id, playerInventoryIn, PortalControllerTileEntity.DEFAULT_PORTAL_COLOR, null);
@@ -36,6 +36,7 @@ public class PortalControllerContainer extends Container {
 	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn,
 			PortalControllerItemStackHandler inventoryIn, int color, BlockPos pos) {
 		super(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, id);
+		Container.assertInventorySize(inventoryIn, PortalControllerItemStackHandler.SLOTS);
 		this.inventory = inventoryIn;
 		this.color = color;
 		this.pos = pos;
@@ -47,7 +48,8 @@ public class PortalControllerContainer extends Container {
 	}
 
 	private void addSlots(PlayerInventory playerInventory) {
-		this.addSlot(new Slot(this.inventory, 0, 5, 5));
+		this.addSlot(new Slot(this.inventory, 0, 80, 104));
+		this.addSlot(new Slot(this.inventory, 1, 80, 138));
 		// player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {

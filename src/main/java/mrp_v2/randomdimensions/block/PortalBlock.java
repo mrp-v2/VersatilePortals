@@ -146,7 +146,7 @@ public class PortalBlock extends BasicBlock {
 			new Size(world, pos, world.getBlockState(pos).get(BlockStateProperties.HORIZONTAL_AXIS))
 					.doOperationOnBlocks((blockPos) -> {
 						BlockState state = world.getBlockState(pos);
-						world.notifyBlockUpdate(pos, state, state, 0);
+						world.notifyBlockUpdate(pos, state, state, 16 | 32);
 					});
 		}
 	}

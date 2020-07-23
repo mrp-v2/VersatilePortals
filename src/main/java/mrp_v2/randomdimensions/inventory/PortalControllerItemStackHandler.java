@@ -11,10 +11,12 @@ import net.minecraftforge.items.ItemStackHandler;
 public class PortalControllerItemStackHandler extends ItemStackHandler
 		implements NonNullSupplier<IItemHandler>, IInventory {
 
+	public static int SLOTS = 2;
+
 	private final PortalControllerTileEntity portalController;
 
 	public PortalControllerItemStackHandler(PortalControllerTileEntity portalController) {
-		super(1);
+		super(SLOTS);
 		this.portalController = portalController;
 	}
 

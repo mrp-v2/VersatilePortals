@@ -7,5 +7,7 @@
 	"itemGroup.random_dimensions": "Random Dimensions",
 	"randomdimensions.portal_controller.color.b": "Portal Color B: ",
 	"randomdimensions.portal_controller.color.g": "Portal Color G: ",
-	"randomdimensions.portal_controller.color.r": "Portal Color R: "
+	"randomdimensions.portal_controller.color.r": "Portal Color R: ",
+	"randomdimensions.portal_controller.slot_label.dimension": "-Dimension Controller",
+	"randomdimensions.portal_controller.slot_label.worldgen": "-Worldgen Controller"
 }

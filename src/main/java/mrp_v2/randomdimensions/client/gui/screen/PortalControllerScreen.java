@@ -63,7 +63,7 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 	protected void addElements(int xStart, int yStart) {
 		this.field_230706_i_.keyboardListener.enableRepeatEvents(true);
 		int sliderYSpacing = 4;
-		int sliderYOffset = 20;
+		int sliderYOffset = 19;
 		int sliderXOffset = 28;
 		int color = this.container.getColor();
 		this.colorR = this.func_230480_a_(new Slider(xStart + sliderXOffset,
@@ -92,5 +92,12 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 
 	public int getCurrentColor() {
 		return Util.createColor(this.colorR.getValueInt(), this.colorG.getValueInt(), this.colorB.getValueInt());
+	}
+
+	@Override
+	protected void func_230451_b_(MatrixStack stack, int i1, int i2) {
+		super.func_230451_b_(stack, i1, i2);
+		this.field_230712_o_.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "dimension"), 8, 92, 4210752);
+		this.field_230712_o_.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "worldgen"), 8, 125, 4210752);
 	}
 }

@@ -43,24 +43,25 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 	}
 
 	private ITextComponent customName;
-	private final PortalControllerItemStackHandler dataHandler;
+	private final PortalControllerItemStackHandler itemStackHandler;
 	private LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
 	private int portalColor;
 
 	public PortalControllerTileEntity() {
 		super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
-		this.dataHandler = new PortalControllerItemStackHandler(this);
-		this.inventoryLazyOptional = LazyOptional.of(() -> this.dataHandler);
+		this.itemStackHandler = new PortalControllerItemStackHandler(this);
+		this.inventoryLazyOptional = LazyOptional.of(() -> this.itemStackHandler);
 		this.portalColor = DEFAULT_PORTAL_COLOR;
 	}
 
 	@Override
 	public void func_230337_a_(BlockState state, CompoundNBT compound) { // read
 		super.func_230337_a_(state, compound);
-		this.dataHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
+		this.itemStackHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
 		this.portalColor = compound.getInt(PORTAL_COLOR_NBT_ID);
 	}
 
+	@Override
 	public ITextComponent getDisplayName() {
 		return this.customName != null ? this.customName : new TranslationTextComponent("container." + ID);
 	}
@@ -72,14 +73,15 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 	@Override
 	public CompoundNBT write(CompoundNBT compound) {
 		super.write(compound);
-		compound.put(INVENTORY_NBT_ID, this.dataHandler.serializeNBT());
+		compound.put(INVENTORY_NBT_ID, this.itemStackHandler.serializeNBT());
 		compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
 		return compound;
 	}
 
 	@Override
 	public Container createMenu(int id, PlayerInventory playerInventoryIn, PlayerEntity playerIn) {
-		return new PortalControllerContainer(id, playerInventoryIn, this.dataHandler, this.portalColor, this.getPos());
+		return new PortalControllerContainer(id, playerInventoryIn, this.itemStackHandler, this.portalColor,
+				this.getPos());
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 		if (this.portalColor != newPortalColor) {
 			this.portalColor = newPortalColor;
 			this.markDirty();
-			this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 18);
+			this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 2 | 4 | 16 | 32);
 		}
 	}
 }
