@@ -12,6 +12,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
 public class EventHandler {
 
+	/**
+	 * @param event  
+	 */
 	@SubscribeEvent
 	public static void clientSetup(final FMLClientSetupEvent event) {
 		RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK, RenderType.getTranslucent());

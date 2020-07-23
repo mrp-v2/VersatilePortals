@@ -17,15 +17,14 @@ public class PortalLighter extends BasicItem {
 	@SuppressWarnings("resource")
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
-		if (PortalBlock.Size.isPortalFrame(context.getWorld(), context.getPos())) {
-			if (PortalBlock.trySpawnPortal(context.getWorld(), context.getPos())) {
-				context.getWorld().playSound(context.getPlayer(), context.getPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE,
-						SoundCategory.BLOCKS, 1.0F, random.nextFloat() * 0.4F + 0.8F);
-				context.getItem().damageItem(1, context.getPlayer(), (player) -> {
-					player.sendBreakAnimation(context.getHand());
-				});
-				return ActionResultType.func_233537_a_(context.getWorld().isRemote);
-			}
+		if (PortalBlock.trySpawnPortal(context.getWorld(), context.getPos().offset(context.getFace()))) {
+			context.getWorld().playSound(context.getPlayer(), context.getPos(),
+					SoundEvents.ITEM_FLINTANDSTEEL_USE,
+					SoundCategory.BLOCKS, 1.0F, random.nextFloat() * 0.4F + 0.8F);
+			context.getItem().damageItem(1, context.getPlayer(), (player) -> {
+				player.sendBreakAnimation(context.getHand());
+			});
+			return ActionResultType.func_233537_a_(context.getWorld().isRemote);
 		}
 		return ActionResultType.FAIL;
 	}

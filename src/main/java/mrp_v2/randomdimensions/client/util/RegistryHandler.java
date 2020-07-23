@@ -1,10 +1,12 @@
 package mrp_v2.randomdimensions.client.util;
 
 import mrp_v2.randomdimensions.RandomDimensions;
+import mrp_v2.randomdimensions.client.gui.screen.PortalControllerScreen;
 import mrp_v2.randomdimensions.client.particle.PortalParticle;
 import mrp_v2.randomdimensions.client.renderer.color.PortalColorer;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -21,9 +23,16 @@ public class RegistryHandler {
 		event.getBlockColors().register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK);
 	}
 
+	/**
+	 * @param event
+	 */
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public static void registerParticles(final ParticleFactoryRegisterEvent event) {
 		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE, PortalParticle.Factory::new);
+	}
+
+	static {
+		ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, PortalControllerScreen::new);
 	}
 }

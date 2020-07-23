@@ -70,7 +70,7 @@
 			"type": "random_from_options",
 			"options_global": {
 				"seed": "#rand_long"
-			}
+			},
 			"options": [
 				{
 					"type": "minecraft:checkerboard",
