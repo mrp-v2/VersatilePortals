@@ -16,35 +16,34 @@ public class RegsitryHandler {
 
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_BLOCK);
-		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_BLOCK);
-		event.getRegistry().register(ObjectHolder.PORTAL_FRAME_BLOCK);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
+				ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
+				ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
 	}
 
 	@SubscribeEvent
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
-		event.getRegistry().register(ObjectHolder.PORTAL_FRAME_BLOCK_ITEM);
-		event.getRegistry().register(ObjectHolder.PORTAL_LIGHTER_ITEM);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
+				ObjectHolder.PORTAL_LIGHTER_ITEM);
 	}
 
 	@SubscribeEvent
 	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerParicles(final RegistryEvent.Register<ParticleType<?>> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_PARTICLE_TYPE);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_PARTICLE_TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerTileEntites(final RegistryEvent.Register<TileEntityType<?>> event) {
-		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
+		event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
 	}
 }

@@ -13,10 +13,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class EventHandler {
 
 	/**
-	 * @param event  
+	 * @param event
 	 */
 	@SubscribeEvent
 	public static void clientSetup(final FMLClientSetupEvent event) {
 		RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK, RenderType.getTranslucent());
+		RenderTypeLookup.setRenderLayer(ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK, RenderType.getTranslucent());
 	}
 }

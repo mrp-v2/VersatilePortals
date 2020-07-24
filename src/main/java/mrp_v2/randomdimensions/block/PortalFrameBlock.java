@@ -1,5 +1,7 @@
 package mrp_v2.randomdimensions.block;
 
+import java.util.function.Function;
+
 import net.minecraft.block.Blocks;
 
 public class PortalFrameBlock extends BasicBlock {
@@ -11,6 +13,10 @@ public class PortalFrameBlock extends BasicBlock {
 	}
 
 	protected PortalFrameBlock(String id) {
-		super(id, Blocks.IRON_BLOCK);
+		this(id, (properties) -> properties);
+	}
+
+	protected PortalFrameBlock(String id, Function<Properties, Properties> propertiesModifier) {
+		super(id, propertiesModifier.apply(Properties.from(Blocks.IRON_BLOCK)));
 	}
 }

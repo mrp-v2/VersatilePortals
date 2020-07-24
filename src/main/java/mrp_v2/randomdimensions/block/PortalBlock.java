@@ -2,11 +2,13 @@ package mrp_v2.randomdimensions.block;
 
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 import com.google.common.cache.LoadingCache;
 
+import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.util.ObjectHolder;
@@ -22,7 +24,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.CachedBlockInfo;
 import net.minecraft.util.Direction;
@@ -30,8 +31,10 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -45,10 +48,16 @@ public class PortalBlock extends BasicBlock {
 	public static final String ID = "portal";
 
 	public PortalBlock() {
-		super(ID, Properties.create(Material.PORTAL).doesNotBlockMovement().hardnessAndResistance(-1.0F)
-				.sound(SoundType.GLASS).func_235838_a_((i) -> {
-					return 11;
-				}));
+		this(ID, (properties) -> properties);
+	}
+
+	protected PortalBlock(String id, Function<Properties, Properties> propertiesModifier) {
+		super(id,
+				propertiesModifier
+						.apply(Properties.create(Material.PORTAL).doesNotBlockMovement().hardnessAndResistance(-1.0F)
+								.sound(SoundType.GLASS).setLightLevel((i) -> {
+									return 11;
+								})));
 		this.setDefaultState(
 				this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
 	}
@@ -70,7 +79,10 @@ public class PortalBlock extends BasicBlock {
 		return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
 	}
 
-	public static boolean trySpawnPortal(IWorld world, BlockPos pos) {
+	public static boolean trySpawnPortal(World world, BlockPos pos) {
+		if (world.func_234923_W_() == World.field_234919_h_ || world.func_234923_W_() == World.field_234920_i_) {
+			return false;
+		}
 		Size size = isPortal(world, pos);
 		if (size != null) {
 			size.placePortalBlocks(world);
@@ -103,17 +115,36 @@ public class PortalBlock extends BasicBlock {
 	}
 
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) { // TODO correct
-																									// teleportation
+	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		if (worldIn instanceof ServerWorld && !entityIn.isPassenger() && !entityIn.isBeingRidden()
 				&& entityIn.isNonBoss()) {
 			RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_
-					? World.field_234919_h_ // TODO custom world registry key
+					? new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS))
+							.getPortalController(worldIn).getTeleportDestination()
 					: World.field_234918_g_;
 			ServerWorld serverWorld = ((ServerWorld) worldIn).getServer().getWorld(registryKey);
 			if (serverWorld == null) {
 				return;
 			}
+			PatternHelper patternHelper = createPatternHelper(worldIn, pos);
+			double d0 = patternHelper.getForwards().getAxis() == Direction.Axis.X
+					? (double) patternHelper.getFrontTopLeft().getZ()
+					: (double) patternHelper.getFrontTopLeft().getX();
+			double d1 = MathHelper.clamp(Math.abs(MathHelper.func_233020_c_(
+					(patternHelper.getForwards().getAxis() == Direction.Axis.X
+							? entityIn.getPosZ()
+							: entityIn.getPosX())
+							- (patternHelper.getForwards().rotateY()
+									.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0),
+					d0, d0 - patternHelper.getWidth())), 0.0D, 1.0D);
+			double d2 = MathHelper
+					.clamp(MathHelper.func_233020_c_(entityIn.getPosY() - 1.0D, patternHelper.getFrontTopLeft().getY(),
+							patternHelper.getFrontTopLeft().getY() - patternHelper.getHeight()), 0.0D, 1.0D);
+			IPortalDataCapability portalData = Teleporter.getPortalData(entityIn);
+			String worldID = Teleporter
+					.getWorldID(serverWorld.func_234923_W_() != World.field_234918_g_ ? serverWorld : worldIn);
+			portalData.setLastPortalVec(worldID, new Vector3d(d1, d2, 0.0D));
+			portalData.setTeleportDirection(worldID, patternHelper.getForwards());
 			entityIn.changeDimension(serverWorld, new Teleporter(serverWorld));
 		}
 	}
@@ -220,9 +251,9 @@ public class PortalBlock extends BasicBlock {
 		private int height;
 		private int width;
 
-		public Size(IBlockDisplayReader reader, BlockPos pos, Direction.Axis axisIn) {
+		public Size(IBlockDisplayReader reader, BlockPos pos, Axis axisIn) {
 			this.axis = axisIn;
-			if (axisIn == Direction.Axis.X) {
+			if (axisIn == Axis.X) {
 				this.leftDir = Direction.EAST;
 				this.rightDir = Direction.WEST;
 			} else {
@@ -303,7 +334,7 @@ public class PortalBlock extends BasicBlock {
 
 		@SuppressWarnings("deprecation")
 		protected static boolean canPlacePortal(BlockState state) {
-			return state.isAir() || state.func_235714_a_(BlockTags.field_232872_am_) || state.isIn(getPortalBlock());
+			return state.isAir() || state.isIn(getPortalBlock());
 		}
 
 		public boolean isValid() {

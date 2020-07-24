@@ -13,7 +13,7 @@
 			"bed_works": "#rand_boolean",
 			"respawn_anchor_works": "#rand_boolean",
 			"has_raids": "#rand_boolean",
-			"logical_height": "rand_int_0_255",
+			"logical_height": "#rand_int_0_255",
 			"infiniburn": "minecraft:infiniburn_overworld"
 		}
 	},

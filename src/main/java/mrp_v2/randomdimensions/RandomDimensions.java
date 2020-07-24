@@ -1,5 +1,6 @@
 package mrp_v2.randomdimensions;
 
+import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.network.Packet;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -21,6 +22,7 @@ public class RandomDimensions {
 	 */
 	private void commonSetup(FMLCommonSetupEvent event) {
 		Packet.Handler.createChannel();
+		CapabilityHandler.registerCapabilities();
 	}
 
 	/**

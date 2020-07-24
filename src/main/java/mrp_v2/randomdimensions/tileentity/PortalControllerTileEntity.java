@@ -19,9 +19,11 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -54,9 +56,14 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 		this.portalColor = DEFAULT_PORTAL_COLOR;
 	}
 
+	@SuppressWarnings("static-method")
+	public RegistryKey<World> getTeleportDestination() {
+		return World.field_234920_i_;
+	}
+
 	@Override
-	public void func_230337_a_(BlockState state, CompoundNBT compound) { // read
-		super.func_230337_a_(state, compound);
+	public void read(BlockState state, CompoundNBT compound) { // read
+		super.read(state, compound);
 		this.itemStackHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
 		this.portalColor = compound.getInt(PORTAL_COLOR_NBT_ID);
 	}

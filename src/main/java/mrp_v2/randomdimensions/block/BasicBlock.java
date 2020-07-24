@@ -9,11 +9,7 @@ import net.minecraft.item.Item;
 
 public class BasicBlock extends Block {
 
-	public BasicBlock(String id, Block baseBlock) {
-		this(id, Properties.from(baseBlock));
-	}
-	
-	public BasicBlock(String id, Properties properties) {
+	protected BasicBlock(String id, Properties properties) {
 		super(properties);
 		this.setRegistryName(RandomDimensions.ID, id);
 	}

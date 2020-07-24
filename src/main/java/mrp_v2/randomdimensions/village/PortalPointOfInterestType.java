@@ -9,7 +9,7 @@ public class PortalPointOfInterestType extends PointOfInterestType {
 	public static final String ID = "portal";
 
 	public PortalPointOfInterestType() {
-		super(ID, PointOfInterestType.getAllStates(ObjectHolder.PORTAL_BLOCK), 0, 1);
+		super(ID, ObjectHolder.getPortalBlockStates(), 0, 1);
 		this.setRegistryName(RandomDimensions.ID, ID);
 	}
 }

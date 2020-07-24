@@ -32,51 +32,51 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 			ITextComponent titleIn) {
 		super(screenContainer, inv, titleIn);
 		this.ySize = PortalControllerContainer.Y_SIZE;
-		this.field_238745_s_ = this.ySize - 94;
+		this.playerInventoryTitleY = this.ySize - 94;
 	}
 
 	@Override
-	public void func_230430_a_(MatrixStack stack, int i1, int i2, float f1) {
-		this.func_230446_a_(stack);
-		super.func_230430_a_(stack, i1, i2, f1);
+	public void render(MatrixStack stack, int i1, int i2, float f1) {
+		this.renderBackground(stack);
+		super.render(stack, i1, i2, f1);
 		this.func_230459_a_(stack, i1, i2);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected void func_230450_a_(MatrixStack stack, float f1, int i1, int i2) {
+	protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float f1, int i1, int i2) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.field_230706_i_.getTextureManager().bindTexture(GUI_TEXTURE);
-		int i = (this.field_230708_k_ - this.xSize) / 2;
-		int j = (this.field_230709_l_ - this.ySize) / 2;
-		this.func_238474_b_(stack, i, j, 0, 0, this.xSize, this.ySize);
+		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
+		int i = (this.width - this.xSize) / 2;
+		int j = (this.height - this.ySize) / 2;
+		this.blit(stack, i, j, 0, 0, this.xSize, this.ySize);
 	}
 
 	@Override
-	protected void func_231160_c_() {
-		super.func_231160_c_();
-		int i = (this.field_230708_k_ - this.xSize) / 2;
-		int j = (this.field_230709_l_ - this.ySize) / 2;
+	protected void init() {
+		super.init();
+		int i = (this.width - this.xSize) / 2;
+		int j = (this.height - this.ySize) / 2;
 		addElements(i, j);
 	}
 
 	protected void addElements(int xStart, int yStart) {
-		this.field_230706_i_.keyboardListener.enableRepeatEvents(true);
+		this.minecraft.keyboardListener.enableRepeatEvents(true);
 		int sliderYSpacing = 4;
 		int sliderYOffset = 19;
 		int sliderXOffset = 28;
 		int color = this.container.getColor();
-		this.colorR = this.func_230480_a_(new Slider(xStart + sliderXOffset,
+		this.colorR = this.addButton(new Slider(xStart + sliderXOffset,
 				yStart + sliderYOffset, 120, 20,
 				Util.makeTranslation(ID, "color.r"), new StringTextComponent(""), 0, 255,
 				Util.iGetColorR(color), false, true, (button) -> {
 				}));
-		this.colorG = this.func_230480_a_(new Slider(xStart + sliderXOffset,
+		this.colorG = this.addButton(new Slider(xStart + sliderXOffset,
 				yStart + sliderYOffset + 20 + sliderYSpacing, 120, 20,
 				Util.makeTranslation(ID, "color.g"), new StringTextComponent(""), 0, 255,
 				Util.iGetColorG(color), false, true, (button) -> {
 				}));
-		this.colorB = this.func_230480_a_(new Slider(xStart + sliderXOffset,
+		this.colorB = this.addButton(new Slider(xStart + sliderXOffset,
 				yStart + sliderYOffset + 20 * 2 + sliderYSpacing * 2, 120, 20,
 				Util.makeTranslation(ID, "color.b"), new StringTextComponent(""), 0, 255,
 				Util.iGetColorB(color), false, true, (button) -> {
@@ -84,10 +84,10 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 	}
 
 	@Override
-	public void func_231164_f_() {
+	public void onClose() {
 		Packet.Handler.INSTANCE.sendToServer(new Packet.PortalColor(this.getCurrentColor(), this.container.getPos()));
-		super.func_231164_f_();
-		this.field_230706_i_.keyboardListener.enableRepeatEvents(false);
+		super.onClose();
+		this.minecraft.keyboardListener.enableRepeatEvents(false);
 	}
 
 	public int getCurrentColor() {
@@ -95,9 +95,9 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 	}
 
 	@Override
-	protected void func_230451_b_(MatrixStack stack, int i1, int i2) {
-		super.func_230451_b_(stack, i1, i2);
-		this.field_230712_o_.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "dimension"), 8, 92, 4210752);
-		this.field_230712_o_.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "worldgen"), 8, 125, 4210752);
+	protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y) {
+		super.drawGuiContainerForegroundLayer(stack, x, y);
+		this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "dimension"), 8, 92, 4210752);
+		this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "worldgen"), 8, 125, 4210752);
 	}
 }

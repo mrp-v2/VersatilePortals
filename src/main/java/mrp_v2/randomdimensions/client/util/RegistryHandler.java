@@ -20,7 +20,8 @@ public class RegistryHandler {
 
 	@SubscribeEvent
 	public static void registerBlockColors(final ColorHandlerEvent.Block event) {
-		event.getBlockColors().register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK);
+		event.getBlockColors().register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK,
+				ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK);
 	}
 
 	/**
@@ -29,7 +30,8 @@ public class RegistryHandler {
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public static void registerParticles(final ParticleFactoryRegisterEvent event) {
-		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE, PortalParticle.Factory::new);
+		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE,
+				PortalParticle.Factory::new);
 	}
 
 	static {

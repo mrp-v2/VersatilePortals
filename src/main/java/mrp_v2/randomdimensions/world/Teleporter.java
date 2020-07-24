@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import mrp_v2.randomdimensions.block.PortalBlock;
+import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
+import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -17,6 +19,7 @@ import net.minecraft.block.pattern.BlockPattern.PatternHelper;
 import net.minecraft.block.pattern.BlockPattern.PortalInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.SChangeGameStatePacket;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -25,9 +28,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.village.PointOfInterest;
 import net.minecraft.village.PointOfInterestManager;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
@@ -42,124 +43,101 @@ public class Teleporter implements ITeleporter {
 		this.random = new Random(worldIn.getSeed());
 	}
 
+	public static IPortalDataCapability getPortalData(Entity entity) {
+		return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
+				.orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
+	}
+
+	public static String getWorldID(World world) {
+		return world.func_234923_W_().func_240901_a_().toString();
+	}
+
 	@Override
 	public Entity placeEntity(Entity entityIn, ServerWorld currentWorld, ServerWorld destinationWorld, float yaw,
 			Function<Boolean, Entity> repositionEntity) {
+		IPortalDataCapability portalData = getPortalData(entityIn);
+		String worldID = getWorldID(
+				currentWorld.func_234923_W_() != World.field_234918_g_ ? currentWorld : destinationWorld);
+		Vector3d lastPortalVec = portalData.getLastPortalVec(worldID);
+		Direction teleportDirection = portalData.getTeleportDirection(worldID);
+		double newPosX = entityIn.getPosX();
+		double newPosZ = entityIn.getPosZ();
+		boolean isOriginalWorldShrinked = currentWorld.func_230315_m_().func_236045_g_();
+		boolean isDestinationWorldShrinked = destinationWorld.func_230315_m_().func_236045_g_();
+		if (!isOriginalWorldShrinked && isDestinationWorldShrinked) {
+			newPosX /= 8.0D;
+			newPosZ /= 8.0D;
+		} else if (isOriginalWorldShrinked && !isDestinationWorldShrinked) {
+			newPosX *= 8.0D;
+			newPosZ *= 8.0D;
+		}
+		double minNewPosX = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minX() + 16.0D);
+		double minNewPosZ = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minZ() + 16.0D);
+		double maxNewPosX = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxX() - 16.0D);
+		double maxNewPosZ = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxZ() - 16.0D);
+		newPosX = MathHelper.clamp(newPosX, minNewPosX, maxNewPosX);
+		newPosZ = MathHelper.clamp(newPosZ, minNewPosZ, maxNewPosZ);
 		if (entityIn instanceof ServerPlayerEntity) {
-			ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entityIn;
-			ServerWorld serverworld = serverPlayerEntity.getServerWorld();
-			double d0 = serverPlayerEntity.getPosX();
-			double d1 = serverPlayerEntity.getPosY();
-			double d2 = serverPlayerEntity.getPosZ();
-			float f = serverPlayerEntity.rotationPitch;
-			float f1 = serverPlayerEntity.rotationYaw;
-			float f2 = f1;
-			serverworld.getProfiler().startSection("moving");
-			if (destinationWorld.func_234923_W_() == World.field_234920_i_) {
-				BlockPos blockpos = ServerWorld.field_241108_a_;
-				d0 = blockpos.getX();
-				d1 = blockpos.getY();
-				d2 = blockpos.getZ();
-				f1 = 90.0F;
-				f = 0.0F;
-			} else {
-				DimensionType dimensiontype1 = serverworld.func_230315_m_();
-				DimensionType dimensiontype = destinationWorld.func_230315_m_();
-				if (!dimensiontype1.func_236045_g_() && dimensiontype.func_236045_g_()) {
-					d0 /= 8.0D;
-					d2 /= 8.0D;
-				} else if (dimensiontype1.func_236045_g_() && !dimensiontype.func_236045_g_()) {
-					d0 *= 8.0D;
-					d2 *= 8.0D;
+			double newPosY = entityIn.getPosY();
+			currentWorld.getProfiler().startSection("moving");
+			entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
+			currentWorld.getProfiler().endSection();
+			currentWorld.getProfiler().startSection("placing");
+			entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
+			if (!this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection)) {
+				if (this.world.func_234923_W_() != World.field_234918_g_) {
+					this.makePortal(entityIn);
+					this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection);
+				} else {
+					entityIn.detach();
+					ServerPlayerEntity serverPlayer = (ServerPlayerEntity) entityIn;
+					serverPlayer.getServerWorld().removePlayer(serverPlayer, true);
+					if (!serverPlayer.queuedEndExit) {
+						serverPlayer.queuedEndExit = true;
+						serverPlayer.connection
+								.sendPacket(new SChangeGameStatePacket(SChangeGameStatePacket.field_241768_e_, 0.0F));
+						return entityIn;
+					}
 				}
 			}
-			serverPlayerEntity.setLocationAndAngles(d0, d1, d2, f1, f);
-			serverworld.getProfiler().endSection();
-			serverworld.getProfiler().startSection("placing");
-			double d6 = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minX() + 16.0D);
-			double d7 = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minZ() + 16.0D);
-			double d4 = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxX() - 16.0D);
-			double d5 = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxZ() - 16.0D);
-			d0 = MathHelper.clamp(d0, d6, d4);
-			d2 = MathHelper.clamp(d2, d7, d5);
-			serverPlayerEntity.setLocationAndAngles(d0, d1, d2, f1, f);
-			if (destinationWorld.func_234923_W_() == World.field_234920_i_) {
-				int i = MathHelper.floor(serverPlayerEntity.getPosX());
-				int j = MathHelper.floor(serverPlayerEntity.getPosY()) - 1;
-				int k = MathHelper.floor(serverPlayerEntity.getPosZ());
-				ServerWorld.func_241121_a_(destinationWorld);
-				serverPlayerEntity.setLocationAndAngles(i, j, k, f1, 0.0F);
-				serverPlayerEntity.setMotion(Vector3d.ZERO);
-			} else if (!this.placeInPortal(serverPlayerEntity, f2)) {
-				this.makePortal(serverPlayerEntity);
-				this.placeInPortal(serverPlayerEntity, f2);
-			}
-			serverworld.getProfiler().endSection();
-			serverPlayerEntity.setWorld(destinationWorld);
+			currentWorld.getProfiler().endSection();
+			entityIn.setWorld(destinationWorld);
+			ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entityIn;
 			destinationWorld.addDuringPortalTeleport(serverPlayerEntity);
-			serverPlayerEntity.connection.setPlayerLocation(serverPlayerEntity.getPosX(), serverPlayerEntity.getPosY(),
-					serverPlayerEntity.getPosZ(), f1, f);
-			return serverPlayerEntity;
+			serverPlayerEntity.connection.setPlayerLocation(entityIn.getPosX(), entityIn.getPosY(),
+					entityIn.getPosZ(), entityIn.rotationYaw, entityIn.rotationPitch);
+			return entityIn;
 		}
 		Vector3d entityInMotionVec = entityIn.getMotion();
-		float f = 0.0F;
+		float rotationModifier = 0.0F;
 		BlockPos blockpos;
-		if (currentWorld.func_234923_W_() == World.field_234920_i_
-				&& destinationWorld.func_234923_W_() == World.field_234918_g_) {
-			blockpos = destinationWorld.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES,
-					destinationWorld.func_241135_u_());
-		} else if (destinationWorld.func_234923_W_() == World.field_234920_i_) {
-			blockpos = ServerWorld.field_241108_a_;
-		} else {
-			double newPosX = entityIn.getPosX();
-			double newPosZ = entityIn.getPosZ();
-			DimensionType currentDimensionType = currentWorld.func_230315_m_();
-			DimensionType destinationDimensionsType = destinationWorld.func_230315_m_();
-			if (!currentDimensionType.func_236045_g_() && destinationDimensionsType.func_236045_g_()) {
-				newPosX /= 8.0D;
-				newPosZ /= 8.0D;
-			} else if (currentDimensionType.func_236045_g_() && !destinationDimensionsType.func_236045_g_()) {
-				newPosX *= 8.0D;
-				newPosZ *= 8.0D;
-			}
-			double d3 = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minX() + 16.0D);
-			double d4 = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minZ() + 16.0D);
-			double d5 = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxX() - 16.0D);
-			double d6 = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxZ() - 16.0D);
-			newPosX = MathHelper.clamp(newPosX, d3, d5);
-			newPosZ = MathHelper.clamp(newPosZ, d4, d6);
-			Vector3d entityInLastPortalVec = entityIn.getLastPortalVec();
-			blockpos = new BlockPos(newPosX, entityIn.getPosY(), newPosZ);
-			PortalInfo portalInfo = this.placeInExistingPortal(blockpos, entityInMotionVec,
-					entityIn.getTeleportDirection(),
-					entityInLastPortalVec.x,
-					entityInLastPortalVec.y);
-			if (portalInfo == null) {
-				return null;
-			}
-			blockpos = new BlockPos(portalInfo.pos);
-			entityInMotionVec = portalInfo.motion;
-			f = portalInfo.rotation;
+		blockpos = new BlockPos(newPosX, entityIn.getPosY(), newPosZ);
+		PortalInfo portalInfo = this.placeInExistingPortal(blockpos, entityInMotionVec, teleportDirection,
+				lastPortalVec.x, lastPortalVec.y);
+		if (portalInfo == null) {
+			return null;
 		}
+		blockpos = new BlockPos(portalInfo.pos);
+		entityInMotionVec = portalInfo.motion;
+		rotationModifier = portalInfo.rotation;
 		currentWorld.getProfiler().endStartSection("reloading");
-		Entity entity = entityIn.getType().create(destinationWorld);
-		if (entity != null) {
-			entity.copyDataFromOld(entityIn);
-			entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw + f, entity.rotationPitch);
-			entity.setMotion(entityInMotionVec);
-			destinationWorld.addFromAnotherDimension(entity);
+		Entity newEntity = entityIn.getType().create(destinationWorld);
+		if (newEntity != null) {
+			newEntity.copyDataFromOld(entityIn);
+			newEntity.moveToBlockPosAndAngles(blockpos, newEntity.rotationYaw + rotationModifier,
+					newEntity.rotationPitch);
+			newEntity.setMotion(entityInMotionVec);
+			destinationWorld.addFromAnotherDimension(newEntity);
 			if (destinationWorld.func_234923_W_() == World.field_234920_i_) {
 				ServerWorld.func_241121_a_(destinationWorld);
 			}
 		}
-		return entity;
+		return newEntity;
 	}
 
-	public boolean placeInPortal(Entity entity, float f) {
-		Vector3d vector3d = entity.getLastPortalVec();
-		Direction direction = entity.getTeleportDirection();
-		PortalInfo portalinfo = this.placeInExistingPortal(entity.func_233580_cy_(),
-				entity.getMotion(), direction, vector3d.x, vector3d.y);
+	public boolean placeInPortal(Entity entity, float f, Vector3d lastPortalVec, Direction teleportDirection) {
+		PortalInfo portalinfo = this.placeInExistingPortal(entity.getPosition(),
+				entity.getMotion(), teleportDirection, lastPortalVec.x, lastPortalVec.y);
 		if (portalinfo == null) {
 			return false;
 		}
@@ -317,7 +295,7 @@ public class Teleporter implements ITeleporter {
 						boolean flag = i9 < 0;
 						mutableBlockPos.setPos(l9, j10, l10);
 						this.world.setBlockState(mutableBlockPos,
-								flag ? ObjectHolder.PORTAL_FRAME_BLOCK.getDefaultState()
+								flag ? ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK.getDefaultState()
 										: Blocks.AIR.getDefaultState());
 					}
 				}
@@ -327,11 +305,13 @@ public class Teleporter implements ITeleporter {
 			for (int j8 = -1; j8 < 4; ++j8) {
 				if (k7 == -1 || k7 == 2 || j8 == -1 || j8 == 3) {
 					mutableBlockPos.setPos(i6 + k7 * l6, k2 + j8, k6 + k7 * i3);
-					this.world.setBlockState(mutableBlockPos, ObjectHolder.PORTAL_FRAME_BLOCK.getDefaultState(), 3);
+					this.world.setBlockState(mutableBlockPos,
+							ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK.getDefaultState(), 3);
 				}
 			}
 		}
-		BlockState blockstate = ObjectHolder.PORTAL_BLOCK.getDefaultState().with(BlockStateProperties.HORIZONTAL_AXIS,
+		BlockState blockstate = ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK.getDefaultState().with(
+				BlockStateProperties.HORIZONTAL_AXIS,
 				l6 == 0 ? Direction.Axis.Z : Direction.Axis.X);
 		for (int k8 = 0; k8 < 2; ++k8) {
 			for (int j9 = 0; j9 < 3; ++j9) {
