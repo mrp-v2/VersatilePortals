@@ -1,5 +1,7 @@
 package mrp_v2.randomdimensions.util;
 
+import java.lang.reflect.Method;
+
 import mrp_v2.randomdimensions.RandomDimensions;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
@@ -38,8 +40,17 @@ public class RegsitryHandler {
 	}
 
 	@SubscribeEvent
-	public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event) {
+	public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event)
+			throws Exception {
 		event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
+		try {
+			Method method = PointOfInterestType.class.getDeclaredMethod("registerBlockStates",
+					PointOfInterestType.class);
+			method.setAccessible(true);
+			method.invoke(null, ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
+		} catch (Exception e) {
+			throw net.minecraft.util.Util.pauseDevMode(e);
+		}
 	}
 
 	@SubscribeEvent

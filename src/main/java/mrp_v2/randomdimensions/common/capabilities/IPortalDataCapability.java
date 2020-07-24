@@ -15,7 +15,15 @@ public interface IPortalDataCapability {
 
 	public void setTeleportDirection(String worldID, Direction teleportDirection);
 
-	public Set<String> getWorldsWithPortalData();
+	public boolean getInPortal();
 
-	public void clearData();
+	public void setInPortal(boolean inPortal);
+
+	public void decrementRemainingPortalCooldown();
+
+	public int getRemainingPortalCooldown();
+
+	public void setRemainingPortalCooldown(int remainingPortalCooldown);
+
+	public Set<String> getWorldsWithPortalData();
 }

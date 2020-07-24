@@ -1,13 +1,13 @@
 package mrp_v2.randomdimensions.common.capabilities;
 
 import mrp_v2.randomdimensions.util.ObjectHolder;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class PortalDataProvider implements ICapabilitySerializable<ListNBT> {
+public class PortalDataProvider implements ICapabilitySerializable<CompoundNBT> {
 
 	private PortalDataHandler portalDataHandler;
 	private LazyOptional<PortalDataHandler> portalDataHandlerLazyOptional;
@@ -26,13 +26,13 @@ public class PortalDataProvider implements ICapabilitySerializable<ListNBT> {
 	}
 
 	@Override
-	public ListNBT serializeNBT() {
-		return (ListNBT) ObjectHolder.PORTAL_DATA_STORAGE.writeNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY,
+	public CompoundNBT serializeNBT() {
+		return (CompoundNBT) ObjectHolder.PORTAL_DATA_STORAGE.writeNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY,
 				this.portalDataHandler, null);
 	}
 
 	@Override
-	public void deserializeNBT(ListNBT nbt) {
+	public void deserializeNBT(CompoundNBT nbt) {
 		ObjectHolder.PORTAL_DATA_STORAGE.readNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY, this.portalDataHandler, null,
 				nbt);
 	}

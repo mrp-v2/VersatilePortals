@@ -13,9 +13,13 @@ import net.minecraft.util.math.vector.Vector3d;
 public class PortalDataHandler implements IPortalDataCapability {
 
 	private final Map<String, MutablePair<Vector3d, Direction>> data;
+	private boolean inPortal;
+	private int remainingPortalCooldown;
 
 	public PortalDataHandler() {
 		this.data = Maps.newHashMap();
+		this.inPortal = false;
+		this.remainingPortalCooldown = 0;
 	}
 
 	@Override
@@ -50,7 +54,31 @@ public class PortalDataHandler implements IPortalDataCapability {
 	}
 
 	@Override
-	public void clearData() {
-		this.data.clear();
+	public boolean getInPortal() {
+		return this.inPortal;
+	}
+
+	@Override
+	public void setInPortal(boolean inPortal) {
+		if (this.inPortal != inPortal) {
+			this.inPortal = inPortal;
+		}
+	}
+
+	@Override
+	public void decrementRemainingPortalCooldown() {
+		if (this.remainingPortalCooldown > 0) {
+			this.remainingPortalCooldown--;
+		}
+	}
+
+	@Override
+	public int getRemainingPortalCooldown() {
+		return this.remainingPortalCooldown;
+	}
+
+	@Override
+	public void setRemainingPortalCooldown(int remainingPortalCooldown) {
+		this.remainingPortalCooldown = remainingPortalCooldown;
 	}
 }

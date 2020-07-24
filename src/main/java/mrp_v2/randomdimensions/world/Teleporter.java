@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import mrp_v2.randomdimensions.block.PortalBlock;
-import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.util.ObjectHolder;
+import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern.PatternHelper;
@@ -43,20 +43,11 @@ public class Teleporter implements ITeleporter {
 		this.random = new Random(worldIn.getSeed());
 	}
 
-	public static IPortalDataCapability getPortalData(Entity entity) {
-		return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
-				.orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
-	}
-
-	public static String getWorldID(World world) {
-		return world.func_234923_W_().func_240901_a_().toString();
-	}
-
 	@Override
 	public Entity placeEntity(Entity entityIn, ServerWorld currentWorld, ServerWorld destinationWorld, float yaw,
 			Function<Boolean, Entity> repositionEntity) {
-		IPortalDataCapability portalData = getPortalData(entityIn);
-		String worldID = getWorldID(
+		IPortalDataCapability portalData = Util.getPortalData(entityIn);
+		String worldID = Util.getWorldID(
 				currentWorld.func_234923_W_() != World.field_234918_g_ ? currentWorld : destinationWorld);
 		Vector3d lastPortalVec = portalData.getLastPortalVec(worldID);
 		Direction teleportDirection = portalData.getTeleportDirection(worldID);
@@ -84,6 +75,8 @@ public class Teleporter implements ITeleporter {
 			currentWorld.getProfiler().endSection();
 			currentWorld.getProfiler().startSection("placing");
 			entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
+			portalData.setInPortal(true);
+			portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
 			if (!this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection)) {
 				if (this.world.func_234923_W_() != World.field_234918_g_) {
 					this.makePortal(entityIn);
@@ -117,6 +110,8 @@ public class Teleporter implements ITeleporter {
 		if (portalInfo == null) {
 			return null;
 		}
+		portalData.setInPortal(true);
+		portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
 		blockpos = new BlockPos(portalInfo.pos);
 		entityInMotionVec = portalInfo.motion;
 		rotationModifier = portalInfo.rotation;

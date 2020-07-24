@@ -12,6 +12,7 @@ import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.util.ObjectHolder;
+import mrp_v2.randomdimensions.util.Util;
 import mrp_v2.randomdimensions.world.Teleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,6 +31,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -79,6 +81,10 @@ public class PortalBlock extends BasicBlock {
 		return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
 	}
 
+	public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return getShape(state, worldIn, pos, ISelectionContext.dummy()).toBoundingBoxList().get(0).offset(pos);
+	}
+
 	public static boolean trySpawnPortal(World world, BlockPos pos) {
 		if (world.func_234923_W_() == World.field_234919_h_ || world.func_234923_W_() == World.field_234920_i_) {
 			return false;
@@ -118,6 +124,13 @@ public class PortalBlock extends BasicBlock {
 	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		if (worldIn instanceof ServerWorld && !entityIn.isPassenger() && !entityIn.isBeingRidden()
 				&& entityIn.isNonBoss()) {
+			if (!entityIn.getBoundingBox().intersects(this.getBoundingBox(state, worldIn, pos))) {
+				return;
+			}
+			IPortalDataCapability portalData = Util.getPortalData(entityIn);
+			if (portalData.getRemainingPortalCooldown() > 0 || portalData.getInPortal()) {
+				return;
+			}
 			RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_
 					? new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS))
 							.getPortalController(worldIn).getTeleportDestination()
@@ -140,8 +153,7 @@ public class PortalBlock extends BasicBlock {
 			double d2 = MathHelper
 					.clamp(MathHelper.func_233020_c_(entityIn.getPosY() - 1.0D, patternHelper.getFrontTopLeft().getY(),
 							patternHelper.getFrontTopLeft().getY() - patternHelper.getHeight()), 0.0D, 1.0D);
-			IPortalDataCapability portalData = Teleporter.getPortalData(entityIn);
-			String worldID = Teleporter
+			String worldID = Util
 					.getWorldID(serverWorld.func_234923_W_() != World.field_234918_g_ ? serverWorld : worldIn);
 			portalData.setLastPortalVec(worldID, new Vector3d(d1, d2, 0.0D));
 			portalData.setTeleportDirection(worldID, patternHelper.getForwards());
