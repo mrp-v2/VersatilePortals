@@ -3,6 +3,7 @@ package mrp_v2.randomdimensions;
 import mrp_v2.randomdimensions.network.Packet;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(RandomDimensions.ID)
@@ -12,12 +13,20 @@ public class RandomDimensions {
 
 	public RandomDimensions() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::gatherData);
 	}
 
 	/**
-	 * @param event  
+	 * @param event
 	 */
 	private void commonSetup(FMLCommonSetupEvent event) {
 		Packet.Handler.createChannel();
+	}
+
+	/**
+	 * @param event
+	 */
+	private void gatherData(GatherDataEvent event) {
+
 	}
 }

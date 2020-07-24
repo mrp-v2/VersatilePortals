@@ -1,10 +1,14 @@
 package mrp_v2.randomdimensions.util;
 
+import java.util.Random;
+
 import mrp_v2.randomdimensions.RandomDimensions;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class Util {
+	public static final Random RAND = new Random();
+
 	public static TranslationTextComponent makeTranslation(String id) {
 		return new TranslationTextComponent(RandomDimensions.ID + "." + id);
 	}

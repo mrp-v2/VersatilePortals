@@ -6,6 +6,7 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.village.PointOfInterestType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -24,7 +25,7 @@ public class RegsitryHandler {
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
 		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
 		event.getRegistry().register(ObjectHolder.PORTAL_FRAME_BLOCK_ITEM);
-		event.getRegistry().register(ObjectHolder.PORTAL_LIGHTER);
+		event.getRegistry().register(ObjectHolder.PORTAL_LIGHTER_ITEM);
 	}
 
 	@SubscribeEvent
@@ -34,11 +35,16 @@ public class RegsitryHandler {
 
 	@SubscribeEvent
 	public static void registerParicles(final RegistryEvent.Register<ParticleType<?>> event) {
-		event.getRegistry().registerAll(ObjectHolder.PORTAL_PARTICLE);
+		event.getRegistry().register(ObjectHolder.PORTAL_PARTICLE_TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event) {
+		event.getRegistry().register(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerTileEntites(final RegistryEvent.Register<TileEntityType<?>> event) {
-		event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
+		event.getRegistry().register(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
 	}
 }

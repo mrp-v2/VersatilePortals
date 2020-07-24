@@ -29,7 +29,7 @@ public class RegistryHandler {
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public static void registerParticles(final ParticleFactoryRegisterEvent event) {
-		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE, PortalParticle.Factory::new);
+		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE, PortalParticle.Factory::new);
 	}
 
 	static {

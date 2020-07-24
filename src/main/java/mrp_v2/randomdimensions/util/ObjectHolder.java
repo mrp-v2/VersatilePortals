@@ -7,6 +7,7 @@ import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.item.PortalLighter;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
+import mrp_v2.randomdimensions.village.PortalPointOfInterestType;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.particles.ParticleType;
@@ -19,9 +20,10 @@ public class ObjectHolder {
 	public static final PortalFrameBlock PORTAL_FRAME_BLOCK;
 	public static final BlockItem PORTAL_CONTROLLER_BLOCK_ITEM;
 	public static final BlockItem PORTAL_FRAME_BLOCK_ITEM;
-	public static final PortalLighter PORTAL_LIGHTER;
+	public static final PortalLighter PORTAL_LIGHTER_ITEM;
 	public static final ContainerType<PortalControllerContainer> PORTAL_CONTROLLER_CONTAINER_TYPE;
-	public static final ParticleType<PortalParticleData> PORTAL_PARTICLE;
+	public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
+	public static final PortalPointOfInterestType PORTAL_POINT_OF_INTEREST_TYPE;
 	public static final TileEntityType<PortalControllerTileEntity> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
 	static {
 		PORTAL_BLOCK = new PortalBlock();
@@ -29,9 +31,10 @@ public class ObjectHolder {
 		PORTAL_FRAME_BLOCK = new PortalFrameBlock();
 		PORTAL_CONTROLLER_BLOCK_ITEM = PORTAL_CONTROLLER_BLOCK.createBlockItem();
 		PORTAL_FRAME_BLOCK_ITEM = PORTAL_FRAME_BLOCK.createBlockItem();
-		PORTAL_LIGHTER = new PortalLighter();
+		PORTAL_LIGHTER_ITEM = new PortalLighter();
 		PORTAL_CONTROLLER_CONTAINER_TYPE = new PortalControllerContainer.Type();
-		PORTAL_PARTICLE = PortalParticleData.createParticleType();
+		PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
+		PORTAL_POINT_OF_INTEREST_TYPE = new PortalPointOfInterestType();
 		PORTAL_CONTROLLER_TILE_ENTITY_TYPE = PortalControllerTileEntity.createTileEntity();
 	}
 }

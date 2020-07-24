@@ -5,22 +5,30 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.google.common.cache.LoadingCache;
+
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.util.ObjectHolder;
+import mrp_v2.randomdimensions.world.Teleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.pattern.BlockPattern;
+import net.minecraft.block.pattern.BlockPattern.PatternHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.CachedBlockInfo;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.Direction.AxisDirection;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -28,14 +36,13 @@ import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class PortalBlock extends BasicBlock {
 
 	public static final String ID = "portal";
-	public static final VoxelShape X_AABB = Block.makeCuboidShape(0.0D, 0.0D, 6.0D, 16.0D, 16.0D, 10.0D);
-	public static final VoxelShape Z_AABB = Block.makeCuboidShape(6.0D, 0.0D, 0.0D, 10.0D, 16.0D, 16.0D);
 
 	public PortalBlock() {
 		super(ID, Properties.create(Material.PORTAL).doesNotBlockMovement().hardnessAndResistance(-1.0F)
@@ -57,19 +64,14 @@ public class PortalBlock extends BasicBlock {
 		return PortalControllerTileEntity.DEFAULT_PORTAL_COLOR;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(BlockStateProperties.HORIZONTAL_AXIS)) {
-		case Z:
-			return Z_AABB;
-		case X:
-		default:
-			return X_AABB;
-		}
+		return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
 	}
 
 	public static boolean trySpawnPortal(IWorld world, BlockPos pos) {
-		PortalBlock.Size size = isPortal(world, pos);
+		Size size = isPortal(world, pos);
 		if (size != null) {
 			size.placePortalBlocks(world);
 			return true;
@@ -78,12 +80,12 @@ public class PortalBlock extends BasicBlock {
 	}
 
 	@Nullable
-	public static PortalBlock.Size isPortal(IWorld world, BlockPos pos) {
-		PortalBlock.Size size = new PortalBlock.Size(world, pos, Direction.Axis.X);
+	public static Size isPortal(IWorld world, BlockPos pos) {
+		Size size = new Size(world, pos, Direction.Axis.X);
 		if (size.isValid() && size.portalBlockCount == 0) {
 			return size;
 		}
-		size = new PortalBlock.Size(world, pos, Direction.Axis.Z);
+		size = new Size(world, pos, Direction.Axis.Z);
 		return size.isValid() && size.portalBlockCount == 0 ? size : null;
 	}
 
@@ -95,7 +97,7 @@ public class PortalBlock extends BasicBlock {
 		Direction.Axis thisAxis = stateIn.get(BlockStateProperties.HORIZONTAL_AXIS);
 		boolean flag = thisAxis != updateAxis && updateAxis.isHorizontal();
 		return !flag && !facingState.isIn(this)
-				&& !(new PortalBlock.Size(worldIn, currentPos, thisAxis)).isValidWithSizeAndCount()
+				&& !(new Size(worldIn, currentPos, thisAxis)).isValidWithSizeAndCount()
 						? Blocks.AIR.getDefaultState()
 						: super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
@@ -103,11 +105,20 @@ public class PortalBlock extends BasicBlock {
 	@Override
 	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) { // TODO correct
 																									// teleportation
-		if (!entityIn.isPassenger() && !entityIn.isBeingRidden() && entityIn.isNonBoss()) {
-			// entityIn.setPortal(pos);
+		if (worldIn instanceof ServerWorld && !entityIn.isPassenger() && !entityIn.isBeingRidden()
+				&& entityIn.isNonBoss()) {
+			RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_
+					? World.field_234919_h_ // TODO custom world registry key
+					: World.field_234918_g_;
+			ServerWorld serverWorld = ((ServerWorld) worldIn).getServer().getWorld(registryKey);
+			if (serverWorld == null) {
+				return;
+			}
+			entityIn.changeDimension(serverWorld, new Teleporter(serverWorld));
 		}
 	}
 
+	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		for (int i = 0; i < 4; ++i) {
@@ -149,6 +160,49 @@ public class PortalBlock extends BasicBlock {
 						world.notifyBlockUpdate(pos, state, state, 16 | 32);
 					});
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public static PatternHelper createPatternHelper(IWorld world, BlockPos pos) {
+		Axis axis = Axis.Z;
+		Size size = new Size(world, pos, Axis.X);
+		LoadingCache<BlockPos, CachedBlockInfo> loadingCache = BlockPattern.createLoadingCache(world, true);
+		if (!size.isValid()) {
+			axis = Direction.Axis.X;
+			size = new Size(world, pos, Axis.Z);
+		}
+		if (!size.isValid()) {
+			return new PatternHelper(pos, Direction.NORTH, Direction.UP, loadingCache, 1, 1, 1);
+		}
+		int[] intArray = new int[AxisDirection.values().length];
+		Direction direction = size.rightDir.rotateYCCW();
+		BlockPos blockpos = size.bottomLeft.up(size.getHeight() - 1);
+		for (AxisDirection axisDirection1 : AxisDirection.values()) {
+			PatternHelper patternHelper = new PatternHelper(
+					direction.getAxisDirection() == axisDirection1 ? blockpos
+							: blockpos.offset(size.rightDir, size.getWidth() - 1),
+					Direction.getFacingFromAxis(axisDirection1, axis), Direction.UP, loadingCache, size.getWidth(),
+					size.getHeight(), 1);
+			for (int i = 0; i < size.getWidth(); ++i) {
+				for (int j = 0; j < size.getHeight(); ++j) {
+					CachedBlockInfo cachedBlockInfo = patternHelper.translateOffset(i, j, 1);
+					if (!cachedBlockInfo.getBlockState().isAir()) {
+						++intArray[axisDirection1.ordinal()];
+					}
+				}
+			}
+		}
+		AxisDirection axisDirection2 = AxisDirection.POSITIVE;
+		for (AxisDirection axisDirection3 : AxisDirection.values()) {
+			if (intArray[axisDirection3.ordinal()] < intArray[axisDirection2.ordinal()]) {
+				axisDirection2 = axisDirection3;
+			}
+		}
+		return new PatternHelper(
+				direction.getAxisDirection() == axisDirection2 ? blockpos
+						: blockpos.offset(size.rightDir, size.getWidth() - 1),
+				Direction.getFacingFromAxis(axisDirection2, axis), Direction.UP, loadingCache, size.getWidth(),
+				size.getHeight(), 1);
 	}
 
 	public static class Size {

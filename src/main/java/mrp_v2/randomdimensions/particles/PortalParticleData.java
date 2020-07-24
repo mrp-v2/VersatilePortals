@@ -72,7 +72,7 @@ public class PortalParticleData implements IParticleData {
 
 	@Override
 	public ParticleType<?> getType() {
-		return ObjectHolder.PORTAL_PARTICLE;
+		return ObjectHolder.PORTAL_PARTICLE_TYPE;
 	}
 
 	@Override
