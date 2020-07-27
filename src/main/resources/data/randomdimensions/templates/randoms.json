@@ -1,9 +1,0 @@
-{
-	"rand_boolean": {
-		"type": "random_from_options",
-		"options": [
-			true,
-			false
-		]
-	}
-}

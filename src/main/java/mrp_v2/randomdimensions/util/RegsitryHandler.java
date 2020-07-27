@@ -3,6 +3,7 @@ package mrp_v2.randomdimensions.util;
 import java.lang.reflect.Method;
 
 import mrp_v2.randomdimensions.RandomDimensions;
+import mrp_v2.randomdimensions.jsontemplate.IJSONTemplateSerializer;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
@@ -12,9 +13,18 @@ import net.minecraft.village.PointOfInterestType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.registries.RegistryBuilder;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
 public class RegsitryHandler {
+
+	/**
+	 * @param event
+	 */
+	@SubscribeEvent
+	public static void registerRegistries(final RegistryEvent.NewRegistry event) {
+		new RegistryBuilder<IJSONTemplateSerializer>().create();
+	}
 
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
