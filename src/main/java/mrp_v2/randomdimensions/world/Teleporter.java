@@ -75,7 +75,6 @@ public class Teleporter implements ITeleporter {
 			currentWorld.getProfiler().endSection();
 			currentWorld.getProfiler().startSection("placing");
 			entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
-			portalData.setInPortal(true);
 			portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
 			if (!this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection)) {
 				if (this.world.func_234923_W_() != World.field_234918_g_) {
@@ -110,7 +109,6 @@ public class Teleporter implements ITeleporter {
 		if (portalInfo == null) {
 			return null;
 		}
-		portalData.setInPortal(true);
 		portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
 		blockpos = new BlockPos(portalInfo.pos);
 		entityInMotionVec = portalInfo.motion;

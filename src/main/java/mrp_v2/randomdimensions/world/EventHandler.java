@@ -1,8 +1,12 @@
 package mrp_v2.randomdimensions.world;
 
 import mrp_v2.randomdimensions.block.PortalBlock;
+import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
+import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
@@ -12,26 +16,31 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 @EventBusSubscriber
 public class EventHandler {
 
-	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public static void worldTick(final WorldTickEvent event) {
 		if (event.world instanceof ServerWorld) {
 			ServerWorld serverWorld = (ServerWorld) event.world;
 			serverWorld.getEntities().forEach((entity) -> {
-				if (!entity.isAlive() || !serverWorld.isBlockLoaded(entity.getPosition())) {
+				if (!entity.isAlive()) {
 					return;
 				}
 				IPortalDataCapability portalData = Util.getPortalData(entity);
-				portalData.decrementRemainingPortalCooldown();
 				boolean collidingWithPortal = false;
 				for (BlockPos pos : Util.getCollidingBlocks(entity.getBoundingBox())) {
 					if (serverWorld.getBlockState(pos).getBlock() instanceof PortalBlock) {
-						collidingWithPortal = true;
-						break;
+						if (entity.getBoundingBox().intersects(ObjectHolder.PORTAL_BLOCK
+								.getBoundingBox(serverWorld.getBlockState(pos), serverWorld, pos))) {
+							collidingWithPortal = true;
+							break;
+						}
 					}
 				}
 				if (!collidingWithPortal) {
-					portalData.setInPortal(false);
+					portalData.decrementRemainingPortalCooldown();
+					if (entity instanceof ServerPlayerEntity) {
+						IPlayerPortalDataCapability playerPortalData = Util.getPlayerPortalData((PlayerEntity) entity);
+						playerPortalData.setInPortalTime(0);
+					}
 				}
 			});
 		}

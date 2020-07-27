@@ -9,6 +9,7 @@ import mrp_v2.randomdimensions.block.IndestructiblePortalFrameBlock;
 import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.block.PortalControllerBlock;
 import mrp_v2.randomdimensions.block.PortalFrameBlock;
+import mrp_v2.randomdimensions.common.capabilities.PlayerPortalDataStorage;
 import mrp_v2.randomdimensions.common.capabilities.PortalDataStorage;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.item.PortalLighter;
@@ -34,6 +35,7 @@ public class ObjectHolder {
 	public static final PortalLighter PORTAL_LIGHTER_ITEM;
 	public static final ContainerType<PortalControllerContainer> PORTAL_CONTROLLER_CONTAINER_TYPE;
 	public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
+	public static final PlayerPortalDataStorage PLAYER_PORTAL_DATA_STORAGE;
 	public static final PortalDataStorage PORTAL_DATA_STORAGE;
 	public static final PortalPointOfInterestType PORTAL_POINT_OF_INTEREST_TYPE;
 	public static final TileEntityType<PortalControllerTileEntity> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
@@ -48,6 +50,7 @@ public class ObjectHolder {
 		PORTAL_LIGHTER_ITEM = new PortalLighter();
 		PORTAL_CONTROLLER_CONTAINER_TYPE = new PortalControllerContainer.Type();
 		PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
+		PLAYER_PORTAL_DATA_STORAGE = new PlayerPortalDataStorage();
 		PORTAL_DATA_STORAGE = new PortalDataStorage();
 		PORTAL_POINT_OF_INTEREST_TYPE = new PortalPointOfInterestType();
 		PORTAL_CONTROLLER_TILE_ENTITY_TYPE = PortalControllerTileEntity.createTileEntity();

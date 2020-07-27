@@ -4,8 +4,10 @@ import java.util.Random;
 
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
+import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -64,6 +66,11 @@ public class Util {
 	public static IPortalDataCapability getPortalData(Entity entity) {
 		return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
 				.orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
+	}
+
+	public static IPlayerPortalDataCapability getPlayerPortalData(PlayerEntity player) {
+		return player.getCapability(CapabilityHandler.PLAYER_PORTAL_DATA_CAPABILITY)
+				.orElseThrow(() -> new RuntimeException("Could not get an IPlayerPortalDataCapability!"));
 	}
 
 	public static String getWorldID(World world) {

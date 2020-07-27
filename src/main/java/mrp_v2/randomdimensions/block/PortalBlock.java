@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.cache.LoadingCache;
 
+import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
@@ -22,6 +23,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPattern.PatternHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -128,8 +131,15 @@ public class PortalBlock extends BasicBlock {
 				return;
 			}
 			IPortalDataCapability portalData = Util.getPortalData(entityIn);
-			if (portalData.getRemainingPortalCooldown() > 0 || portalData.getInPortal()) {
+			if (portalData.getRemainingPortalCooldown() > 0) {
+				portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
 				return;
+			}
+			if (entityIn instanceof ServerPlayerEntity) {
+				IPlayerPortalDataCapability playerPortalData = Util.getPlayerPortalData((PlayerEntity) entityIn);
+				if (playerPortalData.incrementInPortalTime() < entityIn.getMaxInPortalTime()) {
+					return;
+				}
 			}
 			RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_
 					? new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS))
