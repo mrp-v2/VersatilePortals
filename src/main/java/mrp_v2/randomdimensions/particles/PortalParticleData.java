@@ -1,31 +1,26 @@
 package mrp_v2.randomdimensions.particles;
 
-import java.util.Locale;
-
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 
+import java.util.Locale;
+
 public class PortalParticleData implements IParticleData {
 
 	public static final String ID = "portal";
 
-	public static final Codec<PortalParticleData> CODEC = RecordCodecBuilder.create((instance1) -> {
-		return instance1.group(Codec.INT.fieldOf("color").forGetter((instance2) -> {
-			return instance2.getColor();
-		})).apply(instance1, PortalParticleData::new);
-	});
+	public static final Codec<PortalParticleData> CODEC = RecordCodecBuilder.create((instance1) -> instance1.group(Codec.INT.fieldOf("color").forGetter(PortalParticleData::getColor))
+			.apply(instance1, PortalParticleData::new));
 
 	private static final boolean ALWAYS_SHOW = false;
 
-	@SuppressWarnings("deprecation")
 	public static final IParticleData.IDeserializer<PortalParticleData> DESERIALIZER = new IParticleData.IDeserializer<PortalParticleData>() {
 
 		@Override

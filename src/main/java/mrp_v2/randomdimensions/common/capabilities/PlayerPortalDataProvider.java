@@ -8,8 +8,8 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class PlayerPortalDataProvider extends PortalDataProvider {
 
-	private PlayerPortalDataHandler playerPortalDataHandler;
-	private LazyOptional<PlayerPortalDataHandler> portalDataHandlerLazyOptional;
+	private final PlayerPortalDataHandler playerPortalDataHandler;
+	private final LazyOptional<PlayerPortalDataHandler> portalDataHandlerLazyOptional;
 
 	public PlayerPortalDataProvider() {
 		this.playerPortalDataHandler = new PlayerPortalDataHandler();

@@ -2,9 +2,9 @@ package mrp_v2.randomdimensions.common.capabilities;
 
 public interface IPlayerPortalDataCapability extends IPortalDataCapability {
 
-	public int getInPortalTime();
+    int getInPortalTime();
 
-	public int incrementInPortalTime();
+    void setInPortalTime(int inPortalTime);
 
-	public void setInPortalTime(int inPortalTime);
+    int incrementInPortalTime();
 }

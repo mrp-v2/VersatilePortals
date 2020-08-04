@@ -1,14 +1,5 @@
 package mrp_v2.randomdimensions.world;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
 import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.util.ObjectHolder;
@@ -32,6 +23,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
+
+import javax.annotation.Nullable;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Teleporter implements ITeleporter {
 
@@ -101,7 +100,7 @@ public class Teleporter implements ITeleporter {
 			return entityIn;
 		}
 		Vector3d entityInMotionVec = entityIn.getMotion();
-		float rotationModifier = 0.0F;
+		float rotationModifier;
 		BlockPos blockpos;
 		blockpos = new BlockPos(newPosX, entityIn.getPosY(), newPosZ);
 		PortalInfo portalInfo = this.placeInExistingPortal(blockpos, entityInMotionVec, teleportDirection,
@@ -147,15 +146,9 @@ public class Teleporter implements ITeleporter {
 			Direction directionIn, double d1, double d2) {
 		PointOfInterestManager pointOfInterestManager = this.world.getPointOfInterestManager();
 		pointOfInterestManager.ensureLoadedAndValid(this.world, pos, 128);
-		List<PointOfInterest> pointOfInterestList = pointOfInterestManager.getInSquare((pointOfInterestType) -> {
-			return pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE;
-		}, pos, 128, PointOfInterestManager.Status.ANY).collect(Collectors.toList());
+		List<PointOfInterest> pointOfInterestList = pointOfInterestManager.getInSquare((pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE, pos, 128, PointOfInterestManager.Status.ANY).collect(Collectors.toList());
 		Optional<PointOfInterest> optionalPointOfInterest = pointOfInterestList.stream()
-				.min(Comparator.<PointOfInterest>comparingDouble((pointOfInterest) -> {
-					return pointOfInterest.getPos().distanceSq(pos);
-				}).thenComparingInt((pointOfInterest) -> {
-					return pointOfInterest.getPos().getY();
-				}));
+				.min(Comparator.<PointOfInterest>comparingDouble((pointOfInterest) -> pointOfInterest.getPos().distanceSq(pos)).thenComparingInt((pointOfInterest) -> pointOfInterest.getPos().getY()));
 		return optionalPointOfInterest.map((pointOfInterest) -> {
 			BlockPos pointOfInterestPos = pointOfInterest.getPos();
 			this.world.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(pointOfInterestPos), 3,
@@ -164,7 +157,7 @@ public class Teleporter implements ITeleporter {
 					pointOfInterestPos);
 			return patternHelper.getPortalInfo(directionIn, pointOfInterestPos, d2, vec3d,
 					d1);
-		}).orElse((PortalInfo) null);
+		}).orElse(null);
 	}
 
 	public boolean makePortal(Entity entityIn) {

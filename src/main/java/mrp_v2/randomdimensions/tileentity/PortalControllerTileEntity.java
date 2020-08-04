@@ -1,7 +1,5 @@
 package mrp_v2.randomdimensions.tileentity;
 
-import javax.annotation.Nullable;
-
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
@@ -29,6 +27,8 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 
+import javax.annotation.Nullable;
+
 public class PortalControllerTileEntity extends TileEntity implements ICapabilityProvider, INamedContainerProvider {
 
 	public static final String ID = "portal_controller";
@@ -46,7 +46,7 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 
 	private ITextComponent customName;
 	private final PortalControllerItemStackHandler itemStackHandler;
-	private LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
+	private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
 	private int portalColor;
 
 	public PortalControllerTileEntity() {

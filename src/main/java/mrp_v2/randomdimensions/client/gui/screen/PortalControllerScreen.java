@@ -2,7 +2,6 @@ package mrp_v2.randomdimensions.client.gui.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.network.Packet;
@@ -42,7 +41,6 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 		this.func_230459_a_(stack, i1, i2);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float f1, int i1, int i2) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
