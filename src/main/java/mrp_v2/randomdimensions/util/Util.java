@@ -1,7 +1,5 @@
 package mrp_v2.randomdimensions.util;
 
-import java.util.Random;
-
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
@@ -13,22 +11,29 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-public class Util {
+import java.util.Random;
+
+public class Util
+{
 	public static final Random RAND = new Random();
 
-	public static TranslationTextComponent makeTranslation(String id) {
+	public static TranslationTextComponent makeTranslation(String id)
+	{
 		return new TranslationTextComponent(RandomDimensions.ID + "." + id);
 	}
 
-	public static TranslationTextComponent makeTranslation(String... idParts) {
+	public static TranslationTextComponent makeTranslation(String... idParts)
+	{
 		return makeTranslation(String.join(".", idParts));
 	}
 
-	public static int iGetColorR(int color) {
+	public static int iGetColorR(int color)
+	{
 		return (color & 0xFF0000) >> 16;
 	}
 
-	public static int iGetColorG(int color) {
+	public static int iGetColorG(int color)
+	{
 		return (color & 0x00FF00) >> 8;
 	}
 
@@ -88,16 +93,24 @@ public class Util {
 		int ySize = maxY - minY;
 		int zSize = maxZ - minZ;
 		BlockPos[] blocks = new BlockPos[xSize * ySize * zSize];
-		for (int i = 0; i < xSize; i++) {
+		for (int i = 0; i < xSize; i++)
+		{
 			int x = i + minX;
-			for (int j = 0; j < ySize; j++) {
+			for (int j = 0; j < ySize; j++)
+			{
 				int y = j + minY;
-				for (int k = 0; k < zSize; k++) {
+				for (int k = 0; k < zSize; k++)
+				{
 					int z = k + minZ;
 					blocks[(i * ySize + j) * zSize + k] = new BlockPos(x, y, z);
 				}
 			}
 		}
 		return blocks;
+	}
+
+	public static <T> T[] makeArray(T... objects)
+	{
+		return objects;
 	}
 }
