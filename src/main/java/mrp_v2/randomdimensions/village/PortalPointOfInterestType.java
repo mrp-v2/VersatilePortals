@@ -23,11 +23,16 @@ public class PortalPointOfInterestType extends PointOfInterestType
             {
                 continue;
             }
-            if (method.getParameters()[0].getType() == PointOfInterestType.class)
+            if (method.getReturnType() != PointOfInterestType.class)
             {
-                registerBlockStatesMethod = method;
-                break;
+                continue;
             }
+            if (method.getParameters()[0].getType() != PointOfInterestType.class)
+            {
+                continue;
+            }
+            registerBlockStatesMethod = method;
+            break;
         }
         registerBlockStatesMethod.setAccessible(true);
         try
