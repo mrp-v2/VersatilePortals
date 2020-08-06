@@ -13,8 +13,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-import java.lang.reflect.Method;
-
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
 public class RegistryHandler
 {
@@ -25,6 +23,10 @@ public class RegistryHandler
         event.getRegistry().registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
                 ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
                 ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+    }
+
+    public static void postRegistering()
+    {
         WorldUtil.addInvalidBlockSupertypes(PortalBlock.class);
         WorldUtil.addInvalidBlocks(ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
     }
@@ -50,19 +52,8 @@ public class RegistryHandler
 
     @SubscribeEvent
     public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event)
-            throws Exception
     {
         event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
-        try
-        {
-            Method method = PointOfInterestType.class.getDeclaredMethod("registerBlockStates",
-                    PointOfInterestType.class);
-            method.setAccessible(true);
-            method.invoke(null, ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
-        } catch (Exception e)
-        {
-            throw net.minecraft.util.Util.pauseDevMode(e);
-        }
     }
 
     @SubscribeEvent

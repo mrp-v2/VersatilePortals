@@ -2,6 +2,7 @@ package mrp_v2.randomdimensions;
 
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.network.Packet;
+import mrp_v2.randomdimensions.util.RegistryHandler;
 import mrp_v2.randomdimensions.world.util.WorldUtil;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -25,6 +26,7 @@ public class RandomDimensions
     {
         Packet.Handler.createChannel();
         CapabilityHandler.registerCapabilities();
+        RegistryHandler.postRegistering();
         WorldUtil.init();
     }
 }

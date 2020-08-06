@@ -4,12 +4,38 @@ import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.village.PointOfInterestType;
 
-public class PortalPointOfInterestType extends PointOfInterestType {
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-	public static final String ID = "portal";
+public class PortalPointOfInterestType extends PointOfInterestType
+{
 
-	public PortalPointOfInterestType() {
-		super(ID, ObjectHolder.getPortalBlockStates(), 0, 1);
-		this.setRegistryName(RandomDimensions.ID, ID);
-	}
+    public static final String ID = "portal";
+
+    public PortalPointOfInterestType()
+    {
+        super(ID, ObjectHolder.getPortalBlockStates(), 0, 1);
+        this.setRegistryName(RandomDimensions.ID, ID);
+        Method registerBlockStatesMethod = null;
+        for (Method method : PointOfInterestType.class.getDeclaredMethods())
+        {
+            if (method.getParameterCount() != 1)
+            {
+                continue;
+            }
+            if (method.getParameters()[0].getType() == PointOfInterestType.class)
+            {
+                registerBlockStatesMethod = method;
+                break;
+            }
+        }
+        registerBlockStatesMethod.setAccessible(true);
+        try
+        {
+            registerBlockStatesMethod.invoke(null, this);
+        } catch (InvocationTargetException | IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

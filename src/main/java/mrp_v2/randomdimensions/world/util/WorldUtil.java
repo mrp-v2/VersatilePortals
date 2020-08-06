@@ -165,7 +165,7 @@ public class WorldUtil
         List<String> strings = Lists.newArrayList();
         validWorldGenerationBlockStates.forEach((blockState -> strings.add("\n" + blockState.toString())));
         strings.sort(String::compareToIgnoreCase);
-        StringBuilder stringBuilder = new StringBuilder(strings.size() + "valid world generation blocks found: ");
+        StringBuilder stringBuilder = new StringBuilder(strings.size() + " valid world generation blocks found: ");
         strings.forEach(stringBuilder::append);
         LogManager.getLogger().debug(stringBuilder.toString());
     }
