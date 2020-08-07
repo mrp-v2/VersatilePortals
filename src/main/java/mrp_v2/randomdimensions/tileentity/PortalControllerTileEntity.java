@@ -35,9 +35,9 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 
     private static final String INVENTORY_NBT_ID = "Inventory";
     private static final String PORTAL_COLOR_NBT_ID = "PortalColor";
-    public static int DEFAULT_PORTAL_COLOR = 0x00FF00;
-    public static int ERROR_PORTAL_COLOR = 0xFFFFFF;
-    public static int PORTAL_COLOR_UPDATE_FLAGS = 0;
+    public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
+    public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
+    public static final int PORTAL_COLOR_UPDATE_FLAGS = 0;
     private final PortalControllerItemStackHandler itemStackHandler;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
     private ITextComponent customName;

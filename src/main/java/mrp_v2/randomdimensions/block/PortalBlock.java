@@ -302,6 +302,8 @@ public class PortalBlock extends BasicBlock
         public static final int MIN_HEIGHT = 2;
         public static final int MAX_SIZE = 21;
 
+        private static final Block PORTAL_BLOCK = ObjectHolder.PORTAL_BLOCK;
+
         private final Direction.Axis axis;
         private final Direction rightDir;
         private final Direction leftDir;
@@ -372,39 +374,14 @@ public class PortalBlock extends BasicBlock
             return isPortalFrame(iBlockDisplayReader, pos.offset(direction, i)) ? i : 0;
         }
 
-        @SuppressWarnings("deprecation") protected static boolean isOrCanPlacePortal(BlockState blockState)
-        {
-            return blockState.isAir() || blockState.isIn(getPortalBlock());
-        }
-
         public static boolean isPortalFrame(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
         {
             return iBlockDisplayReader.getBlockState(pos).getBlock() instanceof PortalFrameBlock;
         }
 
-        public static boolean isPortalBlock(BlockState blockState)
+        @SuppressWarnings("deprecation") protected static boolean isOrCanPlacePortal(BlockState blockState)
         {
-            return blockState.getBlock() instanceof PortalBlock;
-        }
-
-        @Nullable public static Size getSizeAt(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
-        {
-            Size size = new Size(iBlockDisplayReader, pos, Direction.Axis.X);
-            if (size.isValid())
-            {
-                return size;
-            }
-            size = new Size(iBlockDisplayReader, pos, Direction.Axis.Z);
-            return size.isValid() ? size : null;
-        }
-
-        public boolean isValid()
-        {
-            return this.bottomLeft != null &&
-                    this.width >= MIN_WIDTH &&
-                    this.width <= MAX_SIZE &&
-                    this.height >= MIN_HEIGHT &&
-                    this.height <= MAX_SIZE;
+            return blockState.isAir() || blockState.isIn(PORTAL_BLOCK);
         }
 
         @Nullable public PortalControllerTileEntity getPortalController(IBlockDisplayReader iBlockDisplayReader)
@@ -431,14 +408,45 @@ public class PortalBlock extends BasicBlock
             return portalControllerTE;
         }
 
-        public int getHeight()
+        public boolean isValid()
         {
-            return this.height;
+            return this.bottomLeft != null &&
+                    this.width >= MIN_WIDTH &&
+                    this.width <= MAX_SIZE &&
+                    this.height >= MIN_HEIGHT &&
+                    this.height <= MAX_SIZE;
         }
 
-        public int getWidth()
+        public BlockPos[] getFrameBlocks()
         {
-            return this.width;
+            BlockPos[] edges = new BlockPos[this.height * 2 + this.width * 2 + 4];
+            int j = 0;
+            //corners
+            edges[j++] = this.bottomLeft.down().offset(this.leftDir);
+            edges[j++] = this.bottomLeft.down().offset(this.rightDir, this.width);
+            edges[j++] = this.bottomLeft.up(this.height).offset(this.leftDir);
+            edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, this.width);
+            // left side
+            for (int i = 0; i < this.height; i++)
+            {
+                edges[j++] = this.bottomLeft.offset(this.leftDir).up(i);
+            }
+            // right side
+            for (int i = 0; i < this.height; i++)
+            {
+                edges[j++] = this.bottomLeft.offset(this.rightDir, this.width).up(i);
+            }
+            // top side
+            for (int i = 0; i < this.width; i++)
+            {
+                edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, i);
+            }
+            // bottom side
+            for (int i = 0; i < this.width; i++)
+            {
+                edges[j++] = this.bottomLeft.down().offset(this.rightDir, i);
+            }
+            return edges;
         }
 
         protected int calculatePortalHeight(IBlockDisplayReader reader)
@@ -484,10 +492,43 @@ public class PortalBlock extends BasicBlock
             return 0;
         }
 
+        public static boolean isPortalBlock(BlockState blockState)
+        {
+            return blockState.getBlock() instanceof PortalBlock;
+        }
+
+        private void invalidate()
+        {
+            this.bottomLeft = null;
+            this.width = 0;
+            this.height = 0;
+        }
+
+        @Nullable public static Size getSizeAt(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+        {
+            Size size = new Size(iBlockDisplayReader, pos, Direction.Axis.X);
+            if (size.isValid())
+            {
+                return size;
+            }
+            size = new Size(iBlockDisplayReader, pos, Direction.Axis.Z);
+            return size.isValid() ? size : null;
+        }
+
+        public int getHeight()
+        {
+            return this.height;
+        }
+
+        public int getWidth()
+        {
+            return this.width;
+        }
+
         public void placePortalBlocks(IWorld world)
         {
             this.doOperationOnPortalBlocks((pos) -> world.setBlockState(pos,
-                    getPortalBlock().getDefaultState().with(BlockStateProperties.HORIZONTAL_AXIS, this.axis), 18));
+                    PORTAL_BLOCK.getDefaultState().with(BlockStateProperties.HORIZONTAL_AXIS, this.axis), 18));
         }
 
         public void doOperationOnPortalBlocks(Consumer<BlockPos> operation)
@@ -502,11 +543,6 @@ public class PortalBlock extends BasicBlock
             }
         }
 
-        public static Block getPortalBlock()
-        {
-            return ObjectHolder.PORTAL_BLOCK;
-        }
-
         public boolean isValidWithSizeAndCount()
         {
             return this.isValid() && this.doesSizeMatchCount();
@@ -515,13 +551,6 @@ public class PortalBlock extends BasicBlock
         private boolean doesSizeMatchCount()
         {
             return this.portalBlockCount >= this.width * this.height;
-        }
-
-        private void invalidate()
-        {
-            this.bottomLeft = null;
-            this.width = 0;
-            this.height = 0;
         }
 
         public void doOperationOnBlocks(Consumer<BlockPos> operation)
@@ -536,38 +565,6 @@ public class PortalBlock extends BasicBlock
             {
                 operation.accept(pos);
             }
-        }
-
-        public BlockPos[] getFrameBlocks()
-        {
-            BlockPos[] edges = new BlockPos[this.height * 2 + this.width * 2 + 4];
-            int j = 0;
-            //corners
-            edges[j++] = this.bottomLeft.down().offset(this.leftDir);
-            edges[j++] = this.bottomLeft.down().offset(this.rightDir, this.width);
-            edges[j++] = this.bottomLeft.up(this.height).offset(this.leftDir);
-            edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, this.width);
-            // left side
-            for (int i = 0; i < this.height; i++)
-            {
-                edges[j++] = this.bottomLeft.offset(this.leftDir).up(i);
-            }
-            // right side
-            for (int i = 0; i < this.height; i++)
-            {
-                edges[j++] = this.bottomLeft.offset(this.rightDir, this.width).up(i);
-            }
-            // top side
-            for (int i = 0; i < this.width; i++)
-            {
-                edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, i);
-            }
-            // bottom side
-            for (int i = 0; i < this.width; i++)
-            {
-                edges[j++] = this.bottomLeft.down().offset(this.rightDir, i);
-            }
-            return edges;
         }
     }
 }

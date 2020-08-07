@@ -11,7 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class BasicItem extends Item
 {
 
-    public static ItemGroup MAIN_ITEM_GROUP = new ItemGroup(RandomDimensions.ID)
+    public static final ItemGroup MAIN_ITEM_GROUP = new ItemGroup(RandomDimensions.ID)
     {
         @Override @OnlyIn(Dist.CLIENT) public ItemStack createIcon()
         {

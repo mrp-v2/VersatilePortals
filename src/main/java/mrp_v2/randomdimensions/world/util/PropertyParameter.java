@@ -38,7 +38,7 @@ public abstract class PropertyParameter<T extends Comparable<T>>
         return blockState.hasProperty(this.property);
     }
 
-    public abstract boolean isValid(BlockState blockState);
+    public abstract boolean isInvalid(BlockState blockState);
 
     /*public static class DoesNotHave<T extends Comparable<T>> extends PropertyParameter<T>
     {
@@ -73,14 +73,13 @@ public abstract class PropertyParameter<T extends Comparable<T>>
             this.values = Sets.newHashSet(values);
         }
 
-        @Override
-        public boolean isValid(BlockState blockState)
+        @Override public boolean isInvalid(BlockState blockState)
         {
             if (!this.matchesProperty(blockState))
             {
-                return true;
+                return false;
             }
-            return matchesValues(blockState) == this.areValuesValid;
+            return matchesValues(blockState) != this.areValuesValid;
         }
 
         protected boolean matchesValues(BlockState blockState)

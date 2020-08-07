@@ -15,11 +15,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 @EventBusSubscriber
 public class CapabilityHandler {
 
-	@CapabilityInject(IPortalDataCapability.class)
-	public static Capability<IPortalDataCapability> PORTAL_DATA_CAPABILITY = null;
+	@CapabilityInject(IPortalDataCapability.class) public static final Capability<IPortalDataCapability>
+			PORTAL_DATA_CAPABILITY = null;
 
-	@CapabilityInject(IPlayerPortalDataCapability.class)
-	public static Capability<IPlayerPortalDataCapability> PLAYER_PORTAL_DATA_CAPABILITY = null;
+	@CapabilityInject(IPlayerPortalDataCapability.class) public static final Capability<IPlayerPortalDataCapability>
+			PLAYER_PORTAL_DATA_CAPABILITY = null;
 
 	@SubscribeEvent
 	public static void attachEntityCapabilities(final AttachCapabilitiesEvent<Entity> event) {

@@ -103,7 +103,7 @@ public class WorldUtil
             {
                 for (PropertyParameter propertyParameter : propertyParameters)
                 {
-                    if (!propertyParameter.isValid(blockState))
+                    if (propertyParameter.isInvalid(blockState))
                     {
                         return false;
                     }
@@ -145,23 +145,17 @@ public class WorldUtil
                     new PropertyParameter.ValuesOrMissing<>(BlockStateProperties.BOTTOM,
                             Util.makeArray(Blocks.SCAFFOLDING),
                             true,
-                            false),
-                    new PropertyParameter.ValuesOrMissing<>(BlockStateProperties.POWER_0_15,
-                            Util.makeArray(Blocks.TARGET),
-                            true,
-                            0),
-                    new PropertyParameter.ValuesOrMissing<>(BlockStateProperties.UNSTABLE,
-                            Util.makeArray(Blocks.TNT),
-                            true,
-                            false)
-            ));
+                            false), new PropertyParameter.ValuesOrMissing<>(BlockStateProperties.POWER_0_15,
+                            Util.makeArray(Blocks.TARGET), true, 0),
+                    new PropertyParameter.ValuesOrMissing<>(BlockStateProperties.UNSTABLE, Util.makeArray(Blocks.TNT),
+                            true, false)));
         }
-        validWorldGenerationBlockStates = Lists.newArrayList(
-                StreamSupport.stream(Registry.BLOCK.spliterator(), false)
-                        .flatMap((block) -> block.getStateContainer().getValidStates().stream())
-                        .filter(WorldUtil::isValidForWorldGeneration)
-                        .collect(Collectors.toList())
-        );
+        validWorldGenerationBlockStates = StreamSupport.stream(Registry.BLOCK.spliterator(), false)
+                                                       .flatMap((block) -> block.getStateContainer()
+                                                                                .getValidStates()
+                                                                                .stream())
+                                                       .filter(WorldUtil::isValidForWorldGeneration)
+                                                       .collect(Collectors.toList());
         List<String> strings = Lists.newArrayList();
         validWorldGenerationBlockStates.forEach((blockState -> strings.add("\n" + blockState.toString())));
         strings.sort(String::compareToIgnoreCase);
