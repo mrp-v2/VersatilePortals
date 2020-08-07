@@ -8,18 +8,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BasicItem extends Item {
+public class BasicItem extends Item
+{
 
-	public static ItemGroup MAIN_ITEM_GROUP = new ItemGroup("random_dimensions") {
-		@Override
-		@OnlyIn(Dist.CLIENT)
-		public ItemStack createIcon() {
-			return new ItemStack(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
-		}
-	};
+    public static ItemGroup MAIN_ITEM_GROUP = new ItemGroup(RandomDimensions.ID)
+    {
+        @Override @OnlyIn(Dist.CLIENT) public ItemStack createIcon()
+        {
+            return new ItemStack(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
+        }
+    };
 
-	public BasicItem(Properties properties, String id) {
-		super(properties.group(MAIN_ITEM_GROUP));
-		this.setRegistryName(RandomDimensions.ID, id);
-	}
+    public BasicItem(Properties properties, String id)
+    {
+        super(properties.group(MAIN_ITEM_GROUP));
+        this.setRegistryName(RandomDimensions.ID, id);
+    }
 }

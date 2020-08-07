@@ -1,13 +1,13 @@
 {
-	"block.randomdimensions.portal": "Portal",
-	"block.randomdimensions.portal_frame": "Portal Frame",
-	"block.randomdimensions.portal_controller": "Portal Controller",
-	"container.portal_controller": "Portal Controller",
-	"item.randomdimensions.portal_lighter": "Portal Lighter",
-	"itemGroup.random_dimensions": "Random Dimensions",
-	"randomdimensions.portal_controller.color.b": "Portal Color B: ",
-	"randomdimensions.portal_controller.color.g": "Portal Color G: ",
-	"randomdimensions.portal_controller.color.r": "Portal Color R: ",
-	"randomdimensions.portal_controller.slot_label.dimension": "-Dimension Controller",
-	"randomdimensions.portal_controller.slot_label.worldgen": "-Worldgen Controller"
+    "block.randomdimensions.portal": "Portal",
+    "block.randomdimensions.portal_frame": "Portal Frame",
+    "block.randomdimensions.portal_controller": "Portal Controller",
+    "randomdimensions.container.portal_controller": "Portal Controller",
+    "item.randomdimensions.portal_lighter": "Portal Lighter",
+    "itemGroup.randomdimensions": "Random Dimensions",
+    "randomdimensions.portal_controller.color.b": "Portal Color B: ",
+    "randomdimensions.portal_controller.color.g": "Portal Color G: ",
+    "randomdimensions.portal_controller.color.r": "Portal Color R: ",
+    "randomdimensions.portal_controller.slot_label.dimension": "-Dimension Controller",
+    "randomdimensions.portal_controller.slot_label.worldgen": "-Worldgen Controller"
 }

@@ -1,6 +1,7 @@
 package mrp_v2.randomdimensions.util;
 
 import mrp_v2.randomdimensions.RandomDimensions;
+import mrp_v2.randomdimensions.block.IndestructiblePortalFrameBlock;
 import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.world.util.WorldUtil;
 import net.minecraft.block.Block;
@@ -27,8 +28,7 @@ public class RegistryHandler
 
     public static void postRegistering()
     {
-        WorldUtil.addInvalidBlockSupertypes(PortalBlock.class);
-        WorldUtil.addInvalidBlocks(ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+        WorldUtil.addInvalidBlockSupertypes(PortalBlock.class, IndestructiblePortalFrameBlock.class);
     }
 
     @SubscribeEvent

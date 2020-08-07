@@ -1,0 +1,5 @@
+{
+    "parent": "randomdimensions:block/controller_template_ew", "textures": {
+    "base": "randomdimensions:block/frame", "sub": "minecraft:block/enchanting_table_top"
+}
+}

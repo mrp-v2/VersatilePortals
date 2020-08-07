@@ -16,25 +16,29 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
-public class RegistryHandler {
+public class RegistryHandler
+{
 
-	@SubscribeEvent
-	public static void registerBlockColors(final ColorHandlerEvent.Block event) {
-		event.getBlockColors().register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK,
-				ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK);
-	}
+    static
+    {
+        ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, PortalControllerScreen::new);
+    }
 
-	/**
-	 * @param event
-	 */
-	@SuppressWarnings("resource")
-	@SubscribeEvent
-	public static void registerParticles(final ParticleFactoryRegisterEvent event) {
-		Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE,
-				PortalParticle.Factory::new);
-	}
+    @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)
+    {
+        event.getBlockColors()
+             .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
+                     ObjectHolder.PORTAL_FRAME_BLOCK, ObjectHolder.PORTAL_CONTROLLER_BLOCK,
+                     ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+    }
 
-	static {
-		ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, PortalControllerScreen::new);
-	}
+    /**
+     * @param event
+     */
+    @SuppressWarnings("resource") @SubscribeEvent public static void registerParticles(
+            final ParticleFactoryRegisterEvent event)
+    {
+        Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE,
+                PortalParticle.Factory::new);
+    }
 }

@@ -8,24 +8,28 @@ import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.Nullable;
+
 public class PortalControllerItemStackHandler extends ItemStackHandler
-		implements NonNullSupplier<IItemHandler>, IInventory {
+        implements NonNullSupplier<IItemHandler>, IInventory
+{
 
-	public static int SLOTS = 2;
+    public static int SLOTS = 2;
 
-	private final PortalControllerTileEntity portalController;
+    private final PortalControllerTileEntity portalController;
 
-	public PortalControllerItemStackHandler(PortalControllerTileEntity portalController) {
-		super(SLOTS);
-		this.portalController = portalController;
-	}
+    public PortalControllerItemStackHandler(@Nullable PortalControllerTileEntity portalController)
+    {
+        super(SLOTS);
+        this.portalController = portalController;
+    }
 
-	@Override
-	public IItemHandler get() {
-		return this;
-	}
+    @Override public IItemHandler get()
+    {
+        return this;
+    }
 
-	@Override
+    @Override
 	public void clear() {
 		for (int i = 0; i < super.getSlots(); i++) {
 			super.setStackInSlot(i, ItemStack.EMPTY);
