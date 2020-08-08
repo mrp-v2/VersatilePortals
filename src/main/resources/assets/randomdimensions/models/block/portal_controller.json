@@ -1,0 +1,8 @@
+{
+    "parent": "randomdimensions:block/controller_template",
+    "textures": {
+        "base": "randomdimensions:block/frame",
+        "end": "randomdimensions:block/controller",
+        "sub": "randomdimensions:block/portal"
+    }
+}

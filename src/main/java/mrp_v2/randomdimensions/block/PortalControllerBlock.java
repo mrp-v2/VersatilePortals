@@ -52,7 +52,8 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
         return this.getDefaultState()
-                   .with(BlockStateProperties.HORIZONTAL_AXIS, context.getPlacementHorizontalFacing().getAxis());
+                   .with(BlockStateProperties.HORIZONTAL_AXIS,
+                           context.getPlacementHorizontalFacing().rotateY().getAxis());
     }
 
     @Override

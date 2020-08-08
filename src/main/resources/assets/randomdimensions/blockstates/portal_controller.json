@@ -1,9 +1,10 @@
 {
 	"variants": {
         "axis=x": {
-            "model": "randomdimensions:block/portal_controller_ns"
+            "model": "randomdimensions:block/portal_controller"
         }, "axis=z": {
-            "model": "randomdimensions:block/portal_controller_ew"
+            "model": "randomdimensions:block/portal_controller",
+            "y": 90
         }
     }
 }

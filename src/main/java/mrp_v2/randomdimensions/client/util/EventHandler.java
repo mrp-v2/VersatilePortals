@@ -10,14 +10,16 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
-public class EventHandler {
+public class EventHandler
+{
 
-	/**
-	 * @param event
-	 */
-	@SubscribeEvent
-	public static void clientSetup(final FMLClientSetupEvent event) {
-		RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK, RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK, RenderType.getTranslucent());
-	}
+    /**
+     * @param event
+     */
+    @SubscribeEvent public static void clientSetup(final FMLClientSetupEvent event)
+    {
+        RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK, RenderType.getTranslucent());
+        RenderTypeLookup.setRenderLayer(ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK, RenderType.getTranslucent());
+        RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_CONTROLLER_BLOCK, RenderType.getTranslucent());
+    }
 }
