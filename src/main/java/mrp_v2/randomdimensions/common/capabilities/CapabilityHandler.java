@@ -25,10 +25,10 @@ public class CapabilityHandler {
 	public static void attachEntityCapabilities(final AttachCapabilitiesEvent<Entity> event) {
 		if (event.getObject() instanceof PlayerEntity) {
 			event.addCapability(new ResourceLocation(RandomDimensions.ID, "playerportaldatacapability"),
-					new PlayerPortalDataProvider());
+					new PlayerPortalDataProvider(event));
 		} else {
 			event.addCapability(new ResourceLocation(RandomDimensions.ID, "portaldatacapability"),
-					new PortalDataProvider());
+					new PortalDataProvider(event));
 		}
 	}
 
