@@ -54,7 +54,7 @@ public class PortalFrameBlock extends BasicBlock
         PortalControllerTileEntity testController = null;
         for (PortalBlock.Size size : getPortalSizes(pos, iBlockDisplayReader, false))
         {
-            PortalControllerTileEntity testTileEntity = size.getPortalController(iBlockDisplayReader);
+            PortalControllerTileEntity testTileEntity = size.getPortalController(iBlockDisplayReader).getLeft();
             if (testTileEntity != null)
             {
                 if (testController != null && testController != testTileEntity)

@@ -142,9 +142,15 @@ public class PortalBlock extends BasicBlock
                     return;
                 }
             }
-            RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_ ?
+            PortalControllerTileEntity controller =
                     new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS)).getPortalController(worldIn)
-                                                                                           .getTeleportDestination() :
+                                                                                           .getLeft();
+            if (controller == null)
+            {
+                return;
+            }
+            RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_ ?
+                    controller.getTeleportDestination() :
                     World.field_234918_g_;
             ServerWorld serverWorld = ((ServerWorld) worldIn).getServer().getWorld(registryKey);
             if (serverWorld == null)
@@ -256,7 +262,7 @@ public class PortalBlock extends BasicBlock
     public static int getColor(BlockState blockState, IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
     {
         Size size = new Size(iBlockDisplayReader, pos, blockState.get(BlockStateProperties.HORIZONTAL_AXIS));
-        PortalControllerTileEntity portalControllerTE = size.getPortalController(iBlockDisplayReader);
+        PortalControllerTileEntity portalControllerTE = size.getPortalController(iBlockDisplayReader).getLeft();
         if (portalControllerTE != null)
         {
             return portalControllerTE.getPortalColor();
@@ -320,7 +326,7 @@ public class PortalBlock extends BasicBlock
             {
                 this.height = this.calculatePortalHeight(iBlockDisplayReader);
             }
-            if (this.getPortalController(iBlockDisplayReader) == null)
+            if (!this.getPortalController(iBlockDisplayReader).getRight())
             {
                 this.invalidate();
             }
@@ -367,28 +373,28 @@ public class PortalBlock extends BasicBlock
             return blockState.isAir() || blockState.isIn(PORTAL_BLOCK);
         }
 
-        @Nullable public PortalControllerTileEntity getPortalController(IBlockDisplayReader iBlockDisplayReader)
+        @Nullable
+        public Pair<PortalControllerTileEntity, Boolean> getPortalController(IBlockDisplayReader iBlockDisplayReader)
         {
             PortalControllerTileEntity portalControllerTE = null;
+            Boolean found = false;
             if (this.isValid())
             {
                 for (BlockPos edge : this.getFrameBlocks())
                 {
                     if (iBlockDisplayReader.getBlockState(edge).isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
                     {
-                        TileEntity tileEntity = iBlockDisplayReader.getTileEntity(edge);
-                        if (tileEntity instanceof PortalControllerTileEntity)
+                        if (found)
                         {
-                            if (portalControllerTE != null)
-                            {
-                                return null;
-                            }
-                            portalControllerTE = (PortalControllerTileEntity) tileEntity;
+                            return Pair.of(null, false);
                         }
+                        TileEntity temp = iBlockDisplayReader.getTileEntity(edge);
+                        portalControllerTE = temp == null ? null : (PortalControllerTileEntity) temp;
+                        found = true;
                     }
                 }
             }
-            return portalControllerTE;
+            return Pair.of(portalControllerTE, found);
         }
 
         public boolean isValid()
