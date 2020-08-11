@@ -14,6 +14,7 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
@@ -27,17 +28,20 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class PortalControllerTileEntity extends TileEntity implements ICapabilityProvider, INamedContainerProvider
+public class PortalControllerTileEntity extends TileEntity
+        implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity
 {
 
     public static final String ID = "portal_controller";
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
     public static final int PORTAL_CONTROLLER_UPDATE_FLAGS = 0;
+    public static final int TICKS_PER_RENDER_REVOLUTION = 120;
     private static final String INVENTORY_NBT_ID = "Inventory";
     private static final String PORTAL_COLOR_NBT_ID = "PortalColor";
     private final PortalControllerItemStackHandler itemStackHandler;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
+    public int ticks;
     private ITextComponent customName;
     private int portalColor;
 
@@ -157,5 +161,13 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
     public void onInventorySlotChanged()
     {
         this.sendUpdateToClient();
+    }
+
+    @Override public void tick()
+    {
+        if (++this.ticks >= TICKS_PER_RENDER_REVOLUTION)
+        {
+            this.ticks = 0;
+        }
     }
 }
