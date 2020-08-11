@@ -18,6 +18,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
@@ -29,12 +32,15 @@ import javax.annotation.Nullable;
 
 public class PortalControllerBlock extends PortalFrameBlock
 {
-
     public static final String ID = "portal_controller";
+    private static final VoxelShape SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D),
+            makeCuboidShape(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D),
+            makeCuboidShape(3.0D, 0.0D, 0.0D, 13.0D, 3.0, 16.0D),
+            makeCuboidShape(3.0D, 13.0D, 0.0D, 13.0D, 16.0D, 16.0D)).simplify();
 
     public PortalControllerBlock()
     {
-        super(ID);
+        super(ID, Properties::notSolid);
         this.setDefaultState(
                 this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
     }
@@ -115,5 +121,11 @@ public class PortalControllerBlock extends PortalFrameBlock
             return ActionResultType.func_233537_a_(worldIn.isRemote);
         }
         return ActionResultType.PASS;
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
+    {
+        return SHAPE;
     }
 }

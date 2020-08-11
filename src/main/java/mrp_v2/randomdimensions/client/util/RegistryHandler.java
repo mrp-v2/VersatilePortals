@@ -32,11 +32,8 @@ public class RegistryHandler
                      ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
     }
 
-    /**
-     * @param event
-     */
-    @SuppressWarnings("resource") @SubscribeEvent public static void registerParticles(
-            final ParticleFactoryRegisterEvent event)
+    @SuppressWarnings("resource") @SubscribeEvent
+    public static void registerParticles(final ParticleFactoryRegisterEvent event)
     {
         Minecraft.getInstance().particles.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE,
                 PortalParticle.Factory::new);

@@ -24,57 +24,70 @@ public class PortalControllerItemStackHandler extends ItemStackHandler
         this.portalController = portalController;
     }
 
+    @Override protected void onContentsChanged(int slot)
+    {
+        super.onContentsChanged(slot);
+        if (portalController != null)
+        {
+            portalController.onInventorySlotChanged();
+        }
+    }
+
     @Override public IItemHandler get()
     {
         return this;
     }
 
-    @Override
-	public void clear() {
-		for (int i = 0; i < super.getSlots(); i++) {
-			super.setStackInSlot(i, ItemStack.EMPTY);
-		}
-	}
+    @Override public void clear()
+    {
+        for (int i = 0; i < this.getSlots(); i++)
+        {
+            this.setStackInSlot(i, ItemStack.EMPTY);
+        }
+    }
 
-	@Override
-	public int getSizeInventory() {
-		return super.getSlots();
-	}
+    @Override public int getSizeInventory()
+    {
+        return this.getSlots();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		for (int i = 0; i < super.getSlots(); i++) {
-			if (!super.getStackInSlot(i).isEmpty()) {
-				return false;
-			}
-		}
-		return true;
-	}
+    @Override public boolean isEmpty()
+    {
+        for (int i = 0; i < this.getSlots(); i++)
+        {
+            if (!this.getStackInSlot(i).isEmpty())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		return super.extractItem(index, count, false);
-	}
+    @Override public ItemStack decrStackSize(int index, int count)
+    {
+        return this.extractItem(index, count, false);
+    }
 
-	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return super.extractItem(index, super.getStackInSlot(index).getCount(), false);
-	}
+    @Override public ItemStack removeStackFromSlot(int index)
+    {
+        return this.extractItem(index, this.getStackInSlot(index).getCount(), false);
+    }
 
-	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		super.setStackInSlot(index, stack);
-	}
+    @Override public void setInventorySlotContents(int index, ItemStack stack)
+    {
+        this.setStackInSlot(index, stack);
+    }
 
-	@Override
-	public void markDirty() {
-		if (this.portalController != null) {
-			this.portalController.markDirty();
-		}
-	}
+    @Override public void markDirty()
+    {
+        if (this.portalController != null)
+        {
+            this.portalController.markDirty();
+        }
+    }
 
-	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		return true;
-	}
+    @Override public boolean isUsableByPlayer(PlayerEntity player)
+    {
+        return true;
+    }
 }

@@ -11,7 +11,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT) public class PortalParticle extends net.minecraft.client.particle.PortalParticle
 {
-
     protected PortalParticle(ClientWorld clientWorld, double x, double y, double z, double xSpeed, double ySpeed,
             double zSpeed, int color)
     {

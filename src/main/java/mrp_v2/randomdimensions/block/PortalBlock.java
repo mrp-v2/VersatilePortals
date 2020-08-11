@@ -1,6 +1,7 @@
 package mrp_v2.randomdimensions.block;
 
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
@@ -19,6 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -40,8 +42,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -91,32 +95,6 @@ public class PortalBlock extends BasicBlock
         }
         size = new Size(iBlockDisplayReader, pos, Direction.Axis.Z);
         return size.isValid() && size.portalBlockCount == 0 ? size : null;
-    }
-
-    @SuppressWarnings("deprecation") public static void reRenderPortal(World world, BlockPos pos)
-    {
-        if (world.isBlockLoaded(pos))
-        {
-            Consumer<BlockPos> operation = ((blockPos) ->
-            {
-                BlockState state = world.getBlockState(blockPos);
-                world.notifyBlockUpdate(blockPos, state, state, PortalControllerTileEntity.PORTAL_COLOR_UPDATE_FLAGS);
-            });
-            if (world.getBlockState(pos).getBlock() instanceof PortalBlock)
-            {
-                new Size(world, pos,
-                        world.getBlockState(pos).get(BlockStateProperties.HORIZONTAL_AXIS)).doOperationOnBlocks(
-                        operation);
-            }
-            if (world.getBlockState(pos).getBlock() instanceof PortalFrameBlock)
-            {
-                Size size = Size.getSizeAt(world, pos);
-                if (size.isValid())
-                {
-                    size.doOperationOnFrameBlocks(operation);
-                }
-            }
-        }
     }
 
     @SuppressWarnings("deprecation") @Override
@@ -314,16 +292,7 @@ public class PortalBlock extends BasicBlock
 
         public Size(IBlockDisplayReader iBlockDisplayReader, BlockPos pos, Axis axis)
         {
-            this.axis = axis;
-            if (axis == Axis.X)
-            {
-                this.leftDir = Direction.EAST;
-                this.rightDir = Direction.WEST;
-            } else
-            {
-                this.leftDir = Direction.NORTH;
-                this.rightDir = Direction.SOUTH;
-            }
+            this(axis);
             if (!isOrCanPlacePortal(iBlockDisplayReader.getBlockState(pos)))
             {
                 this.invalidate();
@@ -354,6 +323,20 @@ public class PortalBlock extends BasicBlock
             if (this.getPortalController(iBlockDisplayReader) == null)
             {
                 this.invalidate();
+            }
+        }
+
+        private Size(Axis axis)
+        {
+            this.axis = axis;
+            if (axis == Axis.X)
+            {
+                this.leftDir = Direction.EAST;
+                this.rightDir = Direction.WEST;
+            } else
+            {
+                this.leftDir = Direction.NORTH;
+                this.rightDir = Direction.SOUTH;
             }
         }
 
@@ -504,15 +487,52 @@ public class PortalBlock extends BasicBlock
             this.height = 0;
         }
 
-        @Nullable public static Size getSizeAt(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+        private Size(Axis axis, BlockPos bottomLeft, int height, int width, int portalBlockCount)
         {
-            Size size = new Size(iBlockDisplayReader, pos, Direction.Axis.X);
-            if (size.isValid())
+            this(axis);
+            this.bottomLeft = bottomLeft;
+            this.height = height;
+            this.width = width;
+            this.portalBlockCount = portalBlockCount;
+        }
+
+        public static void writeListToBuffer(List<Size> sizes, PacketBuffer buffer)
+        {
+            buffer.writeInt(sizes.size());
+            for (Size size : sizes)
             {
-                return size;
+                size.writeToBuffer(buffer);
             }
-            size = new Size(iBlockDisplayReader, pos, Direction.Axis.Z);
-            return size.isValid() ? size : null;
+        }
+
+        public void writeToBuffer(PacketBuffer buffer)
+        {
+            buffer.writeBlockPos(this.bottomLeft);
+            buffer.writeInt(this.height);
+            buffer.writeInt(this.width);
+            buffer.writeInt(this.portalBlockCount);
+            buffer.writeEnumValue(this.axis);
+        }
+
+        public static List<Size> readListFromBuffer(PacketBuffer buffer)
+        {
+            int length = buffer.readInt();
+            List<Size> sizes = Lists.newArrayListWithCapacity(length);
+            for (int i = 0; i < length; i++)
+            {
+                sizes.add(readFromBuffer(buffer));
+            }
+            return sizes;
+        }
+
+        public static Size readFromBuffer(PacketBuffer buffer)
+        {
+            BlockPos bottomLeft = buffer.readBlockPos();
+            int height = buffer.readInt();
+            int width = buffer.readInt();
+            int portalBlockCount = buffer.readInt();
+            Axis axis = buffer.readEnumValue(Axis.class);
+            return new Size(axis, bottomLeft, height, width, portalBlockCount);
         }
 
         public int getHeight()
@@ -543,6 +563,13 @@ public class PortalBlock extends BasicBlock
             }
         }
 
+        public Pair<BlockPos, BlockPos> getBlockRange()
+        {
+            BlockPos a = this.bottomLeft.down().offset(this.leftDir);
+            BlockPos b = this.bottomLeft.up(this.height).offset(this.rightDir, this.width);
+            return Pair.of(a, b);
+        }
+
         public boolean isValidWithSizeAndCount()
         {
             return this.isValid() && this.doesSizeMatchCount();
@@ -551,20 +578,6 @@ public class PortalBlock extends BasicBlock
         private boolean doesSizeMatchCount()
         {
             return this.portalBlockCount >= this.width * this.height;
-        }
-
-        public void doOperationOnBlocks(Consumer<BlockPos> operation)
-        {
-            this.doOperationOnPortalBlocks(operation);
-            this.doOperationOnFrameBlocks(operation);
-        }
-
-        public void doOperationOnFrameBlocks(Consumer<BlockPos> operation)
-        {
-            for (BlockPos pos : this.getFrameBlocks())
-            {
-                operation.accept(pos);
-            }
         }
     }
 }

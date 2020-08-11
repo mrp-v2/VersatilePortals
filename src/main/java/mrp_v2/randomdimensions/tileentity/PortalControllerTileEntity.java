@@ -1,7 +1,7 @@
 package mrp_v2.randomdimensions.tileentity;
 
 import mrp_v2.randomdimensions.RandomDimensions;
-import mrp_v2.randomdimensions.block.PortalBlock;
+import mrp_v2.randomdimensions.block.PortalFrameBlock;
 import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.util.ObjectHolder;
@@ -18,7 +18,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -32,12 +31,11 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 {
 
     public static final String ID = "portal_controller";
-
-    private static final String INVENTORY_NBT_ID = "Inventory";
-    private static final String PORTAL_COLOR_NBT_ID = "PortalColor";
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
-    public static final int PORTAL_COLOR_UPDATE_FLAGS = 0;
+    public static final int PORTAL_CONTROLLER_UPDATE_FLAGS = 0;
+    private static final String INVENTORY_NBT_ID = "Inventory";
+    private static final String PORTAL_COLOR_NBT_ID = "PortalColor";
     private final PortalControllerItemStackHandler itemStackHandler;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
     private ITextComponent customName;
@@ -60,40 +58,9 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
         this.portalColor = DEFAULT_PORTAL_COLOR;
     }
 
-    @Override public void read(BlockState state, CompoundNBT compound)
+    public PortalControllerItemStackHandler getItemStackHandler()
     {
-        super.read(state, compound);
-        this.itemStackHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
-        this.portalColor = compound.getInt(PORTAL_COLOR_NBT_ID);
-    }
-
-    @Override public CompoundNBT write(CompoundNBT compound)
-    {
-        super.write(compound);
-        compound.put(INVENTORY_NBT_ID, this.itemStackHandler.serializeNBT());
-        compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
-        return compound;
-    }
-
-    @Override public SUpdateTileEntityPacket getUpdatePacket()
-    {
-        CompoundNBT compound = new CompoundNBT();
-        compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
-        int id = -1;
-        return new SUpdateTileEntityPacket(this.getPos(), id, compound);
-    }
-
-    @Override public CompoundNBT getUpdateTag()
-    {
-        CompoundNBT compound = super.getUpdateTag();
-        compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
-        return compound;
-    }
-
-    @Override public void remove()
-    {
-        super.remove();
-        this.inventoryLazyOptional.invalidate();
+        return itemStackHandler;
     }
 
     @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
@@ -128,24 +95,42 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
 
     @Override public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
-        if (!this.pos.equals(pkt.getPos()))
+        this.read(this.getBlockState(), pkt.getNbtCompound());
+        if (this.world.isBlockLoaded(this.pos))
         {
-            return;
+            PortalFrameBlock.updatePortals(PortalFrameBlock.getPortalSizes(this.pos, this.world, false));
         }
-        int newColor = pkt.getNbtCompound().getInt(PORTAL_COLOR_NBT_ID);
-        if (this.portalColor != newColor)
-        {
-            this.portalColor = newColor;
-            if (this.world.isBlockLoaded(this.pos))
-            {
-                BlockState state = this.world.getBlockState(this.pos);
-                this.world.notifyBlockUpdate(this.pos, state, state, PORTAL_COLOR_UPDATE_FLAGS);
-                for (BlockPos pos : Util.getNeighbors(this.pos))
-                {
-                    PortalBlock.reRenderPortal(this.world, pos);
-                }
-            }
-        }
+    }
+
+    @Override public void read(BlockState state, CompoundNBT compound)
+    {
+        super.read(state, compound);
+        this.portalColor = compound.getInt(PORTAL_COLOR_NBT_ID);
+        this.itemStackHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
+    }
+
+    @Override public CompoundNBT write(CompoundNBT compound)
+    {
+        super.write(compound);
+        compound.put(INVENTORY_NBT_ID, this.itemStackHandler.serializeNBT());
+        compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
+        return compound;
+    }
+
+    @Override public SUpdateTileEntityPacket getUpdatePacket()
+    {
+        return new SUpdateTileEntityPacket(this.getPos(), -1, this.write(new CompoundNBT()));
+    }
+
+    @Override public CompoundNBT getUpdateTag()
+    {
+        return this.write(super.getUpdateTag());
+    }
+
+    @Override public void remove()
+    {
+        this.inventoryLazyOptional.invalidate();
+        super.remove();
     }
 
     public int getPortalColor()
@@ -153,14 +138,24 @@ public class PortalControllerTileEntity extends TileEntity implements ICapabilit
         return this.portalColor;
     }
 
-    public void setPortalColor(int newPortalColor)
+    public void onScreenClosed(int newPortalColor)
     {
         if (this.portalColor != newPortalColor)
         {
             this.portalColor = newPortalColor;
             this.markDirty();
-            this.world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(),
-                    2 | PORTAL_COLOR_UPDATE_FLAGS);
+            this.sendUpdateToClient();
         }
+    }
+
+    private void sendUpdateToClient()
+    {
+        BlockState state = this.getBlockState();
+        this.world.notifyBlockUpdate(this.getPos(), state, state, 2 | PORTAL_CONTROLLER_UPDATE_FLAGS);
+    }
+
+    public void onInventorySlotChanged()
+    {
+        this.sendUpdateToClient();
     }
 }
