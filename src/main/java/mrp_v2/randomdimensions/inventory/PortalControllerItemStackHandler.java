@@ -14,7 +14,7 @@ public class PortalControllerItemStackHandler extends ItemStackHandler
         implements NonNullSupplier<IItemHandler>, IInventory
 {
 
-    public static final int SLOTS = 2;
+    public static final int SLOTS = 1;
 
     private final PortalControllerTileEntity portalController;
 

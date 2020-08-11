@@ -95,7 +95,6 @@ public class PortalControllerScreen extends ContainerScreen<PortalControllerCont
 	@Override
 	protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y) {
 		super.drawGuiContainerForegroundLayer(stack, x, y);
-		this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "dimension"), 8, 92, 4210752);
-		this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "worldgen"), 8, 125, 4210752);
+		this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "control_item"), 8, 92, 4210752);
 	}
 }

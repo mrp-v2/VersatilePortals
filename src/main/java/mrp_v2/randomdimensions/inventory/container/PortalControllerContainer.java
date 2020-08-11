@@ -16,20 +16,23 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.IContainerFactory;
 
-public class PortalControllerContainer extends Container {
+public class PortalControllerContainer extends Container
+{
 
 	public static final String ID = "portal_controller";
 
 	private final PortalControllerItemStackHandler inventory;
 	private final int color;
 	private final BlockPos pos;
-	public static final int Y_SIZE = 252;
+	public static final int Y_SIZE = 218;
 
-	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn) {
+	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn)
+	{
 		this(id, playerInventoryIn, PortalControllerTileEntity.DEFAULT_PORTAL_COLOR, null);
 	}
 
-	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn, int color, BlockPos pos) {
+	public PortalControllerContainer(int id, PlayerInventory playerInventoryIn, int color, BlockPos pos)
+	{
 		this(id, playerInventoryIn, new PortalControllerItemStackHandler(null), color, pos);
 	}
 
@@ -49,7 +52,6 @@ public class PortalControllerContainer extends Container {
 
 	private void addSlots(PlayerInventory playerInventory) {
 		this.addSlot(new Slot(this.inventory, 0, 80, 104));
-		this.addSlot(new Slot(this.inventory, 1, 80, 138));
 		// player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
