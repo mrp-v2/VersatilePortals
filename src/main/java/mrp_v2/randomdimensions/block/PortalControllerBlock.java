@@ -1,6 +1,5 @@
 package mrp_v2.randomdimensions.block;
 
-import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
 import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.Block;
@@ -17,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -28,6 +28,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -94,9 +95,9 @@ public class PortalControllerBlock extends PortalFrameBlock
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
                 if (itemHandler.isPresent())
                 {
-                    InventoryHelper.dropInventoryItems(worldIn, pos,
-                            (PortalControllerItemStackHandler) itemHandler.orElse(
-                                    new PortalControllerItemStackHandler(null)));
+                    NonNullList<ItemStack> itemStacks = NonNullList.create();
+                    itemStacks.add(itemHandler.orElse(new ItemStackHandler()).getStackInSlot(0));
+                    InventoryHelper.dropItems(worldIn, pos, itemStacks);
                 }
             }
         }

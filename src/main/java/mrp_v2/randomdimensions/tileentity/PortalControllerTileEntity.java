@@ -71,7 +71,7 @@ public class PortalControllerTileEntity extends TileEntity
 
     @Nullable @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
     {
-        if (this.itemStackHandler.isEmpty())
+        if (this.itemStackHandler.getStackInSlot(0).isEmpty())
         {
             return null;
         }
@@ -166,6 +166,7 @@ public class PortalControllerTileEntity extends TileEntity
 
     public void onInventorySlotChanged()
     {
+        this.markDirty();
         this.sendUpdateToClient();
     }
 
@@ -181,7 +182,7 @@ public class PortalControllerTileEntity extends TileEntity
         }
         if (this.ticks % 4 == 0)
         {
-            if (this.itemStackHandler.isEmpty())
+            if (this.itemStackHandler.getStackInSlot(0).isEmpty())
             {
                 return;
             }
