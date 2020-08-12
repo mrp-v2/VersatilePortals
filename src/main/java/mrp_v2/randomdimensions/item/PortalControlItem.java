@@ -4,6 +4,7 @@ import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 public abstract class PortalControlItem extends BasicSingleItem
@@ -16,11 +17,12 @@ public abstract class PortalControlItem extends BasicSingleItem
         super(id);
     }
 
-    public static void addDataToItem(ItemStack stack, String worldID)
+    public static void addTeleportDataToItem(ItemStack stack, String worldID)
     {
         CompoundNBT compound = stack.getOrCreateTag();
         compound.putString(WORLD_ID_NBT_ID, worldID);
         stack.setTag(compound);
+        stack.setDisplayName(new StringTextComponent(worldID));
     }
 
     public static RegistryKey<World> getTeleportDestination(ItemStack stack)

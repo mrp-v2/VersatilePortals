@@ -4,6 +4,7 @@ import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.client.gui.screen.PortalControllerScreen;
 import mrp_v2.randomdimensions.client.particle.PortalControllerParticle;
 import mrp_v2.randomdimensions.client.particle.PortalParticle;
+import mrp_v2.randomdimensions.client.renderer.color.ExistingWorldControlItemColorer;
 import mrp_v2.randomdimensions.client.renderer.color.PortalColorer;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.client.Minecraft;
@@ -32,6 +33,12 @@ public class RegistryHandler
              .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
                      ObjectHolder.PORTAL_FRAME_BLOCK, ObjectHolder.PORTAL_CONTROLLER_BLOCK,
                      ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+    }
+
+    @SubscribeEvent public static void registerItemColors(final ColorHandlerEvent.Item event)
+    {
+        event.getItemColors()
+             .register(ExistingWorldControlItemColorer.INSTANCE, ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
     }
 
     @SuppressWarnings("resource") @SubscribeEvent

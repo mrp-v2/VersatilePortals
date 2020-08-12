@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "randomdimensions:item/existing_world_control"
+    }
+}
