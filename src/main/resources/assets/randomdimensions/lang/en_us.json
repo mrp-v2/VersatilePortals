@@ -3,6 +3,8 @@
     "block.randomdimensions.portal_frame": "Portal Frame",
     "block.randomdimensions.portal_controller": "Portal Controller",
     "randomdimensions.container.portal_controller": "Portal Controller",
+    "item.randomdimensions.empty_existing_world_control": "Empty Existing World Control",
+    "item.randomdimensions.existing_world_control": "Existing World Control",
     "item.randomdimensions.portal_lighter": "Portal Lighter",
     "itemGroup.randomdimensions": "Random Dimensions",
     "randomdimensions.portal_controller.color.b": "Portal Color B: ",
