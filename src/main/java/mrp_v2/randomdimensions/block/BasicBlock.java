@@ -1,7 +1,7 @@
 package mrp_v2.randomdimensions.block;
 
 import mrp_v2.randomdimensions.RandomDimensions;
-import mrp_v2.randomdimensions.item.BasicItem;
+import mrp_v2.randomdimensions.item.BasicSingleItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
@@ -15,10 +15,10 @@ public class BasicBlock extends Block {
 	}
 
 	public BlockItem createBlockItem() {
-		BlockState defaultState = this.getDefaultState();
-		BlockItem blockItem = new BlockItem(this,
-				new Item.Properties().addToolType(this.getHarvestTool(defaultState), this.getHarvestLevel(defaultState))
-						.group(BasicItem.MAIN_ITEM_GROUP));
+        BlockState defaultState = this.getDefaultState();
+        BlockItem blockItem = new BlockItem(this,
+                new Item.Properties().addToolType(this.getHarvestTool(defaultState), this.getHarvestLevel(defaultState))
+                                     .group(BasicSingleItem.MAIN_ITEM_GROUP));
 		blockItem.setRegistryName(this.getRegistryName());
 		return blockItem;
 	}

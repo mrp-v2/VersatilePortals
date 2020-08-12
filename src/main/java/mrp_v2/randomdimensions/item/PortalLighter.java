@@ -6,14 +6,13 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 
-public class PortalLighter extends BasicItem
+public class PortalLighter extends BasicSingleItem
 {
-
     public static final String ID = "portal_lighter";
 
     public PortalLighter()
     {
-        super(new Properties().maxDamage(64), ID);
+        super((properties) -> properties.maxDamage(64), ID);
     }
 
     @SuppressWarnings("resource") @Override public ActionResultType onItemUse(ItemUseContext context)

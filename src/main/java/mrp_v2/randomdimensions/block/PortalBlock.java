@@ -142,16 +142,18 @@ public class PortalBlock extends BasicBlock
                     return;
                 }
             }
-            PortalControllerTileEntity controller =
-                    new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS)).getPortalController(worldIn)
-                                                                                           .getLeft();
-            if (controller == null)
+            RegistryKey<World> registryKey = World.field_234918_g_;
+            if (worldIn.func_234923_W_() == World.field_234918_g_)
             {
-                return;
+                PortalControllerTileEntity controller =
+                        new Size(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS)).getPortalController(
+                                worldIn).getLeft();
+                if (controller == null)
+                {
+                    return;
+                }
+                registryKey = controller.getTeleportDestination();
             }
-            RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_ ?
-                    controller.getTeleportDestination() :
-                    World.field_234918_g_;
             if (registryKey == null)
             {
                 return;

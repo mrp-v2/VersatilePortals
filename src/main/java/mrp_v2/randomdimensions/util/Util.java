@@ -6,12 +6,16 @@ import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class Util
@@ -80,6 +84,15 @@ public class Util
                      .orElseThrow(() -> new RuntimeException("Could not get an IPlayerPortalDataCapability!"));
     }
 
+    @Nullable public static RegistryKey<World> createWorldKey(String worldID)
+    {
+        if (worldID.isEmpty())
+        {
+            return null;
+        }
+        return RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(worldID));
+    }
+
     public static String getWorldID(World world)
     {
         return world.func_234923_W_().func_240901_a_().toString();
@@ -113,7 +126,7 @@ public class Util
         return blocks;
     }
 
-    public static <T> T[] makeArray(T... objects)
+    @SafeVarargs public static <T> T[] makeArray(T... objects)
     {
         return objects;
     }

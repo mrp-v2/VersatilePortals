@@ -5,6 +5,8 @@ import mrp_v2.randomdimensions.block.*;
 import mrp_v2.randomdimensions.common.capabilities.PlayerPortalDataStorage;
 import mrp_v2.randomdimensions.common.capabilities.PortalDataStorage;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
+import mrp_v2.randomdimensions.item.EmptyExistingWorldTeleportItem;
+import mrp_v2.randomdimensions.item.ExistingWorldTeleportItem;
 import mrp_v2.randomdimensions.item.PortalLighter;
 import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
@@ -30,6 +32,8 @@ public class ObjectHolder
     public static final BlockItem PORTAL_CONTROLLER_BLOCK_ITEM;
     public static final BlockItem PORTAL_FRAME_BLOCK_ITEM;
     public static final PortalLighter PORTAL_LIGHTER_ITEM;
+    public static final EmptyExistingWorldTeleportItem EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
+    public static final ExistingWorldTeleportItem EXISTING_WORLD_TELEPORT_ITEM;
     public static final ContainerType<PortalControllerContainer> PORTAL_CONTROLLER_CONTAINER_TYPE;
     public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
     public static final ParticleType<PortalControllerParticleData> PORTAL_CONTROLLER_PARTICLE_TYPE;
@@ -48,6 +52,8 @@ public class ObjectHolder
         PORTAL_CONTROLLER_BLOCK_ITEM = PORTAL_CONTROLLER_BLOCK.createBlockItem();
         PORTAL_FRAME_BLOCK_ITEM = PORTAL_FRAME_BLOCK.createBlockItem();
         PORTAL_LIGHTER_ITEM = new PortalLighter();
+        EMPTY_EXISTING_WORLD_TELEPORT_ITEM = new EmptyExistingWorldTeleportItem();
+        EXISTING_WORLD_TELEPORT_ITEM = new ExistingWorldTeleportItem();
         PORTAL_CONTROLLER_CONTAINER_TYPE = new PortalControllerContainer.Type();
         PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
         PORTAL_CONTROLLER_PARTICLE_TYPE = PortalControllerParticleData.createParticleType();

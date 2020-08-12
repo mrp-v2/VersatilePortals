@@ -34,7 +34,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
     {
         event.getRegistry()
              .registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
-                     ObjectHolder.PORTAL_LIGHTER_ITEM);
+                     ObjectHolder.PORTAL_LIGHTER_ITEM, ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM,
+                     ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
     }
 
     @SubscribeEvent public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event)

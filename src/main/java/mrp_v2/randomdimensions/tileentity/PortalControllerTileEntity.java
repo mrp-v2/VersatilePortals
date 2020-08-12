@@ -1,9 +1,11 @@
 package mrp_v2.randomdimensions.tileentity;
 
 import mrp_v2.randomdimensions.RandomDimensions;
+import mrp_v2.randomdimensions.block.PortalControllerBlock;
 import mrp_v2.randomdimensions.block.PortalFrameBlock;
 import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
+import mrp_v2.randomdimensions.item.PortalControlItem;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.block.BlockState;
@@ -69,7 +71,11 @@ public class PortalControllerTileEntity extends TileEntity
 
     @Nullable @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
     {
-        return null;
+        if (this.itemStackHandler.isEmpty())
+        {
+            return null;
+        }
+        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0));
     }
 
     @Override public ITextComponent getDisplayName()
