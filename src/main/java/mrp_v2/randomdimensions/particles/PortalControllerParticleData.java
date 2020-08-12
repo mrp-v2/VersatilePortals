@@ -1,7 +1,5 @@
 package mrp_v2.randomdimensions.particles;
 
-import com.mojang.serialization.Codec;
-import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.particles.ParticleType;
 
@@ -11,17 +9,7 @@ public class PortalControllerParticleData extends ColorParticleData
 
     public static ParticleType<PortalControllerParticleData> createParticleType()
     {
-        ParticleType<PortalControllerParticleData> particleType = new ParticleType<PortalControllerParticleData>(false,
-                makeDeserializer(PortalControllerParticleData::new))
-        {
-
-            @Override public Codec<PortalControllerParticleData> func_230522_e_()
-            {
-                return makeCodec(PortalControllerParticleData::new);
-            }
-        };
-        particleType.setRegistryName(RandomDimensions.ID, ID);
-        return particleType;
+        return ColorParticleData.createParticleType(PortalControllerParticleData::new, ID);
     }
 
     public PortalControllerParticleData(int color)

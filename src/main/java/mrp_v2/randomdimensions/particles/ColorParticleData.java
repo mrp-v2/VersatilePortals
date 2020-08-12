@@ -4,6 +4,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mrp_v2.randomdimensions.RandomDimensions;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
@@ -20,7 +21,22 @@ public abstract class ColorParticleData implements IParticleData
         this.color = color;
     }
 
-    protected static <T extends ColorParticleData> Codec<T> makeCodec(Function<Integer, T> constructor)
+    protected static <T extends ColorParticleData> ParticleType<T> createParticleType(Function<Integer, T> constructor,
+            String id)
+    {
+        ParticleType<T> particleType = new ParticleType<T>(false, makeDeserializer(constructor))
+        {
+
+            @Override public Codec<T> func_230522_e_()
+            {
+                return makeCodec(constructor);
+            }
+        };
+        particleType.setRegistryName(RandomDimensions.ID, id);
+        return particleType;
+    }
+
+    private static <T extends ColorParticleData> Codec<T> makeCodec(Function<Integer, T> constructor)
     {
         return RecordCodecBuilder.create(
                 (instance1) -> instance1.group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor))
@@ -32,7 +48,7 @@ public abstract class ColorParticleData implements IParticleData
         return this.color;
     }
 
-    protected static <T extends ColorParticleData> IParticleData.IDeserializer<T> makeDeserializer(
+    private static <T extends ColorParticleData> IParticleData.IDeserializer<T> makeDeserializer(
             Function<Integer, T> constructor)
     {
         return new IParticleData.IDeserializer<T>()
@@ -58,10 +74,10 @@ public abstract class ColorParticleData implements IParticleData
         buffer.writeInt(this.color);
     }
 
-    abstract String getID();
-
     @Override public String getParameters()
     {
         return String.format(Locale.ROOT, "%s, %d", getID(), this.color);
     }
+
+    abstract String getID();
 }
