@@ -35,7 +35,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -46,6 +45,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -86,14 +86,14 @@ public class PortalBlock extends BasicBlock
         return false;
     }
 
-    @Nullable public static Size canMakePortal(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+    @Nullable public static Size canMakePortal(World world, BlockPos pos)
     {
-        Size size = new Size(iBlockDisplayReader, pos, Direction.Axis.X);
+        Size size = new Size(world, pos, Direction.Axis.X);
         if (size.isValid() && size.portalBlockCount == 0)
         {
             return size;
         }
-        size = new Size(iBlockDisplayReader, pos, Direction.Axis.Z);
+        size = new Size(world, pos, Direction.Axis.Z);
         return size.isValid() && size.portalBlockCount == 0 ? size : null;
     }
 
@@ -263,10 +263,10 @@ public class PortalBlock extends BasicBlock
         }
     }
 
-    public static int getColor(BlockState blockState, IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+    public static int getColor(BlockState blockState, World world, BlockPos pos)
     {
-        Size size = new Size(iBlockDisplayReader, pos, blockState.get(BlockStateProperties.HORIZONTAL_AXIS));
-        PortalControllerTileEntity portalControllerTE = size.getPortalController(iBlockDisplayReader).getLeft();
+        Size size = new Size(world, pos, blockState.get(BlockStateProperties.HORIZONTAL_AXIS));
+        PortalControllerTileEntity portalControllerTE = size.getPortalController(world).getLeft();
         if (portalControllerTE != null)
         {
             return portalControllerTE.getPortalColor();
@@ -300,10 +300,10 @@ public class PortalBlock extends BasicBlock
         private int height;
         private int width;
 
-        public Size(IBlockDisplayReader iBlockDisplayReader, BlockPos pos, Axis axis)
+        public Size(IWorld iWorld, BlockPos pos, Axis axis)
         {
             this(axis);
-            if (!isOrCanPlacePortal(iBlockDisplayReader.getBlockState(pos)))
+            if (!isOrCanPlacePortal(iWorld.getBlockState(pos)))
             {
                 this.invalidate();
                 return;
@@ -311,15 +311,15 @@ public class PortalBlock extends BasicBlock
             for (BlockPos blockpos = pos;
                  pos.getY() > blockpos.getY() - MAX_SIZE &&
                          pos.getY() > 0 &&
-                         isOrCanPlacePortal(iBlockDisplayReader.getBlockState(pos.down()));
+                         isOrCanPlacePortal(iWorld.getBlockState(pos.down()));
                  pos = pos.down())
             {
             }
-            int i = getDistanceUntilEdge(pos, this.leftDir, iBlockDisplayReader) - 1;
+            int i = getDistanceUntilEdge(pos, this.leftDir, iWorld) - 1;
             if (i >= 0)
             {
                 this.bottomLeft = pos.offset(this.leftDir, i);
-                this.width = getDistanceUntilEdge(this.bottomLeft, this.rightDir, iBlockDisplayReader);
+                this.width = getDistanceUntilEdge(this.bottomLeft, this.rightDir, iWorld);
                 if (this.width < MIN_WIDTH || this.width > MAX_SIZE)
                 {
                     this.invalidate();
@@ -328,9 +328,9 @@ public class PortalBlock extends BasicBlock
             }
             if (this.bottomLeft != null)
             {
-                this.height = this.calculatePortalHeight(iBlockDisplayReader);
+                this.height = this.calculatePortalHeight(iWorld);
             }
-            if (!this.getPortalController(iBlockDisplayReader).getRight())
+            if (!this.getPortalController(iWorld).getRight())
             {
                 this.invalidate();
             }
@@ -350,26 +350,24 @@ public class PortalBlock extends BasicBlock
             }
         }
 
-        protected static int getDistanceUntilEdge(BlockPos pos, Direction direction,
-                IBlockDisplayReader iBlockDisplayReader)
+        protected static int getDistanceUntilEdge(BlockPos pos, Direction direction, IWorld iWorld)
         {
             int i;
             for (i = 0; i < MAX_SIZE; ++i)
             {
                 BlockPos blockpos = pos.offset(direction, i);
-                if (!isOrCanPlacePortal(iBlockDisplayReader.getBlockState(blockpos)) ||
-                        !isPortalFrame(iBlockDisplayReader, blockpos.down()))
+                if (!isOrCanPlacePortal(iWorld.getBlockState(blockpos)) || !isPortalFrame(iWorld, blockpos.down()))
                 {
                     break;
                 }
             }
 
-            return isPortalFrame(iBlockDisplayReader, pos.offset(direction, i)) ? i : 0;
+            return isPortalFrame(iWorld, pos.offset(direction, i)) ? i : 0;
         }
 
-        public static boolean isPortalFrame(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+        public static boolean isPortalFrame(IWorld iWorld, BlockPos pos)
         {
-            return iBlockDisplayReader.getBlockState(pos).getBlock() instanceof PortalFrameBlock;
+            return iWorld.getBlockState(pos).getBlock() instanceof PortalFrameBlock;
         }
 
         @SuppressWarnings("deprecation") protected static boolean isOrCanPlacePortal(BlockState blockState)
@@ -377,24 +375,28 @@ public class PortalBlock extends BasicBlock
             return blockState.isAir() || blockState.isIn(PORTAL_BLOCK);
         }
 
-        @Nullable
-        public Pair<PortalControllerTileEntity, Boolean> getPortalController(IBlockDisplayReader iBlockDisplayReader)
+        @Nullable public Pair<PortalControllerTileEntity, Boolean> getPortalController(IWorld iWorld)
         {
             PortalControllerTileEntity portalControllerTE = null;
             Boolean found = false;
             if (this.isValid())
             {
-                for (BlockPos edge : this.getFrameBlocks())
+                for (Pair<BlockPos, Optional<Direction>> edge : this.getFrameBlocks())
                 {
-                    if (iBlockDisplayReader.getBlockState(edge).isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
+                    BlockState state = iWorld.getBlockState(edge.getLeft());
+                    if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
                     {
-                        if (found)
+                        if (!edge.getRight().isPresent() ||
+                                state.isSolidSide(iWorld, edge.getLeft(), edge.getRight().get()))
                         {
-                            return Pair.of(null, false);
+                            if (found)
+                            {
+                                return Pair.of(null, false);
+                            }
+                            TileEntity temp = iWorld.getTileEntity(edge.getLeft());
+                            portalControllerTE = temp == null ? null : (PortalControllerTileEntity) temp;
+                            found = true;
                         }
-                        TileEntity temp = iBlockDisplayReader.getTileEntity(edge);
-                        portalControllerTE = temp == null ? null : (PortalControllerTileEntity) temp;
-                        found = true;
                     }
                 }
             }
@@ -410,39 +412,40 @@ public class PortalBlock extends BasicBlock
                     this.height <= MAX_SIZE;
         }
 
-        public BlockPos[] getFrameBlocks()
+        public List<Pair<BlockPos, Optional<Direction>>> getFrameBlocks()
         {
-            BlockPos[] edges = new BlockPos[this.height * 2 + this.width * 2 + 4];
-            int j = 0;
+            List<Pair<BlockPos, Optional<Direction>>> edges =
+                    Lists.newArrayListWithCapacity(this.height * 2 + this.width * 2 + 4);
             //corners
-            edges[j++] = this.bottomLeft.down().offset(this.leftDir);
-            edges[j++] = this.bottomLeft.down().offset(this.rightDir, this.width);
-            edges[j++] = this.bottomLeft.up(this.height).offset(this.leftDir);
-            edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, this.width);
+            edges.add(Pair.of(this.bottomLeft.down().offset(this.leftDir), Optional.empty()));
+            edges.add(Pair.of(this.bottomLeft.down().offset(this.rightDir, this.width), Optional.empty()));
+            edges.add(Pair.of(this.bottomLeft.up(this.height).offset(this.leftDir), Optional.empty()));
+            edges.add(Pair.of(this.bottomLeft.up(this.height).offset(this.rightDir, this.width), Optional.empty()));
             // left side
             for (int i = 0; i < this.height; i++)
             {
-                edges[j++] = this.bottomLeft.offset(this.leftDir).up(i);
+                edges.add(Pair.of(this.bottomLeft.offset(this.leftDir).up(i), Optional.of(this.rightDir)));
             }
             // right side
             for (int i = 0; i < this.height; i++)
             {
-                edges[j++] = this.bottomLeft.offset(this.rightDir, this.width).up(i);
+                edges.add(Pair.of(this.bottomLeft.offset(this.rightDir, this.width).up(i), Optional.of(this.leftDir)));
             }
             // top side
             for (int i = 0; i < this.width; i++)
             {
-                edges[j++] = this.bottomLeft.up(this.height).offset(this.rightDir, i);
+                edges.add(
+                        Pair.of(this.bottomLeft.up(this.height).offset(this.rightDir, i), Optional.of(Direction.DOWN)));
             }
             // bottom side
             for (int i = 0; i < this.width; i++)
             {
-                edges[j++] = this.bottomLeft.down().offset(this.rightDir, i);
+                edges.add(Pair.of(this.bottomLeft.down().offset(this.rightDir, i), Optional.of(Direction.UP)));
             }
             return edges;
         }
 
-        protected int calculatePortalHeight(IBlockDisplayReader reader)
+        protected int calculatePortalHeight(IWorld iWorld)
         {
             loop:
             for (this.height = 0; this.height < MAX_SIZE; ++this.height)
@@ -450,7 +453,7 @@ public class PortalBlock extends BasicBlock
                 for (int i = 0; i < this.width; ++i)
                 {
                     BlockPos testBlockPos = this.bottomLeft.offset(this.rightDir, i).up(this.height);
-                    BlockState testBlockState = reader.getBlockState(testBlockPos);
+                    BlockState testBlockState = iWorld.getBlockState(testBlockPos);
                     if (!Size.isOrCanPlacePortal(testBlockState))
                     {
                         break loop;
@@ -459,11 +462,11 @@ public class PortalBlock extends BasicBlock
                     {
                         ++this.portalBlockCount;
                     }
-                    if (i == 0 && !isPortalFrame(reader, testBlockPos.offset(this.leftDir)))
+                    if (i == 0 && !isPortalFrame(iWorld, testBlockPos.offset(this.leftDir)))
                     {
                         break loop;
                     }
-                    if (i == this.width - 1 && !isPortalFrame(reader, testBlockPos.offset(this.rightDir)))
+                    if (i == this.width - 1 && !isPortalFrame(iWorld, testBlockPos.offset(this.rightDir)))
                     {
                         break loop;
                     }
@@ -471,7 +474,7 @@ public class PortalBlock extends BasicBlock
             }
             for (int j = 0; j < this.width; ++j)
             {
-                if (!isPortalFrame(reader, this.bottomLeft.offset(this.rightDir, j).up(this.height)))
+                if (!isPortalFrame(iWorld, this.bottomLeft.offset(this.rightDir, j).up(this.height)))
                 {
                     this.height = 0;
                     break;

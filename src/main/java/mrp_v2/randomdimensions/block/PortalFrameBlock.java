@@ -10,7 +10,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,9 +38,9 @@ public class PortalFrameBlock extends BasicBlock
         super(id, propertiesModifier.apply(Properties.from(Blocks.LAPIS_BLOCK)));
     }
 
-    public static int getColor(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+    public static int getColor(IWorld iWorld, BlockPos pos)
     {
-        PortalControllerTileEntity controller = getPortalController(iBlockDisplayReader, pos);
+        PortalControllerTileEntity controller = getPortalController(iWorld, pos);
         if (controller != null)
         {
             return controller.getPortalColor();
@@ -48,13 +48,12 @@ public class PortalFrameBlock extends BasicBlock
         return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
     }
 
-    @Nullable
-    public static PortalControllerTileEntity getPortalController(IBlockDisplayReader iBlockDisplayReader, BlockPos pos)
+    @Nullable public static PortalControllerTileEntity getPortalController(IWorld iWorld, BlockPos pos)
     {
         PortalControllerTileEntity testController = null;
-        for (PortalBlock.Size size : getPortalSizes(pos, iBlockDisplayReader, false))
+        for (PortalBlock.Size size : getPortalSizes(pos, iWorld, false))
         {
-            PortalControllerTileEntity testTileEntity = size.getPortalController(iBlockDisplayReader).getLeft();
+            PortalControllerTileEntity testTileEntity = size.getPortalController(iWorld).getLeft();
             if (testTileEntity != null)
             {
                 if (testController != null && testController != testTileEntity)
@@ -67,13 +66,12 @@ public class PortalFrameBlock extends BasicBlock
         return testController;
     }
 
-    public static List<PortalBlock.Size> getPortalSizes(BlockPos pos, IBlockDisplayReader iBlockDisplayReader,
-            boolean includeSelf)
+    public static List<PortalBlock.Size> getPortalSizes(BlockPos pos, IWorld iWorld, boolean includeSelf)
     {
         List<PortalBlock.Size> portals = Lists.newArrayList();
         for (Pair<BlockPos, Direction.Axis> test : getPossiblePortalLocations(pos))
         {
-            PortalBlock.Size size = new PortalBlock.Size(iBlockDisplayReader, test.getLeft(), test.getRight());
+            PortalBlock.Size size = new PortalBlock.Size(iWorld, test.getLeft(), test.getRight());
             if (size.isValid())
             {
                 portals.add(size);
@@ -81,12 +79,12 @@ public class PortalFrameBlock extends BasicBlock
         }
         if (includeSelf)
         {
-            PortalBlock.Size size = new PortalBlock.Size(iBlockDisplayReader, pos, Direction.Axis.X);
+            PortalBlock.Size size = new PortalBlock.Size(iWorld, pos, Direction.Axis.X);
             if (size.isValid())
             {
                 portals.add(size);
             }
-            size = new PortalBlock.Size(iBlockDisplayReader, pos, Direction.Axis.Z);
+            size = new PortalBlock.Size(iWorld, pos, Direction.Axis.Z);
             if (size.isValid())
             {
                 portals.add(size);

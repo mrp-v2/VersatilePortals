@@ -6,6 +6,7 @@ import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.World;
@@ -28,6 +29,7 @@ import java.lang.reflect.Field;
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
+        ClientWorld world = null;
         if (iBlockDisplayReader instanceof ChunkRenderCache)
         {
             for (Field field : ChunkRenderCache.class.getDeclaredFields())
@@ -37,7 +39,7 @@ import java.lang.reflect.Field;
                     field.setAccessible(true);
                     try
                     {
-                        iBlockDisplayReader = (IBlockDisplayReader) field.get(iBlockDisplayReader);
+                        world = (ClientWorld) field.get(iBlockDisplayReader);
                     } catch (IllegalAccessException e)
                     {
                         e.printStackTrace();
@@ -45,17 +47,17 @@ import java.lang.reflect.Field;
                 }
             }
         }
-        if (iBlockDisplayReader == null)
+        if (world == null)
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
         if (blockState.getBlock() instanceof PortalFrameBlock)
         {
-            return PortalFrameBlock.getColor(iBlockDisplayReader, pos);
+            return PortalFrameBlock.getColor(world, pos);
         }
         if (blockState.getBlock() instanceof PortalBlock)
         {
-            return PortalBlock.getColor(blockState, iBlockDisplayReader, pos);
+            return PortalBlock.getColor(blockState, world, pos);
         }
         return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
     }
