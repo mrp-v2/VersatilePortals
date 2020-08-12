@@ -107,7 +107,7 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
-        return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_NS : SHAPE_EW;
+        return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
     }
 
     @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)
@@ -119,8 +119,7 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
         return this.getDefaultState()
-                   .with(BlockStateProperties.HORIZONTAL_AXIS,
-                           context.getPlacementHorizontalFacing().rotateY().getAxis());
+                   .with(BlockStateProperties.HORIZONTAL_AXIS, context.getPlacementHorizontalFacing().getAxis());
     }
 
     @Override
