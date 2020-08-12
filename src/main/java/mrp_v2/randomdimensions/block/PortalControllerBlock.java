@@ -112,23 +112,8 @@ public class PortalControllerBlock extends PortalFrameBlock
 
     @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)
     {
-        PortalControllerTileEntity controller = getPortalController(worldIn, pos);
-        if (controller == null)
-        {
-            return;
-        }
-        worldIn.addParticle(new PortalControllerParticleData(controller.getPortalColor()), pos.getX() + 0.5D,
-                pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.01D, 0.0D);
-    }
-
-    @Nullable private static PortalControllerTileEntity getPortalController(World world, BlockPos pos)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        if (tileEntity == null)
-        {
-            return null;
-        }
-        return tileEntity instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) tileEntity : null;
+        worldIn.addParticle(new PortalControllerParticleData(PortalFrameBlock.getColor(worldIn, pos)),
+                pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.3125D, 0.0D);
     }
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
