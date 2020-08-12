@@ -14,16 +14,15 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
-public class RegistryHandler
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID) public class RegistryHandler
 {
 
-    @SubscribeEvent
-    public static void registerBlocks(final RegistryEvent.Register<Block> event)
+    @SubscribeEvent public static void registerBlocks(final RegistryEvent.Register<Block> event)
     {
-        event.getRegistry().registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
-                ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
-                ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+        event.getRegistry()
+             .registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
+                     ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
+                     ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
     }
 
     public static void postRegistering()
@@ -31,23 +30,22 @@ public class RegistryHandler
         WorldUtil.addInvalidBlockSupertypes(PortalBlock.class, IndestructiblePortalFrameBlock.class);
     }
 
-    @SubscribeEvent
-    public static void registerItems(final RegistryEvent.Register<Item> event)
+    @SubscribeEvent public static void registerItems(final RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
-                ObjectHolder.PORTAL_LIGHTER_ITEM);
+        event.getRegistry()
+             .registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
+                     ObjectHolder.PORTAL_LIGHTER_ITEM);
     }
 
-    @SubscribeEvent
-    public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event)
+    @SubscribeEvent public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event)
     {
         event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE);
     }
 
-    @SubscribeEvent
-    public static void registerParticles(final RegistryEvent.Register<ParticleType<?>> event)
+    @SubscribeEvent public static void registerParticles(final RegistryEvent.Register<ParticleType<?>> event)
     {
-        event.getRegistry().registerAll(ObjectHolder.PORTAL_PARTICLE_TYPE);
+        event.getRegistry()
+             .registerAll(ObjectHolder.PORTAL_PARTICLE_TYPE, ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE);
     }
 
     @SubscribeEvent
@@ -56,8 +54,7 @@ public class RegistryHandler
         event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
     }
 
-    @SubscribeEvent
-    public static void registerTileEntities(final RegistryEvent.Register<TileEntityType<?>> event)
+    @SubscribeEvent public static void registerTileEntities(final RegistryEvent.Register<TileEntityType<?>> event)
     {
         event.getRegistry().registerAll(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
     }

@@ -1,6 +1,7 @@
 package mrp_v2.randomdimensions.block;
 
 import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
+import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,12 +24,15 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public class PortalControllerBlock extends PortalFrameBlock
 {
@@ -53,33 +57,6 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
         return new PortalControllerTileEntity();
-    }
-
-    @Override public BlockState getStateForPlacement(BlockItemUseContext context)
-    {
-        return this.getDefaultState()
-                   .with(BlockStateProperties.HORIZONTAL_AXIS,
-                           context.getPlacementHorizontalFacing().rotateY().getAxis());
-    }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
-            ItemStack stack)
-    {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-        if (stack.hasDisplayName())
-        {
-            TileEntity tileEntity = worldIn.getTileEntity(pos);
-            if (tileEntity instanceof PortalControllerTileEntity)
-            {
-                ((PortalControllerTileEntity) tileEntity).setCustomName(stack.getDisplayName());
-            }
-        }
-    }
-
-    @Override protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
-    {
-        builder.add(BlockStateProperties.HORIZONTAL_AXIS);
     }
 
     @Override
@@ -127,5 +104,53 @@ public class PortalControllerBlock extends PortalFrameBlock
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         return SHAPE;
+    }
+
+    @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)
+    {
+        PortalControllerTileEntity controller = getPortalController(worldIn, pos);
+        if (controller == null)
+        {
+            return;
+        }
+        worldIn.addParticle(new PortalControllerParticleData(controller.getPortalColor()), pos.getX() + 0.5D,
+                pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.1D, 0.0D);
+    }
+
+    @Nullable private static PortalControllerTileEntity getPortalController(World world, BlockPos pos)
+    {
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        return tileEntity instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) tileEntity : null;
+    }
+
+    @Override public BlockState getStateForPlacement(BlockItemUseContext context)
+    {
+        return this.getDefaultState()
+                   .with(BlockStateProperties.HORIZONTAL_AXIS,
+                           context.getPlacementHorizontalFacing().rotateY().getAxis());
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+            ItemStack stack)
+    {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        if (stack.hasDisplayName())
+        {
+            TileEntity tileEntity = worldIn.getTileEntity(pos);
+            if (tileEntity instanceof PortalControllerTileEntity)
+            {
+                ((PortalControllerTileEntity) tileEntity).setCustomName(stack.getDisplayName());
+            }
+        }
+    }
+
+    @Override protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
+    {
+        builder.add(BlockStateProperties.HORIZONTAL_AXIS);
     }
 }
