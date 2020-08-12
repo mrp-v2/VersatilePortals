@@ -9,6 +9,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class PortalControllerParticle extends SpriteTexturedParticle
 {
+    private final double originX;
+    private final double originY;
+    private final double originZ;
+
     protected PortalControllerParticle(ClientWorld clientWorld, double x, double y, double z, double motionX,
             double motionY, double motionZ, int color)
     {
@@ -16,10 +20,10 @@ public class PortalControllerParticle extends SpriteTexturedParticle
         this.motionX = motionX;
         this.motionY = motionY;
         this.motionZ = motionZ;
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        this.particleScale = 0.51f;
+        this.originX = this.posX;
+        this.originY = this.posY;
+        this.originZ = this.posZ;
+        this.particleScale = 0.05f;
         this.particleRed = Util.fGetColorR(color);
         this.particleGreen = Util.fGetColorG(color);
         this.particleBlue = Util.fGetColorB(color);
@@ -28,11 +32,7 @@ public class PortalControllerParticle extends SpriteTexturedParticle
 
     @Override public float getScale(float scaleFactor)
     {
-        float scale = (this.maxAge / 2.0F + scaleFactor) / this.maxAge;
-        scale = 1.0F - scale;
-        scale = scale * scale;
-        scale = 1.0F - scale;
-        return this.particleScale * scale;
+        return this.particleScale;
     }
 
     @Override public void tick()
@@ -45,9 +45,10 @@ public class PortalControllerParticle extends SpriteTexturedParticle
             this.setExpired();
         } else
         {
-            this.posX = this.posX + this.motionX;
-            this.posY = this.posY + this.motionY;
-            this.posZ = this.posZ + this.motionZ;
+            double agePercent = (double) this.age / this.maxAge;
+            this.posX = this.originX + this.motionX * agePercent;
+            this.posY = this.originY + this.motionY * agePercent;
+            this.posZ = this.originZ + this.motionZ * agePercent;
         }
     }
 
@@ -56,26 +57,16 @@ public class PortalControllerParticle extends SpriteTexturedParticle
         return IParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
-    @Override public void move(double x, double y, double z)
-    {
-        this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
-        this.resetPositionToBB();
-    }
-
     @Override protected int getBrightnessForRender(float partialTick)
     {
         int superBrightness = super.getBrightnessForRender(partialTick);
-        float agePercent = (float) this.age / (float) this.maxAge;
-        agePercent = agePercent * agePercent;
-        agePercent = agePercent * agePercent;
-        int j = superBrightness & 255;
-        int k = superBrightness >> 16 & 255;
-        k = k + (int) (agePercent * 15.0F * 16.0F);
-        if (k > 240)
+        int sBLeft16And255 = superBrightness >> 16 & 255;
+        sBLeft16And255 += 15;
+        if (sBLeft16And255 > 240)
         {
-            k = 240;
+            sBLeft16And255 = 240;
         }
-        return j | k << 16;
+        return superBrightness & 255 | sBLeft16And255 << 16;
     }
 
     @OnlyIn(Dist.CLIENT) public static class Factory implements IParticleFactory<PortalControllerParticleData>
@@ -91,10 +82,10 @@ public class PortalControllerParticle extends SpriteTexturedParticle
         public Particle makeParticle(PortalControllerParticleData particleData, ClientWorld worldIn, double x, double y,
                 double z, double xSpeed, double ySpeed, double zSpeed)
         {
-            PortalParticle portalParticle =
-                    new PortalParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, particleData.getColor());
-            portalParticle.selectSpriteRandomly(this.spriteSet);
-            return portalParticle;
+            PortalControllerParticle portalControllerParticle =
+                    new PortalControllerParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, particleData.getColor());
+            portalControllerParticle.selectSpriteRandomly(this.spriteSet);
+            return portalControllerParticle;
         }
     }
 }

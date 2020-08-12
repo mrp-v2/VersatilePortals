@@ -165,9 +165,21 @@ public class PortalControllerTileEntity extends TileEntity
 
     @Override public void tick()
     {
+        if (!this.world.isRemote)
+        {
+            return;
+        }
         if (++this.ticks >= TICKS_PER_RENDER_REVOLUTION)
         {
             this.ticks = 0;
+        }
+        if (this.ticks % 4 == 0)
+        {
+            if (this.itemStackHandler.isEmpty())
+            {
+                return;
+            }
+            PortalControllerBlock.animateTick(this.getBlockState(), this.world, this.pos);
         }
     }
 }

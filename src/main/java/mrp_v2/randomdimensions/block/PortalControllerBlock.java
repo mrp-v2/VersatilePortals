@@ -24,15 +24,12 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class PortalControllerBlock extends PortalFrameBlock
 {
@@ -51,6 +48,27 @@ public class PortalControllerBlock extends PortalFrameBlock
         super(ID, Properties::notSolid);
         this.setDefaultState(
                 this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
+    }
+
+    public static void animateTick(BlockState stateIn, World worldIn, BlockPos pos)
+    {
+        PortalControllerParticleData data = new PortalControllerParticleData(PortalFrameBlock.getColor(worldIn, pos));
+        double x = pos.getX() + 0.5D;
+        double y = pos.getY() + 0.5D;
+        double z = pos.getZ() + 0.5D;
+        double motion = 0.0625D * 6.0D;
+        double noMotion = 0.0D;
+        worldIn.addParticle(data, x, y, z, noMotion, motion, noMotion);
+        worldIn.addParticle(data, x, y, z, noMotion, -motion, noMotion);
+        if (stateIn.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.Z)
+        {
+            worldIn.addParticle(data, x, y, z, motion, noMotion, noMotion);
+            worldIn.addParticle(data, x, y, z, -motion, noMotion, noMotion);
+        } else
+        {
+            worldIn.addParticle(data, x, y, z, noMotion, noMotion, motion);
+            worldIn.addParticle(data, x, y, z, noMotion, noMotion, -motion);
+        }
     }
 
     @Override public boolean hasTileEntity(BlockState state)
@@ -108,12 +126,6 @@ public class PortalControllerBlock extends PortalFrameBlock
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
-    }
-
-    @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        worldIn.addParticle(new PortalControllerParticleData(PortalFrameBlock.getColor(worldIn, pos)),
-                pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.3125D, 0.0D);
     }
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
