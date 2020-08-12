@@ -37,10 +37,14 @@ import java.util.Random;
 public class PortalControllerBlock extends PortalFrameBlock
 {
     public static final String ID = "portal_controller";
-    private static final VoxelShape SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D),
-            makeCuboidShape(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D),
-            makeCuboidShape(3.0D, 0.0D, 0.0D, 13.0D, 3.0, 16.0D),
-            makeCuboidShape(3.0D, 13.0D, 0.0D, 13.0D, 16.0D, 16.0D)).simplify();
+    private static final VoxelShape BASE_SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D),
+            makeCuboidShape(0.0D, 13.0D, 0.0D, 16.0D, 16.0D, 16.0D));
+    private static final VoxelShape SHAPE_NS =
+            VoxelShapes.or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 3.0D, 13.0, 16.0D),
+                    makeCuboidShape(13.0D, 3.0D, 0.0D, 16.0D, 13.0D, 16.0D)).simplify();
+    private static final VoxelShape SHAPE_EW =
+            VoxelShapes.or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 16.0D, 13.0D, 3.0D),
+                    makeCuboidShape(0.0D, 3.0D, 13.0D, 16.0D, 13.0D, 16.0D)).simplify();
 
     public PortalControllerBlock()
     {
@@ -103,7 +107,7 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
-        return SHAPE;
+        return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_NS : SHAPE_EW;
     }
 
     @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)
@@ -114,7 +118,7 @@ public class PortalControllerBlock extends PortalFrameBlock
             return;
         }
         worldIn.addParticle(new PortalControllerParticleData(controller.getPortalColor()), pos.getX() + 0.5D,
-                pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.1D, 0.0D);
+                pos.getY() + 0.5D, pos.getZ() + 0.5D, 0.0D, 0.01D, 0.0D);
     }
 
     @Nullable private static PortalControllerTileEntity getPortalController(World world, BlockPos pos)
