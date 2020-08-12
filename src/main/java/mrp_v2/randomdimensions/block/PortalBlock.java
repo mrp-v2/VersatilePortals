@@ -152,6 +152,10 @@ public class PortalBlock extends BasicBlock
             RegistryKey<World> registryKey = worldIn.func_234923_W_() == World.field_234918_g_ ?
                     controller.getTeleportDestination() :
                     World.field_234918_g_;
+            if (registryKey == null)
+            {
+                return;
+            }
             ServerWorld serverWorld = ((ServerWorld) worldIn).getServer().getWorld(registryKey);
             if (serverWorld == null)
             {

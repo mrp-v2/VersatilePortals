@@ -67,9 +67,9 @@ public class PortalControllerTileEntity extends TileEntity
         return itemStackHandler;
     }
 
-    @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
+    @Nullable @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
     {
-        return World.field_234920_i_;
+        return null;
     }
 
     @Override public ITextComponent getDisplayName()
