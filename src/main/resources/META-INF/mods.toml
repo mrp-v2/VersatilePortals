@@ -1,5 +1,6 @@
 modLoader="javafml"
-loaderVersion="[32,)"
+loaderVersion="[33,)"
+license="All rights reserved"
 [[mods]]
 	modId="randomdimensions"
 	version="${version}"
@@ -9,16 +10,16 @@ loaderVersion="[32,)"
 	issueTrackerURL="https://www.curseforge.com/minecraft/mc-mods/random-dimensions/issues"
 	displayURL="https://minecraft.curseforge.com/projects/random-dimensions"
 	authors="mrp_v2"
-	description='''Adds simple machines for automating conversion of concrete powder into concrete.'''
+	description='''Adds portals that take you wherever you want.'''
 [[dependencies.randomdimensions]]
     modId="forge"
     mandatory=true
-    versionRange="[32,)"
+    versionRange="[33,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.randomdimensions]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1]"
+    versionRange="[1.16.2]"
     ordering="NONE"
     side="BOTH"

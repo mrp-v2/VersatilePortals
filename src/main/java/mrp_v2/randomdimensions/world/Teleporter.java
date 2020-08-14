@@ -1,40 +1,39 @@
 package mrp_v2.randomdimensions.world;
 
-import mrp_v2.randomdimensions.block.PortalBlock;
-import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
+import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.pattern.BlockPattern.PatternHelper;
-import net.minecraft.block.pattern.BlockPattern.PortalInfo;
+import net.minecraft.block.PortalInfo;
+import net.minecraft.block.PortalSize;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.play.server.SChangeGameStatePacket;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
+import net.minecraft.util.TeleportationRepositioner;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.village.PointOfInterest;
 import net.minecraft.village.PointOfInterestManager;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Teleporter implements ITeleporter
 {
-
     protected final ServerWorld world;
     protected final Random random;
 
@@ -48,260 +47,132 @@ public class Teleporter implements ITeleporter
     public Entity placeEntity(Entity entityIn, ServerWorld currentWorld, ServerWorld destinationWorld, float yaw,
             Function<Boolean, Entity> repositionEntity)
     {
-        IPortalDataCapability portalData = Util.getPortalData(entityIn);
-        String worldID = Util.getWorldID(
-                currentWorld.func_234923_W_() != World.field_234918_g_ ? currentWorld : destinationWorld);
-        Vector3d lastPortalVec = portalData.getLastPortalVec(worldID);
-        Direction teleportDirection = portalData.getTeleportDirection(worldID);
-        double newPosX = entityIn.getPosX();
-        double newPosZ = entityIn.getPosZ();
-        boolean isOriginalWorldShrinked = currentWorld.func_230315_m_().func_236045_g_();
-        boolean isDestinationWorldShrinked = destinationWorld.func_230315_m_().func_236045_g_();
-        if (!isOriginalWorldShrinked && isDestinationWorldShrinked)
+        IPlayerPortalDataCapability playerPortalData = Util.getPlayerPortalDataOrNull(entityIn);
+        PortalInfo portalInfo = getPortalInfo(entityIn);
+        if (playerPortalData != null)
         {
-            newPosX /= 8.0D;
-            newPosZ /= 8.0D;
-        } else if (isOriginalWorldShrinked && !isDestinationWorldShrinked)
-        {
-            newPosX *= 8.0D;
-            newPosZ *= 8.0D;
-        }
-        double minNewPosX = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minX() + 16.0D);
-        double minNewPosZ = Math.min(-2.9999872E7D, destinationWorld.getWorldBorder().minZ() + 16.0D);
-        double maxNewPosX = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxX() - 16.0D);
-        double maxNewPosZ = Math.min(2.9999872E7D, destinationWorld.getWorldBorder().maxZ() - 16.0D);
-        newPosX = MathHelper.clamp(newPosX, minNewPosX, maxNewPosX);
-        newPosZ = MathHelper.clamp(newPosZ, minNewPosZ, maxNewPosZ);
-        if (entityIn instanceof ServerPlayerEntity)
-        {
-            double newPosY = entityIn.getPosY();
+            ServerPlayerEntity player = (ServerPlayerEntity) entityIn;
             currentWorld.getProfiler().startSection("moving");
-            entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
             currentWorld.getProfiler().endSection();
             currentWorld.getProfiler().startSection("placing");
-            entityIn.setLocationAndAngles(newPosX, newPosY, newPosZ, entityIn.rotationYaw, entityIn.rotationPitch);
-            portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
-            if (!this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection))
-            {
-                if (this.world.func_234923_W_() != World.field_234918_g_)
-                {
-                    this.makePortal(entityIn);
-                    this.placeInPortal(entityIn, entityIn.rotationYaw, lastPortalVec, teleportDirection);
-                } else
-                {
-                    entityIn.detach();
-                    ServerPlayerEntity serverPlayer = (ServerPlayerEntity) entityIn;
-                    serverPlayer.getServerWorld().removePlayer(serverPlayer, true);
-                    if (!serverPlayer.queuedEndExit)
-                    {
-                        serverPlayer.queuedEndExit = true;
-                        serverPlayer.connection.sendPacket(
-                                new SChangeGameStatePacket(SChangeGameStatePacket.field_241768_e_, 0.0F));
-                        return entityIn;
-                    }
-                }
-            }
+            player.setWorld(destinationWorld);
+            destinationWorld.addDuringPortalTeleport(player);
+            player.rotationYaw = portalInfo.field_242960_c;
+            player.rotationPitch = portalInfo.field_242961_d;
+            player.setPositionAndUpdate(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
+            player.connection.captureCurrentPosition();
             currentWorld.getProfiler().endSection();
-            entityIn.setWorld(destinationWorld);
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entityIn;
-            destinationWorld.addDuringPortalTeleport(serverPlayerEntity);
-            serverPlayerEntity.connection.setPlayerLocation(entityIn.getPosX(), entityIn.getPosY(), entityIn.getPosZ(),
-                    entityIn.rotationYaw, entityIn.rotationPitch);
-            return entityIn;
-        }
-        Vector3d entityInMotionVec = entityIn.getMotion();
-        float rotationModifier;
-        BlockPos blockpos;
-        blockpos = new BlockPos(newPosX, entityIn.getPosY(), newPosZ);
-        PortalInfo portalInfo =
-                this.placeInExistingPortal(blockpos, entityInMotionVec, teleportDirection, lastPortalVec.x,
-                        lastPortalVec.y);
-        if (portalInfo == null)
+            return player;
+        } else
         {
-            return null;
-        }
-        portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
-        blockpos = new BlockPos(portalInfo.pos);
-        entityInMotionVec = portalInfo.motion;
-        rotationModifier = portalInfo.rotation;
-        currentWorld.getProfiler().endStartSection("reloading");
-        Entity newEntity = entityIn.getType().create(destinationWorld);
-        if (newEntity != null)
-        {
-            newEntity.copyDataFromOld(entityIn);
-            newEntity.moveToBlockPosAndAngles(blockpos, newEntity.rotationYaw + rotationModifier,
-                    newEntity.rotationPitch);
-            newEntity.setMotion(entityInMotionVec);
-            destinationWorld.addFromAnotherDimension(newEntity);
-            if (destinationWorld.func_234923_W_() == World.field_234920_i_)
+            this.world.getProfiler().endStartSection("reloading");
+            Entity newEntity = entityIn.getType().create(destinationWorld);
+            if (newEntity != null)
             {
-                ServerWorld.func_241121_a_(destinationWorld);
+                newEntity.copyDataFromOld(entityIn);
+                newEntity.setLocationAndAngles(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z,
+                        portalInfo.field_242960_c, entityIn.rotationPitch);
+                newEntity.setMotion(portalInfo.motion);
+                destinationWorld.addFromAnotherDimension(newEntity);
             }
+            return newEntity;
         }
-        return newEntity;
     }
 
-    public boolean placeInPortal(Entity entity, float f, Vector3d lastPortalVec, Direction teleportDirection)
+    @Nullable private PortalInfo getPortalInfo(Entity entity)
     {
-        PortalInfo portalinfo =
-                this.placeInExistingPortal(entity.getPosition(), entity.getMotion(), teleportDirection, lastPortalVec.x,
-                        lastPortalVec.y);
-        if (portalinfo == null)
+        boolean toNether = this.world.func_234923_W_() == World.field_234919_h_;
+        WorldBorder worldborder = this.world.getWorldBorder();
+        double minX = Math.max(-2.9999872E7D, worldborder.minX() + 16.0D);
+        double minZ = Math.max(-2.9999872E7D, worldborder.minZ() + 16.0D);
+        double maxX = Math.min(2.9999872E7D, worldborder.maxX() - 16.0D);
+        double maxZ = Math.min(2.9999872E7D, worldborder.maxZ() - 16.0D);
+        double coordinateMultiplier = DimensionType.func_242715_a(entity.world.func_230315_m_(), this.world.func_230315_m_());
+        BlockPos pos = new BlockPos(MathHelper.clamp(entity.getPosX() * coordinateMultiplier, minX, maxX), entity.getPosY(),
+                MathHelper.clamp(entity.getPosZ() * coordinateMultiplier, minZ, maxZ));
+        return this.teleportExistingPortal(pos, toNether).map((result) ->
         {
-            return false;
-        }
-        Vector3d portalInfoPos = portalinfo.pos;
-        Vector3d portalInfoMotion = portalinfo.motion;
-        entity.setMotion(portalInfoMotion);
-        entity.rotationYaw = f + portalinfo.rotation;
-        entity.moveForced(portalInfoPos.x, portalInfoPos.y, portalInfoPos.z);
-        return true;
-    }
-
-    @Nullable
-    public PortalInfo placeInExistingPortal(BlockPos pos, Vector3d vec3d, Direction directionIn, double d1, double d2)
-    {
-        PointOfInterestManager pointOfInterestManager = this.world.getPointOfInterestManager();
-        pointOfInterestManager.ensureLoadedAndValid(this.world, pos, 128);
-        List<PointOfInterest> pointOfInterestList = pointOfInterestManager.getInSquare(
-                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE, pos, 128,
-                PointOfInterestManager.Status.ANY).collect(Collectors.toList());
-        Optional<PointOfInterest> optionalPointOfInterest = pointOfInterestList.stream()
-                                                                               .min(Comparator.<PointOfInterest>comparingDouble(
-                                                                                       (pointOfInterest) -> pointOfInterest
-                                                                                               .getPos()
-                                                                                               .distanceSq(
-                                                                                                       pos)).thenComparingInt(
-                                                                                       (pointOfInterest) -> pointOfInterest
-                                                                                               .getPos()
-                                                                                               .getY()));
-        return optionalPointOfInterest.map((pointOfInterest) ->
-        {
-            BlockPos pointOfInterestPos = pointOfInterest.getPos();
-            this.world.getChunkProvider()
-                      .registerTicket(TicketType.PORTAL, new ChunkPos(pointOfInterestPos), 3, pointOfInterestPos);
-            PatternHelper patternHelper = PortalBlock.createPatternHelper(this.world, pointOfInterestPos);
-            return patternHelper.getPortalInfo(directionIn, pointOfInterestPos, d2, vec3d, d1);
+            Direction.Axis axis = Direction.Axis.X;
+            Vector3d vector3d = new Vector3d(0.5D, 0.0D, 0.0D);
+            return PortalSize.func_242963_a(this.world, result, axis, vector3d, entity.getSize(entity.getPose()),
+                    entity.getMotion(), entity.rotationYaw, entity.rotationPitch);
         }).orElse(null);
     }
 
-    public void makePortal(Entity entityIn)
+    public Optional<TeleportationRepositioner.Result> teleportExistingPortal(BlockPos searchOrigin,
+            boolean fromNormalScaleToShrunkScale)
     {
-        double d0 = -1.0D;
-        int j = MathHelper.floor(entityIn.getPosX());
-        int k = MathHelper.floor(entityIn.getPosY());
-        int l = MathHelper.floor(entityIn.getPosZ());
-        int i1 = j;
-        int j1 = k;
-        int k1 = l;
-        int l1 = 0;
-        int i2 = this.random.nextInt(4);
-        BlockPos.Mutable mutableBlockPos = new BlockPos.Mutable();
-        for (int j2 = j - 16; j2 <= j + 16; ++j2)
+        PointOfInterestManager pointOfInterestManager = this.world.getPointOfInterestManager();
+        int i = fromNormalScaleToShrunkScale ? 16 : 128;
+        pointOfInterestManager.ensureLoadedAndValid(this.world, searchOrigin, i);
+        Optional<PointOfInterest> optionalPointOfInterest = pointOfInterestManager.getInSquare(
+                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE, searchOrigin, i,
+                PointOfInterestManager.Status.ANY)
+                .sorted(Comparator.<PointOfInterest>comparingDouble(
+                        (pointOfInterest) -> pointOfInterest.getPos().distanceSq(searchOrigin)).thenComparingInt(
+                        (pointOfInterest) -> pointOfInterest.getPos().getY()))
+                .filter((pointOfInterest) -> this.world.getBlockState(pointOfInterest.getPos())
+                        .hasProperty(BlockStateProperties.HORIZONTAL_AXIS))
+                .findFirst();
+        return optionalPointOfInterest.map((pointOfInterest) ->
         {
-            double d1 = j2 + 0.5D - entityIn.getPosX();
-            for (int l2 = l - 16; l2 <= l + 16; ++l2)
-            {
-                double d2 = l2 + 0.5D - entityIn.getPosZ();
-                loop1:
-                for (int j3 = this.world.func_234938_ad_() - 1; j3 >= 0; --j3)
-                {
-                    if (this.world.isAirBlock(mutableBlockPos.setPos(j2, j3, l2)))
-                    {
-                        while (j3 > 0 && this.world.isAirBlock(mutableBlockPos.setPos(j2, j3 - 1, l2)))
-                        {
-                            --j3;
-                        }
-                        for (int k3 = i2; k3 < i2 + 4; ++k3)
-                        {
-                            int l3 = k3 % 2;
-                            int i4 = 1 - l3;
-                            if (k3 % 4 >= 2)
-                            {
-                                l3 = -l3;
-                                i4 = -i4;
-                            }
-                            for (int j4 = 0; j4 < 3; ++j4)
-                            {
-                                for (int k4 = 0; k4 < 4; ++k4)
-                                {
-                                    for (int l4 = -1; l4 < 4; ++l4)
-                                    {
-                                        int i5 = j2 + (k4 - 1) * l3 + j4 * i4;
-                                        int j5 = j3 + l4;
-                                        int k5 = l2 + (k4 - 1) * i4 - j4 * l3;
-                                        mutableBlockPos.setPos(i5, j5, k5);
-                                        if (l4 < 0 &&
-                                                !this.world.getBlockState(mutableBlockPos).getMaterial().isSolid() ||
-                                                l4 >= 0 && !this.world.isAirBlock(mutableBlockPos))
-                                        {
-                                            continue loop1;
-                                        }
-                                    }
-                                }
-                            }
-                            double d5 = j3 + 0.5D - entityIn.getPosY();
-                            double d7 = d1 * d1 + d5 * d5 + d2 * d2;
-                            if (d0 < 0.0D || d7 < d0)
-                            {
-                                d0 = d7;
-                                i1 = j2;
-                                j1 = j3;
-                                k1 = l2;
-                                l1 = k3 % 4;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (d0 < 0.0D)
-        {
-            for (int l5 = j - 16; l5 <= j + 16; ++l5)
-            {
-                double d3 = l5 + 0.5D - entityIn.getPosX();
-                for (int j6 = l - 16; j6 <= l + 16; ++j6)
-                {
-                    double d4 = j6 + 0.5D - entityIn.getPosZ();
-                    loop2:
-                    for (int i7 = this.world.func_234938_ad_() - 1; i7 >= 0; --i7)
-                    {
-                        if (this.world.isAirBlock(mutableBlockPos.setPos(l5, i7, j6)))
-                        {
-                            while (i7 > 0 && this.world.isAirBlock(mutableBlockPos.setPos(l5, i7 - 1, j6)))
-                            {
-                                --i7;
-                            }
-                            for (int l7 = i2; l7 < i2 + 2; ++l7)
-                            {
-                                int l8 = l7 % 2;
-                                int k9 = 1 - l8;
+            BlockPos blockPos = pointOfInterest.getPos();
+            this.world.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(blockPos), 3, blockPos);
+            BlockState blockState1 = this.world.getBlockState(blockPos);
+            return TeleportationRepositioner.func_243676_a(blockPos,
+                    blockState1.get(BlockStateProperties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21,
+                    //TODO related to portal size?
+                    (blockState2) -> this.world.getBlockState(blockState2) == blockState1);
+        });
+    }
 
-                                for (int i10 = 0; i10 < 4; ++i10)
+    public Optional<TeleportationRepositioner.Result> teleportNewPortal(BlockPos pos, Direction.Axis axis)
+    {
+        Direction direction = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, axis);
+        double d0 = -1.0D;
+        BlockPos blockPos1 = null;
+        double d1 = -1.0D;
+        BlockPos blockPos2 = null;
+        WorldBorder worldBorder = this.world.getWorldBorder();
+        int i = this.world.func_234938_ad_() - 1;
+        BlockPos.Mutable mutableBlockPos1 = pos.toMutable();
+        for (BlockPos.Mutable mutableBlockPos2 : BlockPos.func_243514_a(pos, 16, Direction.EAST, Direction.SOUTH))
+        {
+            int j = Math.min(i, this.world.getHeight(Heightmap.Type.MOTION_BLOCKING, mutableBlockPos2.getX(),
+                    mutableBlockPos2.getZ()));
+            if (worldBorder.contains(mutableBlockPos2) && worldBorder.contains(mutableBlockPos2.move(direction, 1)))
+            {
+                mutableBlockPos2.move(direction.getOpposite(), 1);
+                for (int l = j; l >= 0; l--)
+                {
+                    mutableBlockPos2.setY(l);
+                    if (this.world.isAirBlock(mutableBlockPos2))
+                    {
+                        int i1;
+                        for (i1 = l; l > 0 && this.world.isAirBlock(mutableBlockPos2.move(Direction.DOWN)); l--)
+                        {
+                        }
+                        if (l + 4 <= i)
+                        {
+                            int j1 = i1 - l;
+                            if (j1 <= 0 || j1 >= 3)
+                            {
+                                mutableBlockPos2.setY(l);
+                                if (this.isSpaceEmpty(mutableBlockPos2, mutableBlockPos1, direction, 0))
                                 {
-                                    for (int k10 = -1; k10 < 4; ++k10)
+                                    double d2 = pos.distanceSq(mutableBlockPos2);
+                                    if (this.isSpaceEmpty(mutableBlockPos2, mutableBlockPos1, direction, -1) &&
+                                            this.isSpaceEmpty(mutableBlockPos2, mutableBlockPos1, direction, 1) &&
+                                            (d0 == -1.0D || d0 > d2))
                                     {
-                                        int i11 = l5 + (i10 - 1) * l8;
-                                        int j11 = i7 + k10;
-                                        int k11 = j6 + (i10 - 1) * k9;
-                                        mutableBlockPos.setPos(i11, j11, k11);
-                                        if (k10 < 0 &&
-                                                !this.world.getBlockState(mutableBlockPos).getMaterial().isSolid() ||
-                                                k10 >= 0 && !this.world.isAirBlock(mutableBlockPos))
-                                        {
-                                            continue loop2;
-                                        }
+                                        d0 = d2;
+                                        blockPos1 = mutableBlockPos2.toImmutable();
                                     }
-                                }
-                                double d6 = i7 + 0.5D - entityIn.getPosY();
-                                double d8 = d3 * d3 + d6 * d6 + d4 * d4;
-                                if (d0 < 0.0D || d8 < d0)
-                                {
-                                    d0 = d8;
-                                    i1 = l5;
-                                    j1 = i7;
-                                    k1 = j6;
-                                    l1 = l7 % 2;
+                                    if (d0 == -1.0D && (d1 == -1.0D || d1 > d2))
+                                    {
+                                        d1 = d2;
+                                        blockPos2 = mutableBlockPos2.toImmutable();
+                                    }
                                 }
                             }
                         }
@@ -309,62 +180,86 @@ public class Teleporter implements ITeleporter
                 }
             }
         }
-        int i6 = i1;
-        int k2 = j1;
-        int k6 = k1;
-        int l6 = l1 % 2;
-        int i3 = 1 - l6;
-        if (l1 % 4 >= 2)
+        if (d0 == -1.0D && d1 != -1.0D)
         {
-            l6 = -l6;
-            i3 = -i3;
+            blockPos1 = blockPos2;
+            d0 = d1;
         }
-        if (d0 < 0.0D)
+        int floorWidth = 2;
+        int portalWidth = 2;
+        int portalHeight = 3;
+        if (d0 == -1.0D)
         {
-            j1 = MathHelper.clamp(j1, 70, this.world.func_234938_ad_() - 10);
-            k2 = j1;
-            for (int j7 = -1; j7 <= 1; ++j7)
+            blockPos1 = (new BlockPos(pos.getX(), MathHelper.clamp(pos.getY(), 70, this.world.func_234938_ad_() - 10),
+                    pos.getZ())).toImmutable();
+            Direction rotated = direction.rotateY();
+            if (!worldBorder.contains(blockPos1))
             {
-                for (int i8 = 1; i8 < 3; ++i8)
+                return Optional.empty();
+            }
+            for (int l1 = -1; l1 < floorWidth; l1++) // creates floor of generated portal and air above
+            {
+                for (int k2 = 0; k2 < portalWidth; k2++)
                 {
-                    for (int i9 = -1; i9 < 3; ++i9)
+                    for (int i3 = -1; i3 < portalHeight; i3++)
                     {
-                        int l9 = i6 + (i8 - 1) * l6 + j7 * i3;
-                        int j10 = k2 + i9;
-                        int l10 = k6 + (i8 - 1) * i3 - j7 * l6;
-                        boolean flag = i9 < 0;
-                        mutableBlockPos.setPos(l9, j10, l10);
-                        this.world.setBlockState(mutableBlockPos, flag ?
+                        BlockState blockState = i3 < 0 ?
                                 ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK.getDefaultState() :
-                                Blocks.AIR.getDefaultState());
+                                Blocks.AIR.getDefaultState();
+                        mutableBlockPos1.func_239621_a_(blockPos1,
+                                k2 * direction.getXOffset() + l1 * rotated.getXOffset(), i3,
+                                k2 * direction.getZOffset() + l1 * rotated.getZOffset());
+                        this.world.setBlockState(mutableBlockPos1, blockState);
                     }
                 }
             }
         }
-        for (int k7 = -1; k7 < 3; ++k7)
+        for (int k1 = -1; k1 < portalWidth + 1; k1++) // creates portal frame
         {
-            for (int j8 = -1; j8 < 4; ++j8)
+            for (int i2 = -1; i2 < portalHeight + 1; i2++)
             {
-                if (k7 == -1 || k7 == 2 || j8 == -1 || j8 == 3)
+                if (k1 == -1 | k1 == portalWidth || i2 == -1 || i2 == portalHeight)
                 {
-                    mutableBlockPos.setPos(i6 + k7 * l6, k2 + j8, k6 + k7 * i3);
-                    this.world.setBlockState(mutableBlockPos,
+                    mutableBlockPos1.func_239621_a_(blockPos1, k1 * direction.getXOffset(), i2,
+                            k1 * direction.getZOffset());
+                    this.world.setBlockState(mutableBlockPos1,
                             ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK.getDefaultState(), 3);
                 }
             }
         }
-        BlockState blockstate = ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK.getDefaultState()
-                                                                        .with(BlockStateProperties.HORIZONTAL_AXIS,
-                                                                                l6 == 0 ?
-                                                                                        Direction.Axis.Z :
-                                                                                        Direction.Axis.X);
-        for (int k8 = 0; k8 < 2; ++k8)
+        BlockState blockState = ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK.getDefaultState()
+                .with(BlockStateProperties.HORIZONTAL_AXIS, axis);
+        for (int j2 = 0; j2 < portalWidth; j2++) // creates portal
         {
-            for (int j9 = 0; j9 < 3; ++j9)
+            for (int l2 = 0; l2 < portalHeight; l2++)
             {
-                mutableBlockPos.setPos(i6 + k8 * l6, k2 + j9, k6 + k8 * i3);
-                this.world.setBlockState(mutableBlockPos, blockstate, 18);
+                mutableBlockPos1.func_239621_a_(blockPos1, j2 * direction.getXOffset(), l2,
+                        j2 * direction.getZOffset());
+                this.world.setBlockState(mutableBlockPos1, blockState, 18);
             }
         }
+        return Optional.of(new TeleportationRepositioner.Result(blockPos1.toImmutable(), portalWidth, portalHeight));
+    }
+
+    private boolean isSpaceEmpty(BlockPos origin, BlockPos.Mutable mutable, Direction axis, int offset)
+    {
+        Direction rotated = axis.rotateY();
+        for (int i = -1; i < 3; i++) //TODO related to portal size?
+        {
+            for (int j = -1; j < 4; j++)
+            {
+                mutable.func_239621_a_(origin, axis.getXOffset() * i + rotated.getXOffset() * offset, j,
+                        axis.getZOffset() * i + rotated.getZOffset() * offset);
+                if (j < 0 && !this.world.getBlockState(mutable).getMaterial().isSolid())
+                {
+                    return false;
+                }
+                if (j >= 0 && !this.world.isAirBlock(mutable))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

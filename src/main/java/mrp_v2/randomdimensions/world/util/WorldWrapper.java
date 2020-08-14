@@ -13,6 +13,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
@@ -213,5 +214,10 @@ public class WorldWrapper implements IWorld
     @Override public boolean hasBlockState(BlockPos pos, Predicate<BlockState> state)
     {
         return this.world.hasBlockState(pos, state);
+    }
+
+    @Override public DynamicRegistries func_241828_r()
+    {
+        return this.world.func_241828_r();
     }
 }

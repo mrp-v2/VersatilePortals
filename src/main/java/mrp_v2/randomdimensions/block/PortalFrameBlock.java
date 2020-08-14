@@ -10,6 +10,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -48,12 +49,12 @@ public class PortalFrameBlock extends BasicBlock
         return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
     }
 
-    @Nullable public static PortalControllerTileEntity getPortalController(IWorld iWorld, BlockPos pos)
+    @Nullable public static PortalControllerTileEntity getPortalController(IWorld world, BlockPos pos)
     {
         PortalControllerTileEntity testController = null;
-        for (PortalBlock.Size size : getPortalSizes(pos, iWorld, false))
+        for (PortalSize size : getPortalSizes(pos, world, false))
         {
-            PortalControllerTileEntity testTileEntity = size.getPortalController(iWorld).getLeft();
+            PortalControllerTileEntity testTileEntity = size.getPortalController(world).getLeft();
             if (testTileEntity != null)
             {
                 if (testController != null && testController != testTileEntity)
@@ -66,12 +67,12 @@ public class PortalFrameBlock extends BasicBlock
         return testController;
     }
 
-    public static List<PortalBlock.Size> getPortalSizes(BlockPos pos, IWorld iWorld, boolean includeSelf)
+    public static List<PortalSize> getPortalSizes(BlockPos pos, IWorld iWorld, boolean includeSelf)
     {
-        List<PortalBlock.Size> portals = Lists.newArrayList();
+        List<PortalSize> portals = Lists.newArrayList();
         for (Pair<BlockPos, Direction.Axis> test : getPossiblePortalLocations(pos))
         {
-            PortalBlock.Size size = new PortalBlock.Size(iWorld, test.getLeft(), test.getRight());
+            PortalSize size = new PortalSize(iWorld, test.getLeft(), test.getRight());
             if (size.isValid())
             {
                 portals.add(size);
@@ -79,12 +80,12 @@ public class PortalFrameBlock extends BasicBlock
         }
         if (includeSelf)
         {
-            PortalBlock.Size size = new PortalBlock.Size(iWorld, pos, Direction.Axis.X);
+            PortalSize size = new PortalSize(iWorld, pos, Direction.Axis.X);
             if (size.isValid())
             {
                 portals.add(size);
             }
-            size = new PortalBlock.Size(iWorld, pos, Direction.Axis.Z);
+            size = new PortalSize(iWorld, pos, Direction.Axis.Z);
             if (size.isValid())
             {
                 portals.add(size);
@@ -114,9 +115,9 @@ public class PortalFrameBlock extends BasicBlock
                 Pair.of(pos.down().east(), Direction.Axis.X), Pair.of(pos.down().west(), Direction.Axis.X));
     }
 
-    public static void updatePortals(List<PortalBlock.Size> sizes)
+    public static void updatePortals(List<PortalSize> sizes)
     {
-        for (PortalBlock.Size size : sizes)
+        for (PortalSize size : sizes)
         {
             Pair<BlockPos, BlockPos> range = size.getBlockRange();
             int x1 = range.getLeft().getX();
@@ -147,6 +148,11 @@ public class PortalFrameBlock extends BasicBlock
         }
     }
 
+    public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
+    {
+        return true;
+    }
+
     /**
      * Post-placement, only server-side
      */
@@ -163,9 +169,9 @@ public class PortalFrameBlock extends BasicBlock
                 new Packet.PortalFrameUpdate(pos, getUpdateSizes(oldState, pos, world)));
     }
 
-    private static List<PortalBlock.Size> getUpdateSizes(BlockState oldState, BlockPos pos, World world)
+    private static List<PortalSize> getUpdateSizes(BlockState oldState, BlockPos pos, World world)
     {
-        List<PortalBlock.Size> sizes = Lists.newArrayList();
+        List<PortalSize> sizes = Lists.newArrayList();
         sizes.addAll(getPortalSizes(pos, world, false));
         sizes.addAll(getPortalSizes(pos, new WorldWrapper(world, pos, oldState), true));
         return sizes;

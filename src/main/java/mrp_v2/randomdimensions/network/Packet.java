@@ -1,8 +1,8 @@
 package mrp_v2.randomdimensions.network;
 
 import mrp_v2.randomdimensions.RandomDimensions;
-import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.block.PortalFrameBlock;
+import mrp_v2.randomdimensions.block.PortalSize;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -18,14 +18,11 @@ import java.util.function.Supplier;
 
 public class Packet
 {
-
     public static class Handler
     {
-
         public static final String ID = "portal_color";
         private static final String PROTOCOL_VERSION = "1";
         public static SimpleChannel INSTANCE;
-
         private static int id = 0;
 
         public static void createChannel()
@@ -42,9 +39,9 @@ public class Packet
     public static class PortalFrameUpdate
     {
         private final BlockPos pos;
-        private final List<PortalBlock.Size> sizes;
+        private final List<PortalSize> sizes;
 
-        public PortalFrameUpdate(BlockPos pos, List<PortalBlock.Size> sizes)
+        public PortalFrameUpdate(BlockPos pos, List<PortalSize> sizes)
         {
             this.pos = pos;
             this.sizes = sizes;
@@ -53,13 +50,13 @@ public class Packet
         public PortalFrameUpdate(PacketBuffer buffer)
         {
             this.pos = buffer.readBlockPos();
-            this.sizes = PortalBlock.Size.readListFromBuffer(buffer);
+            this.sizes = PortalSize.readListFromBuffer(buffer);
         }
 
         public void encode(PacketBuffer buffer)
         {
             buffer.writeBlockPos(this.pos);
-            PortalBlock.Size.writeListToBuffer(this.sizes, buffer);
+            PortalSize.writeListToBuffer(this.sizes, buffer);
         }
 
         public void handle(Supplier<NetworkEvent.Context> context)

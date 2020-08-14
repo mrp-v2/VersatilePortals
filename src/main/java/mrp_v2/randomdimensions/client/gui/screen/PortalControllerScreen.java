@@ -18,10 +18,8 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 @OnlyIn(Dist.CLIENT) public class PortalControllerScreen extends ContainerScreen<PortalControllerContainer>
 {
     public static final String ID = "portal_controller";
-
     public static final ResourceLocation GUI_TEXTURE =
             new ResourceLocation(RandomDimensions.ID, "textures/gui/container/portal_controller.png");
-
     private Slider colorR;
     private Slider colorG;
     private Slider colorB;
@@ -52,7 +50,7 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
     @Override protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y)
     {
         super.drawGuiContainerForegroundLayer(stack, x, y);
-        this.font.func_238422_b_(stack, Util.makeTranslation(ID, "slot_label", "control_item"), 8, 92, 4210752);
+        this.font.func_243248_b(stack, Util.makeTranslation(ID, "slot_label", "control_item"), 8, 92, 4210752);
     }
 
     @Override protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float f1, int i1, int i2)

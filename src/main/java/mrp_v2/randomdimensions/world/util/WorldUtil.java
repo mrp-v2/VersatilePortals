@@ -206,7 +206,7 @@ public class WorldUtil
     }
 
     /**
-     * Adds functions that decide whether a <c>BlockState</c>blockstate is suitable for world generation.
+     * Adds functions that decide whether a <c>BlockState</c> is suitable for world generation.
      */
     public static void addBlockStateValidityCheckers(Function<BlockState, Boolean>... blockStateValidityCheckers)
     {

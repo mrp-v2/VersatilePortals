@@ -16,8 +16,7 @@ public class PlayerPortalDataHandler extends PortalDataHandler implements IPlaye
 
 	@Override
 	public int incrementInPortalTime() {
-		this.inPortalTime++;
-		return this.inPortalTime;
+		return ++this.inPortalTime;
 	}
 
 	@Override
