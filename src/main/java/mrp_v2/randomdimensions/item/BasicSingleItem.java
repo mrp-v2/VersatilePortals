@@ -22,10 +22,10 @@ public class BasicSingleItem extends Item
 
     public BasicSingleItem(String id)
     {
-        this((properties) -> properties, id);
+        this(id, (properties) -> properties);
     }
 
-    public BasicSingleItem(Function<Properties, Properties> propertiesModifier, String id)
+    public BasicSingleItem(String id, Function<Properties, Properties> propertiesModifier)
     {
         super(propertiesModifier.apply(new Properties().maxStackSize(1).group(MAIN_ITEM_GROUP)));
         this.setRegistryName(RandomDimensions.ID, id);

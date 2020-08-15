@@ -73,9 +73,7 @@ public class PortalSize
 
     private static boolean canConnect(BlockState state)
     {
-        return state.isAir() ||
-                state.isIn(BlockTags.FIRE) ||
-                state.isIn(BlockTags.getCollection().get(ObjectHolder.PORTAL_BLOCKS_LOCATION));
+        return state.isAir() || state.isIn(BlockTags.FIRE) || state.isIn(ObjectHolder.PORTAL_BLOCKS);
     }
 
     public static List<PortalSize> readListFromBuffer(PacketBuffer buffer)
@@ -152,7 +150,7 @@ public class PortalSize
             for (Pair<BlockPos, Optional<Direction>> frame : this.getFrameBlocks())
             {
                 BlockState state = world.getBlockState(frame.getLeft());
-                if (state.isIn(BlockTags.getCollection().get(ObjectHolder.PORTAL_CONTROLLER_BLOCKS_LOCATION)))
+                if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCKS))
                 {
                     if (!frame.getRight().isPresent() ||
                             state.isSolidSide(world, frame.getLeft(), frame.getRight().get()))
@@ -238,7 +236,7 @@ public class PortalSize
                 {
                     return i;
                 }
-                if (state.isIn(BlockTags.getCollection().get(ObjectHolder.PORTAL_BLOCKS_LOCATION)))
+                if (state.isIn(ObjectHolder.PORTAL_BLOCKS))
                 {
                     this.portalBlockCount++;
                 }

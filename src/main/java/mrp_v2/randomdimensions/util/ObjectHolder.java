@@ -1,7 +1,6 @@
 package mrp_v2.randomdimensions.util;
 
 import com.google.common.collect.Sets;
-import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.block.*;
 import mrp_v2.randomdimensions.common.capabilities.PlayerPortalDataStorage;
 import mrp_v2.randomdimensions.common.capabilities.PortalDataStorage;
@@ -13,13 +12,15 @@ import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.village.PortalPointOfInterestType;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.particles.ParticleType;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.PointOfInterestType;
+import net.minecraftforge.common.Tags;
 
 import java.util.Set;
 
@@ -36,9 +37,9 @@ public class ObjectHolder
     public static final EmptyExistingWorldControlItem EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
     public static final ExistingWorldControlItem EXISTING_WORLD_TELEPORT_ITEM;
     public static final ContainerType<PortalControllerContainer> PORTAL_CONTROLLER_CONTAINER_TYPE;
-    public static final ResourceLocation PORTAL_BLOCKS_LOCATION;
-    public static final ResourceLocation PORTAL_FRAME_BLOCKS_LOCATION;
-    public static final ResourceLocation PORTAL_CONTROLLER_BLOCKS_LOCATION;
+    public static final Tags.IOptionalNamedTag<Block> PORTAL_BLOCKS;
+    public static final Tags.IOptionalNamedTag<Block> PORTAL_FRAME_BLOCKS;
+    public static final Tags.IOptionalNamedTag<Block> PORTAL_CONTROLLER_BLOCKS;
     public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
     public static final ParticleType<PortalControllerParticleData> PORTAL_CONTROLLER_PARTICLE_TYPE;
     public static final PlayerPortalDataStorage PLAYER_PORTAL_DATA_STORAGE;
@@ -59,9 +60,9 @@ public class ObjectHolder
         EMPTY_EXISTING_WORLD_TELEPORT_ITEM = new EmptyExistingWorldControlItem();
         EXISTING_WORLD_TELEPORT_ITEM = new ExistingWorldControlItem();
         PORTAL_CONTROLLER_CONTAINER_TYPE = new PortalControllerContainer.Type();
-        PORTAL_BLOCKS_LOCATION = new ResourceLocation(RandomDimensions.ID, "portals");
-        PORTAL_FRAME_BLOCKS_LOCATION = new ResourceLocation(RandomDimensions.ID, "portal_frames");
-        PORTAL_CONTROLLER_BLOCKS_LOCATION = new ResourceLocation(RandomDimensions.ID, "portal_controllers");
+        PORTAL_BLOCKS = BlockTags.createOptional(Util.makeResourceLocation("portals"));
+        PORTAL_FRAME_BLOCKS = BlockTags.createOptional(Util.makeResourceLocation("portal_frames"));
+        PORTAL_CONTROLLER_BLOCKS = BlockTags.createOptional(Util.makeResourceLocation("portal_controllers"));
         PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
         PORTAL_CONTROLLER_PARTICLE_TYPE = PortalControllerParticleData.createParticleType();
         PLAYER_PORTAL_DATA_STORAGE = new PlayerPortalDataStorage();

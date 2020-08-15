@@ -10,7 +10,7 @@ public class ExistingWorldControlItem extends PortalControlItem
 
     public ExistingWorldControlItem()
     {
-        super(ID);
+        super(ID, (properties -> properties.group(null)));
     }
 
     public static void addColorDataToItem(ItemStack stack, int color)

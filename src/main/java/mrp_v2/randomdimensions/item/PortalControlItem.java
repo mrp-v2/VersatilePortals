@@ -7,6 +7,8 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
+import java.util.function.Function;
+
 public abstract class PortalControlItem extends BasicSingleItem
 {
     public static final String WORLD_ID_NBT_ID = "WorldID";
@@ -15,6 +17,10 @@ public abstract class PortalControlItem extends BasicSingleItem
     protected PortalControlItem(String id)
     {
         super(id);
+    }
+    
+    protected PortalControlItem(String id, Function<Properties, Properties> propertiesModifer){
+        super(id, propertiesModifer);
     }
 
     public static void addTeleportDataToItem(ItemStack stack, String worldID)

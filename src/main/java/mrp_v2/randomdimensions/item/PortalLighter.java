@@ -14,7 +14,7 @@ public class PortalLighter extends BasicSingleItem
 
     public PortalLighter()
     {
-        super((properties) -> properties.maxDamage(64), ID);
+        super(ID, (properties) -> properties.maxDamage(64));
     }
 
     @SuppressWarnings("resource") @Override public ActionResultType onItemUse(ItemUseContext context)

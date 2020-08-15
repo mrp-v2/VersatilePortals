@@ -154,4 +154,9 @@ public class Util
         }
         return mergedArray;
     }
+
+    public static ResourceLocation makeResourceLocation(String... parts)
+    {
+        return new ResourceLocation(RandomDimensions.ID, String.join("/", parts));
+    }
 }
