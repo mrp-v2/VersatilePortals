@@ -14,28 +14,29 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+import java.lang.reflect.InvocationTargetException;
+
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID) public class RegistryHandler
 {
+    static
+    {
+        WorldUtil.addInvalidBlockSupertypes(PortalBlock.class, IndestructiblePortalFrameBlock.class);
+    }
 
     @SubscribeEvent public static void registerBlocks(final RegistryEvent.Register<Block> event)
     {
         event.getRegistry()
-             .registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
-                     ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
-                     ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
-    }
-
-    public static void postRegistering()
-    {
-        WorldUtil.addInvalidBlockSupertypes(PortalBlock.class, IndestructiblePortalFrameBlock.class);
+                .registerAll(ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
+                        ObjectHolder.PORTAL_CONTROLLER_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
+                        ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
     }
 
     @SubscribeEvent public static void registerItems(final RegistryEvent.Register<Item> event)
     {
         event.getRegistry()
-             .registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
-                     ObjectHolder.PORTAL_LIGHTER_ITEM, ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM,
-                     ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
+                .registerAll(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM, ObjectHolder.PORTAL_FRAME_BLOCK_ITEM,
+                        ObjectHolder.PORTAL_LIGHTER_ITEM, ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM,
+                        ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
     }
 
     @SubscribeEvent public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event)
@@ -46,13 +47,14 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
     @SubscribeEvent public static void registerParticles(final RegistryEvent.Register<ParticleType<?>> event)
     {
         event.getRegistry()
-             .registerAll(ObjectHolder.PORTAL_PARTICLE_TYPE, ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE);
+                .registerAll(ObjectHolder.PORTAL_PARTICLE_TYPE, ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE);
     }
 
     @SubscribeEvent
     public static void registerPointOfInterestTypes(final RegistryEvent.Register<PointOfInterestType> event)
+            throws InvocationTargetException, IllegalAccessException
     {
-        event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE);
+        event.getRegistry().registerAll(ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE.register());
     }
 
     @SubscribeEvent public static void registerTileEntities(final RegistryEvent.Register<TileEntityType<?>> event)

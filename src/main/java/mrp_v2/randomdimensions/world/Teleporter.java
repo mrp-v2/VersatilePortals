@@ -1,13 +1,14 @@
 package mrp_v2.randomdimensions.world;
 
-import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
+import mrp_v2.randomdimensions.block.PortalSize;
+import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PortalInfo;
-import net.minecraft.block.PortalSize;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
@@ -29,27 +30,30 @@ import net.minecraftforge.common.util.ITeleporter;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 
 public class Teleporter implements ITeleporter
 {
     protected final ServerWorld world;
-    protected final Random random;
+    protected final Direction.Axis axis;
 
-    public Teleporter(ServerWorld worldIn)
+    public Teleporter(ServerWorld worldIn, Direction.Axis axis)
     {
         this.world = worldIn;
-        this.random = new Random(worldIn.getSeed());
+        this.axis = axis;
     }
 
     @Override
     public Entity placeEntity(Entity entityIn, ServerWorld currentWorld, ServerWorld destinationWorld, float yaw,
             Function<Boolean, Entity> repositionEntity)
     {
-        IPlayerPortalDataCapability playerPortalData = Util.getPlayerPortalDataOrNull(entityIn);
         PortalInfo portalInfo = getPortalInfo(entityIn);
-        if (playerPortalData != null)
+        if (portalInfo == null)
+        {
+            return null;
+        }
+        Entity returnEntity;
+        if (entityIn instanceof PlayerEntity)
         {
             ServerPlayerEntity player = (ServerPlayerEntity) entityIn;
             currentWorld.getProfiler().startSection("moving");
@@ -62,7 +66,7 @@ public class Teleporter implements ITeleporter
             player.setPositionAndUpdate(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
             player.connection.captureCurrentPosition();
             currentWorld.getProfiler().endSection();
-            return player;
+            returnEntity = player;
         } else
         {
             this.world.getProfiler().endStartSection("reloading");
@@ -75,8 +79,13 @@ public class Teleporter implements ITeleporter
                 newEntity.setMotion(portalInfo.motion);
                 destinationWorld.addFromAnotherDimension(newEntity);
             }
-            return newEntity;
+            returnEntity = newEntity;
         }
+        IPortalDataCapability portalData = Util.getPortalData(returnEntity);
+        portalData.setRemainingPortalCooldown(returnEntity.getPortalCooldown());
+        portalData.setInPortalTime(0);
+        returnEntity.getMaxInPortalTime();
+        return returnEntity;
     }
 
     @Nullable private PortalInfo getPortalInfo(Entity entity)
@@ -87,27 +96,35 @@ public class Teleporter implements ITeleporter
         double minZ = Math.max(-2.9999872E7D, worldborder.minZ() + 16.0D);
         double maxX = Math.min(2.9999872E7D, worldborder.maxX() - 16.0D);
         double maxZ = Math.min(2.9999872E7D, worldborder.maxZ() - 16.0D);
-        double coordinateMultiplier = DimensionType.func_242715_a(entity.world.func_230315_m_(), this.world.func_230315_m_());
-        BlockPos pos = new BlockPos(MathHelper.clamp(entity.getPosX() * coordinateMultiplier, minX, maxX), entity.getPosY(),
-                MathHelper.clamp(entity.getPosZ() * coordinateMultiplier, minZ, maxZ));
-        return this.teleportExistingPortal(pos, toNether).map((result) ->
-        {
-            Direction.Axis axis = Direction.Axis.X;
-            Vector3d vector3d = new Vector3d(0.5D, 0.0D, 0.0D);
-            return PortalSize.func_242963_a(this.world, result, axis, vector3d, entity.getSize(entity.getPose()),
-                    entity.getMotion(), entity.rotationYaw, entity.rotationPitch);
-        }).orElse(null);
+        double coordinateMultiplier =
+                DimensionType.func_242715_a(entity.world.func_230315_m_(), this.world.func_230315_m_());
+        BlockPos pos =
+                new BlockPos(MathHelper.clamp(entity.getPosX() * coordinateMultiplier, minX, maxX), entity.getPosY(),
+                        MathHelper.clamp(entity.getPosZ() * coordinateMultiplier, minZ, maxZ));
+        return this.teleportExistingPortal(pos, coordinateMultiplier)
+                .map((result) -> this.convertTeleportResult(result, entity))
+                .orElseGet(() -> this.teleportNewPortal(pos)
+                        .map((result) -> this.convertTeleportResult(result, entity))
+                        .orElse(null));
+    }
+
+    private PortalInfo convertTeleportResult(TeleportationRepositioner.Result result, Entity entity)
+    {
+        Direction.Axis axis = Direction.Axis.X;
+        Vector3d vector3d = new Vector3d(0.5D, 0.0D, 0.0D);
+        return net.minecraft.block.PortalSize.func_242963_a(this.world, result, axis, vector3d,
+                entity.getSize(entity.getPose()), entity.getMotion(), entity.rotationYaw, entity.rotationPitch);
     }
 
     public Optional<TeleportationRepositioner.Result> teleportExistingPortal(BlockPos searchOrigin,
-            boolean fromNormalScaleToShrunkScale)
+            double coordinateMultiplier)
     {
         PointOfInterestManager pointOfInterestManager = this.world.getPointOfInterestManager();
-        int i = fromNormalScaleToShrunkScale ? 16 : 128;
+        int i = coordinateMultiplier == 0.125D ? 16 : 128;
         pointOfInterestManager.ensureLoadedAndValid(this.world, searchOrigin, i);
         Optional<PointOfInterest> optionalPointOfInterest = pointOfInterestManager.getInSquare(
-                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE, searchOrigin, i,
-                PointOfInterestManager.Status.ANY)
+                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE,
+                searchOrigin, i, PointOfInterestManager.Status.ANY)
                 .sorted(Comparator.<PointOfInterest>comparingDouble(
                         (pointOfInterest) -> pointOfInterest.getPos().distanceSq(searchOrigin)).thenComparingInt(
                         (pointOfInterest) -> pointOfInterest.getPos().getY()))
@@ -120,15 +137,14 @@ public class Teleporter implements ITeleporter
             this.world.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(blockPos), 3, blockPos);
             BlockState blockState1 = this.world.getBlockState(blockPos);
             return TeleportationRepositioner.func_243676_a(blockPos,
-                    blockState1.get(BlockStateProperties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21,
-                    //TODO related to portal size?
+                    blockState1.get(BlockStateProperties.HORIZONTAL_AXIS), PortalSize.MAX_WIDTH, Direction.Axis.Y, 21,
                     (blockState2) -> this.world.getBlockState(blockState2) == blockState1);
         });
     }
 
-    public Optional<TeleportationRepositioner.Result> teleportNewPortal(BlockPos pos, Direction.Axis axis)
+    public Optional<TeleportationRepositioner.Result> teleportNewPortal(BlockPos pos)
     {
-        Direction direction = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, axis);
+        Direction direction = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, this.axis);
         double d0 = -1.0D;
         BlockPos blockPos1 = null;
         double d1 = -1.0D;
@@ -228,7 +244,7 @@ public class Teleporter implements ITeleporter
             }
         }
         BlockState blockState = ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK.getDefaultState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, axis);
+                .with(BlockStateProperties.HORIZONTAL_AXIS, this.axis);
         for (int j2 = 0; j2 < portalWidth; j2++) // creates portal
         {
             for (int l2 = 0; l2 < portalHeight; l2++)
@@ -244,9 +260,9 @@ public class Teleporter implements ITeleporter
     private boolean isSpaceEmpty(BlockPos origin, BlockPos.Mutable mutable, Direction axis, int offset)
     {
         Direction rotated = axis.rotateY();
-        for (int i = -1; i < 3; i++) //TODO related to portal size?
+        for (int i = -1; i < PortalSize.MIN_WIDTH + 1; i++)
         {
-            for (int j = -1; j < 4; j++)
+            for (int j = -1; j < PortalSize.MIN_HEIGHT + 1; j++)
             {
                 mutable.func_239621_a_(origin, axis.getXOffset() * i + rotated.getXOffset() * offset, j,
                         axis.getZOffset() * i + rotated.getZOffset() * offset);

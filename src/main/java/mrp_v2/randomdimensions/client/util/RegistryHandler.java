@@ -11,18 +11,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-@OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = RandomDimensions.ID)
 public class RegistryHandler
 {
-
-    static
+    public static void init()
     {
         ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, PortalControllerScreen::new);
     }
@@ -30,15 +27,15 @@ public class RegistryHandler
     @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)
     {
         event.getBlockColors()
-             .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
-                     ObjectHolder.PORTAL_FRAME_BLOCK, ObjectHolder.PORTAL_CONTROLLER_BLOCK,
-                     ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+                .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
+                        ObjectHolder.PORTAL_FRAME_BLOCK, ObjectHolder.PORTAL_CONTROLLER_BLOCK,
+                        ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
     }
 
     @SubscribeEvent public static void registerItemColors(final ColorHandlerEvent.Item event)
     {
         event.getItemColors()
-             .register(ExistingWorldControlItemColorer.INSTANCE, ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
+                .register(ExistingWorldControlItemColorer.INSTANCE, ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
     }
 
     @SuppressWarnings("resource") @SubscribeEvent

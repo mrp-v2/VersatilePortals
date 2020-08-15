@@ -2,7 +2,7 @@ package mrp_v2.randomdimensions.tileentity;
 
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.block.PortalControllerBlock;
-import mrp_v2.randomdimensions.block.PortalFrameBlock;
+import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import mrp_v2.randomdimensions.inventory.PortalControllerItemStackHandler;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.item.PortalControlItem;
@@ -33,7 +33,6 @@ import javax.annotation.Nullable;
 public class PortalControllerTileEntity extends TileEntity
         implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity
 {
-
     public static final String ID = "portal_controller";
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
@@ -51,7 +50,7 @@ public class PortalControllerTileEntity extends TileEntity
     {
         TileEntityType<PortalControllerTileEntity> tileEntityType =
                 TileEntityType.Builder.create(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK)
-                                      .build(null);
+                        .build(null);
         tileEntityType.setRegistryName(RandomDimensions.ID, ID);
         return tileEntityType;
     }
@@ -108,7 +107,7 @@ public class PortalControllerTileEntity extends TileEntity
         this.read(this.getBlockState(), pkt.getNbtCompound());
         if (this.world.isBlockLoaded(this.pos))
         {
-            PortalFrameBlock.updatePortals(PortalFrameBlock.getPortalSizes(this.pos, this.world, false));
+            PortalFrameUtil.updatePortals(PortalFrameUtil.getPortalSizes(this.pos, this.world, false));
         }
     }
 

@@ -19,27 +19,39 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class PortalSize
 {
+    public static final int MAX_WIDTH = 21;
+    public static final int MAX_HEIGHT = 21;
+    public static final int MIN_WIDTH = 1;
+    public static final int MIN_HEIGHT = 2;
     private static final AbstractBlock.IExtendedPositionPredicate<Direction> PORTAL_FRAME_PREDICATE =
             (state, reader, pos, side) ->
             {
                 Block block = state.getBlock();
-                return block instanceof PortalFrameBlock &&
-                        ((PortalFrameBlock) block).isSideValidForPortal(state, reader, pos, side);
+                if (!state.isIn(ObjectHolder.PORTAL_FRAME_BLOCKS))
+                {
+                    //return false;
+                }
+                if (!(block instanceof IPortalFrameBlock))
+                {
+                    return false;
+                }
+                return ((IPortalFrameBlock) block).isSideValidForPortal(state, reader, pos, side);
             };
-    private static final int MAX_WIDTH = 21;
-    private static final int MAX_HEIGHT = 21;
-    private static final int MIN_WIDTH = 1;
-    private static final int MIN_HEIGHT = 2;
+    private static final AbstractBlock.IPositionPredicate PORTAL_CONTROLLER_PREDICATE =
+            (state, reader, pos) -> state.getBlock() instanceof PortalControllerBlock;
+    private static final Function<BlockState, Boolean> PORTAL_PREDICATE =
+            (state) -> state.getBlock() instanceof PortalBlock;
     private final Direction.Axis axis;
     private final Direction rightDir;
-    private int portalBlockCount;
-    @Nullable private BlockPos bottomLeft;
     private int height;
     private int width;
+    private int portalBlockCount;
+    @Nullable private BlockPos bottomLeft;
 
     public PortalSize(IWorld world, BlockPos pos, Direction.Axis axis)
     {
@@ -48,16 +60,21 @@ public class PortalSize
         this.bottomLeft = this.getBottomLeft(pos, world);
         if (this.bottomLeft == null)
         {
-            this.bottomLeft = pos;
-            this.width = 1;
-            this.height = 1;
+            this.invalidate();
         } else
         {
             this.width = this.getWidth(world);
             if (this.width > 0)
             {
                 this.height = this.getHeight(world);
+            } else
+            {
+                this.invalidate();
             }
+        }
+        if (this.isValid() && !this.getPortalController(world).getRight())
+        {
+            this.invalidate();
         }
     }
 
@@ -73,7 +90,7 @@ public class PortalSize
 
     private static boolean canConnect(BlockState state)
     {
-        return state.isAir() || state.isIn(BlockTags.FIRE) || state.isIn(ObjectHolder.PORTAL_BLOCKS);
+        return state.isAir() || state.isIn(BlockTags.FIRE) || PORTAL_PREDICATE.apply(state);
     }
 
     public static List<PortalSize> readListFromBuffer(PacketBuffer buffer)
@@ -132,6 +149,13 @@ public class PortalSize
                 this.height <= MAX_HEIGHT;
     }
 
+    private void invalidate()
+    {
+        this.bottomLeft = null;
+        this.height = 0;
+        this.width = 0;
+    }
+
     public void placePortalBlocks(IWorld world)
     {
         BlockState state =
@@ -150,19 +174,16 @@ public class PortalSize
             for (Pair<BlockPos, Optional<Direction>> frame : this.getFrameBlocks())
             {
                 BlockState state = world.getBlockState(frame.getLeft());
-                if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCKS))
+                if (PORTAL_CONTROLLER_PREDICATE.test(state, world, frame.getLeft()))
                 {
-                    if (!frame.getRight().isPresent() ||
-                            state.isSolidSide(world, frame.getLeft(), frame.getRight().get()))
+                    if (found)
                     {
-                        if (found)
-                        {
-                            return Pair.of(null, false);
-                        }
-                        TileEntity temp = world.getTileEntity(frame.getLeft());
-                        portalControllerTileEntity = temp == null ? null : (PortalControllerTileEntity) temp;
-                        found = true;
+                        return Pair.of(null, false);
                     }
+                    TileEntity temp = world.getTileEntity(frame.getLeft());
+                    portalControllerTileEntity =
+                            temp instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) temp : null;
+                    found = true;
                 }
             }
         }
@@ -299,7 +320,7 @@ public class PortalSize
     private int getWidth(IWorld world)
     {
         int i = this.getDistanceFromEdge(this.bottomLeft, this.rightDir, world);
-        return i >= 2 && i <= 21 ? i : 0;
+        return i >= MIN_WIDTH && i <= MAX_WIDTH ? i : 0;
     }
 
     public Pair<BlockPos, BlockPos> getBlockRange()

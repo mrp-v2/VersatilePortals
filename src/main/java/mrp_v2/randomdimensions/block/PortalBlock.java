@@ -1,6 +1,5 @@
 package mrp_v2.randomdimensions.block;
 
-import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
@@ -110,13 +109,9 @@ public class PortalBlock extends BasicBlock
                 portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
                 return;
             }
-            IPlayerPortalDataCapability playerPortalData = Util.getPlayerPortalDataOrNull(entityIn);
-            if (playerPortalData != null)
+            if (portalData.incrementInPortalTime() < entityIn.getMaxInPortalTime())
             {
-                if (playerPortalData.incrementInPortalTime() < entityIn.getMaxInPortalTime())
-                {
-                    return;
-                }
+                return;
             }
             RegistryKey<World> registryKey = World.field_234918_g_;
             if (worldIn.func_234923_W_() == World.field_234918_g_)
@@ -138,7 +133,8 @@ public class PortalBlock extends BasicBlock
             {
                 return;
             }
-            entityIn.changeDimension(serverWorld, new Teleporter(serverWorld));
+            entityIn.changeDimension(serverWorld,
+                    new Teleporter(serverWorld, state.get(BlockStateProperties.HORIZONTAL_AXIS)));
         }
     }
 

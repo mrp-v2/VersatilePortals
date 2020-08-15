@@ -1,8 +1,8 @@
 package mrp_v2.randomdimensions.network;
 
 import mrp_v2.randomdimensions.RandomDimensions;
-import mrp_v2.randomdimensions.block.PortalFrameBlock;
 import mrp_v2.randomdimensions.block.PortalSize;
+import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -68,7 +68,7 @@ public class Packet
                 {
                     if (world.isBlockLoaded(this.pos))
                     {
-                        PortalFrameBlock.updatePortals(this.sizes);
+                        PortalFrameUtil.updatePortals(this.sizes);
                     }
                 }
             });

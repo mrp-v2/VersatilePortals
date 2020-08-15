@@ -1,7 +1,8 @@
 package mrp_v2.randomdimensions.client.renderer.color;
 
+import mrp_v2.randomdimensions.block.IPortalFrameBlock;
 import mrp_v2.randomdimensions.block.PortalBlock;
-import mrp_v2.randomdimensions.block.PortalFrameBlock;
+import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.chunk.ChunkRenderCache;
@@ -18,7 +19,6 @@ import java.lang.reflect.Field;
 
 @OnlyIn(Dist.CLIENT) public class PortalColorer implements IBlockColor
 {
-
     public static final PortalColorer INSTANCE = new PortalColorer();
 
     @Override
@@ -51,9 +51,9 @@ import java.lang.reflect.Field;
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
-        if (blockState.getBlock() instanceof PortalFrameBlock)
+        if (blockState.getBlock() instanceof IPortalFrameBlock)
         {
-            return PortalFrameBlock.getColor(world, pos);
+            return PortalFrameUtil.getColor(world, pos);
         }
         if (blockState.getBlock() instanceof PortalBlock)
         {

@@ -2,7 +2,6 @@ package mrp_v2.randomdimensions.util;
 
 import com.google.common.collect.Sets;
 import mrp_v2.randomdimensions.block.*;
-import mrp_v2.randomdimensions.common.capabilities.PlayerPortalDataStorage;
 import mrp_v2.randomdimensions.common.capabilities.PortalDataStorage;
 import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.item.EmptyExistingWorldControlItem;
@@ -42,7 +41,6 @@ public class ObjectHolder
     public static final Tags.IOptionalNamedTag<Block> PORTAL_CONTROLLER_BLOCKS;
     public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
     public static final ParticleType<PortalControllerParticleData> PORTAL_CONTROLLER_PARTICLE_TYPE;
-    public static final PlayerPortalDataStorage PLAYER_PORTAL_DATA_STORAGE;
     public static final PortalDataStorage PORTAL_DATA_STORAGE;
     public static final PortalPointOfInterestType PORTAL_POINT_OF_INTEREST_TYPE;
     public static final TileEntityType<PortalControllerTileEntity> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
@@ -65,7 +63,6 @@ public class ObjectHolder
         PORTAL_CONTROLLER_BLOCKS = BlockTags.createOptional(Util.makeResourceLocation("portal_controllers"));
         PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
         PORTAL_CONTROLLER_PARTICLE_TYPE = PortalControllerParticleData.createParticleType();
-        PLAYER_PORTAL_DATA_STORAGE = new PlayerPortalDataStorage();
         PORTAL_DATA_STORAGE = new PortalDataStorage();
         PORTAL_POINT_OF_INTEREST_TYPE = new PortalPointOfInterestType();
         PORTAL_CONTROLLER_TILE_ENTITY_TYPE = PortalControllerTileEntity.createTileEntity();

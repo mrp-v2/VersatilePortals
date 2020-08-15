@@ -2,10 +2,8 @@ package mrp_v2.randomdimensions.util;
 
 import mrp_v2.randomdimensions.RandomDimensions;
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
-import mrp_v2.randomdimensions.common.capabilities.IPlayerPortalDataCapability;
 import mrp_v2.randomdimensions.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -76,17 +74,6 @@ public class Util
     {
         return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
                 .orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
-    }
-
-    @Nullable public static IPlayerPortalDataCapability getPlayerPortalDataOrNull(Entity entity)
-    {
-        return entity.getCapability(CapabilityHandler.PLAYER_PORTAL_DATA_CAPABILITY).orElse(null);
-    }
-
-    public static IPlayerPortalDataCapability getPlayerPortalData(PlayerEntity player)
-    {
-        return player.getCapability(CapabilityHandler.PLAYER_PORTAL_DATA_CAPABILITY)
-                .orElseThrow(() -> new RuntimeException("Could not get an IPlayerPortalDataCapability!"));
     }
 
     @Nullable public static RegistryKey<World> createWorldKey(String worldID)

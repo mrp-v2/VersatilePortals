@@ -1,82 +1,88 @@
 package mrp_v2.randomdimensions.common.capabilities;
 
+import com.google.common.collect.Maps;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3d;
+import org.apache.commons.lang3.tuple.MutablePair;
+
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.MutablePair;
+public class PortalDataHandler implements IPortalDataCapability
+{
+    private final Map<String, MutablePair<Vector3d, Direction>> data;
+    private int remainingPortalCooldown;
+    private int inPortalTime;
 
-import com.google.common.collect.Maps;
+    public PortalDataHandler()
+    {
+        this.data = Maps.newHashMap();
+        this.remainingPortalCooldown = 0;
+        this.inPortalTime = 0;
+    }
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.Vector3d;
+    @Override public Vector3d getLastPortalVec(String worldID)
+    {
+        return this.data.get(worldID).getLeft();
+    }
 
-public class PortalDataHandler implements IPortalDataCapability {
+    @Override public void setLastPortalVec(String worldID, Vector3d lastPortalVec)
+    {
+        this.ensureExists(worldID);
+        this.data.get(worldID).setLeft(lastPortalVec);
+    }
 
-	private final Map<String, MutablePair<Vector3d, Direction>> data;
-	private int remainingPortalCooldown;
-	private int timeInPortal;
+    @Override public Direction getTeleportDirection(String worldID)
+    {
+        return this.data.get(worldID).getRight();
+    }
 
-	public PortalDataHandler() {
-		this.data = Maps.newHashMap();
-		this.remainingPortalCooldown = 0;
-		this.timeInPortal = 0;
-	}
+    @Override public void setTeleportDirection(String worldID, Direction teleportDirection)
+    {
+        this.ensureExists(worldID);
+        this.data.get(worldID).setRight(teleportDirection);
+    }
 
-	@Override
-	public Vector3d getLastPortalVec(String worldID) {
-		return this.data.get(worldID).getLeft();
-	}
+    @Override public void decrementRemainingPortalCooldown()
+    {
+        if (this.remainingPortalCooldown > 0)
+        {
+            this.remainingPortalCooldown--;
+        }
+    }
 
-	@Override
-	public void setLastPortalVec(String worldID, Vector3d lastPortalVec) {
-		this.ensureExists(worldID);
-		this.data.get(worldID).setLeft(lastPortalVec);
-	}
+    @Override public int getRemainingPortalCooldown()
+    {
+        return this.remainingPortalCooldown;
+    }
 
-	@Override
-	public Direction getTeleportDirection(String worldID) {
-		return this.data.get(worldID).getRight();
-	}
+    @Override public void setRemainingPortalCooldown(int remainingPortalCooldown)
+    {
+        this.remainingPortalCooldown = remainingPortalCooldown;
+    }
 
-	@Override
-	public void setTeleportDirection(String worldID, Direction teleportDirection) {
-		this.ensureExists(worldID);
-		this.data.get(worldID).setRight(teleportDirection);
-	}
+    @Override public int getInPortalTime()
+    {
+        return this.inPortalTime;
+    }
 
-	private void ensureExists(String worldID) {
-		this.data.putIfAbsent(worldID, new MutablePair<Vector3d, Direction>());
-	}
+    @Override public void setInPortalTime(int inPortalTime)
+    {
+        this.inPortalTime = inPortalTime;
+    }
 
-	@Override
-	public Set<String> getWorldsWithPortalData() {
-		return this.data.keySet();
-	}
+    @Override public int incrementInPortalTime()
+    {
+        return ++this.inPortalTime;
+    }
 
-	@Override
-	public void decrementRemainingPortalCooldown() {
-		if (this.remainingPortalCooldown > 0) {
-			this.remainingPortalCooldown--;
-		}
-	}
+    @Override public Set<String> getWorldsWithPortalData()
+    {
+        return this.data.keySet();
+    }
 
-	@Override
-	public int getRemainingPortalCooldown() {
-		return this.remainingPortalCooldown;
-	}
-
-	@Override
-	public void setRemainingPortalCooldown(int remainingPortalCooldown) {
-		this.remainingPortalCooldown = remainingPortalCooldown;
-	}
-
-	@Override
-	public int getTimeInPortal() {
-		return this.timeInPortal;
-	}
-
-	@Override
-	public void setTimeInPortal(int timeInPortal) {
-		this.timeInPortal = timeInPortal;
-	}
+    private void ensureExists(String worldID)
+    {
+        this.data.putIfAbsent(worldID, new MutablePair<Vector3d, Direction>());
+    }
 }

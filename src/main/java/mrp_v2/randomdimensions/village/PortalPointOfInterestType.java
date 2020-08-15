@@ -9,13 +9,16 @@ import java.lang.reflect.Method;
 
 public class PortalPointOfInterestType extends PointOfInterestType
 {
-
     public static final String ID = "portal";
 
     public PortalPointOfInterestType()
     {
         super(ID, ObjectHolder.getPortalBlockStates(), 0, 1);
         this.setRegistryName(RandomDimensions.ID, ID);
+    }
+
+    public PortalPointOfInterestType register() throws InvocationTargetException, IllegalAccessException
+    {
         Method registerBlockStatesMethod = null;
         for (Method method : PointOfInterestType.class.getDeclaredMethods())
         {
@@ -35,12 +38,7 @@ public class PortalPointOfInterestType extends PointOfInterestType
             break;
         }
         registerBlockStatesMethod.setAccessible(true);
-        try
-        {
-            registerBlockStatesMethod.invoke(null, this);
-        } catch (InvocationTargetException | IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
+        registerBlockStatesMethod.invoke(null, this);
+        return this;
     }
 }

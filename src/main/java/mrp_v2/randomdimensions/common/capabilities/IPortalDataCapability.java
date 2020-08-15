@@ -21,9 +21,11 @@ public interface IPortalDataCapability {
 
     void setRemainingPortalCooldown(int remainingPortalCooldown);
 
-    int getTimeInPortal();
+    int getInPortalTime();
 
-    void setTimeInPortal(int timeInPortal);
+    void setInPortalTime(int inPortalTime);
+
+    int incrementInPortalTime();
 
     Set<String> getWorldsWithPortalData();
 }

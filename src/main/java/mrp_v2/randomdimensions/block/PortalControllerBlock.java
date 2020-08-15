@@ -1,5 +1,6 @@
 package mrp_v2.randomdimensions.block;
 
+import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.Block;
@@ -53,7 +54,7 @@ public class PortalControllerBlock extends PortalFrameBlock
 
     public static void animateTick(BlockState stateIn, World worldIn, BlockPos pos)
     {
-        PortalControllerParticleData data = new PortalControllerParticleData(PortalFrameBlock.getColor(worldIn, pos));
+        PortalControllerParticleData data = new PortalControllerParticleData(PortalFrameUtil.getColor(worldIn, pos));
         double x = pos.getX() + 0.5D;
         double y = pos.getY() + 0.5D;
         double z = pos.getZ() + 0.5D;
@@ -72,14 +73,9 @@ public class PortalControllerBlock extends PortalFrameBlock
         }
     }
 
-    @Override public boolean hasTileEntity(BlockState state)
+    @Override public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
     {
-        return true;
-    }
-
-    @Override public TileEntity createTileEntity(BlockState state, IBlockReader world)
-    {
-        return new PortalControllerTileEntity();
+        return state.isSolidSide(reader, pos, side);
     }
 
     @Override
@@ -101,6 +97,16 @@ public class PortalControllerBlock extends PortalFrameBlock
                 }
             }
         }
+    }
+
+    @Override public boolean hasTileEntity(BlockState state)
+    {
+        return true;
+    }
+
+    @Override public TileEntity createTileEntity(BlockState state, IBlockReader world)
+    {
+        return new PortalControllerTileEntity();
     }
 
     @Override
@@ -126,13 +132,18 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
+        return this.getShape(state);
+    }
+
+    private VoxelShape getShape(BlockState state)
+    {
         return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
     }
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
         return this.getDefaultState()
-                   .with(BlockStateProperties.HORIZONTAL_AXIS, context.getPlacementHorizontalFacing().getAxis());
+                .with(BlockStateProperties.HORIZONTAL_AXIS, context.getPlacementHorizontalFacing().getAxis());
     }
 
     @Override
