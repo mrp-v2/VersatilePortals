@@ -1,8 +1,8 @@
 modLoader="javafml"
-loaderVersion="[33,)"
+loaderVersion="[${majorForgeVersion},)"
 license="All rights reserved"
 [[mods]]
-	modId="randomdimensions"
+	modId="${modId}"
 	version="${version}"
 	displayName="Random Dimensions"
 	#logoFile="RandomDimensionsLogo.png"
@@ -11,15 +11,15 @@ license="All rights reserved"
 	displayURL="https://minecraft.curseforge.com/projects/random-dimensions"
 	authors="mrp_v2"
 	description='''Adds portals that take you wherever you want.'''
-[[dependencies.randomdimensions]]
+[[dependencies.${modId}]]
     modId="forge"
     mandatory=true
-    versionRange="[33,)"
+    versionRange="[${majorForgeVersion},)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.randomdimensions]]
+[[dependencies.${modId}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.2]"
+    versionRange="[${mcVersion}]"
     ordering="NONE"
     side="BOTH"

@@ -1,0 +1,35 @@
+{
+    "type": "configurablerecipeslibrary:crafting_shaped_configurable",
+    "pattern": [
+        "FBF", "BRB", "FEF"
+    ],
+    "key": {
+        "F": {
+            "item": "randomdimensions:portal_frame"
+        },
+        "B": {
+            "tag": "forge:bookshelves"
+        },
+        "E": {
+            "item": "minecraft:enchanting_table"
+        },
+        "R": {
+            "tag": "forge:dusts/redstone"
+        }
+    },
+    "result": {
+        "item": "randomdimensions:portal_controller",
+        "count": 1
+    },
+    "overrides": [
+        {
+            "condition": "${modId}:harder_crafting",
+            "original": {
+                "tag": "forge:dusts/redstone"
+            },
+            "replacement": {
+                "tag": "forge:storage_blocks/redstone"
+            }
+        }
+    ]
+}

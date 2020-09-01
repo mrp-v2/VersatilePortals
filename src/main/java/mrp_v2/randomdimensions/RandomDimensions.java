@@ -1,5 +1,6 @@
 package mrp_v2.randomdimensions;
 
+import mrp_v2.randomdimensions.client.util.RegistryHandler;
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.network.Packet;
 import mrp_v2.randomdimensions.world.util.WorldUtil;
@@ -16,10 +17,11 @@ import java.util.function.Supplier;
 {
     public static final String ID = "random" + "dimensions";
     public static Supplier<World> WORLD_SUPPLIER;
+    public static String DISPLAY_NAME = "Random Dimensions";
 
     static
     {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> mrp_v2.randomdimensions.client.util.RegistryHandler::init);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> RegistryHandler::init);
     }
 
     public RandomDimensions()
@@ -27,7 +29,7 @@ import java.util.function.Supplier;
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         WORLD_SUPPLIER = () -> null;
     }
-    
+
     private void commonSetup(FMLCommonSetupEvent event)
     {
         Packet.Handler.createChannel();
