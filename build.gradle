@@ -12,12 +12,8 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-def mcVersion = '1.16.2'
-def majorForgeVersion = '33'
-def forgeVersion = "${majorForgeVersion}.0.31"
-version = "${mcVersion}-1.0.0.0"
-def author = 'mrp_v2'
-def modId = 'randomdimensions'
+def forgeVersion = "${forgeMajor}.${forgeMinor}.${forgePatch}"
+version = "${mcVersion}-${modMajorMod}.${modMajorAPI}.${modMinor}.${modPatch}"
 archivesBaseName = modId
 group = "${author}.${archivesBaseName}"
 
@@ -86,11 +82,11 @@ jar.finalizedBy('reobfJar')
 processResources {
     inputs.property 'version', project.version
     inputs.property 'modId', modId
-    inputs.property 'majorForgeVersion', majorForgeVersion
+    inputs.property 'forgeMajor', forgeMajor
     inputs.property 'mcVersion', mcVersion
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version': project.version, 'modId': modId, 'majorForgeVersion': majorForgeVersion,
+        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor,
                 'mcVersion': mcVersion
     }
     from(sourceSets.main.resources.srcDirs) {

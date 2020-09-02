@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[${majorForgeVersion},)"
+loaderVersion="[${forgeMajor},)"
 license="All rights reserved"
 [[mods]]
 	modId="${modId}"
@@ -14,7 +14,7 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="forge"
     mandatory=true
-    versionRange="[${majorForgeVersion},)"
+    versionRange="[${forgeMajor},)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${modId}]]
