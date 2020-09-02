@@ -11,7 +11,7 @@
             "item": "minecraft:clock"
         },
         "M": {
-            "item": "minecraft:empty_map"
+            "item": "minecraft:map"
         },
         "S": {
             "item": "minecraft:compass"
