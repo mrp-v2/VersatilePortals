@@ -20,7 +20,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.village.PointOfInterest;
 import net.minecraft.village.PointOfInterestManager;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
@@ -90,7 +89,6 @@ public class Teleporter implements ITeleporter
 
     @Nullable private PortalInfo getPortalInfo(Entity entity)
     {
-        boolean toNether = this.world.func_234923_W_() == World.field_234919_h_;
         WorldBorder worldborder = this.world.getWorldBorder();
         double minX = Math.max(-2.9999872E7D, worldborder.minX() + 16.0D);
         double minZ = Math.max(-2.9999872E7D, worldborder.minZ() + 16.0D);
