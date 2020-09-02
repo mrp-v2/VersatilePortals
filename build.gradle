@@ -86,10 +86,13 @@ processResources {
     inputs.property 'mcVersion', mcVersion
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
+        include '**/*'
+        exclude '**/*.png'
         expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor,
                 'mcVersion': mcVersion
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
+        exclude '**/*'
     }
 }

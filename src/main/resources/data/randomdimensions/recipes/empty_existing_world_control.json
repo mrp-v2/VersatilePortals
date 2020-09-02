@@ -21,7 +21,7 @@
         }
     },
     "result": {
-        "item": "randomdimensions:empty_existing_world_control",
+        "item": "${modId}:empty_existing_world_control",
         "count": 1
     }
 }

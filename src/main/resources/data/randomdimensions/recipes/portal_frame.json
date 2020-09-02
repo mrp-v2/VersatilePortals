@@ -12,7 +12,7 @@
         }
     },
     "result": {
-        "item": "randomdimensions:portal_frame",
+        "item": "${modId}:portal_frame",
         "count": 1
     },
     "overrides": [

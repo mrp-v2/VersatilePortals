@@ -1,7 +1,7 @@
 {
 	"variants": {
 		"": {
-			"model": "randomdimensions:block/portal_frame"
+			"model": "${modId}:block/portal_frame"
 		}
 	}
 }

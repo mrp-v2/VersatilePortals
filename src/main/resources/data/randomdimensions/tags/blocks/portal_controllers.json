@@ -1,6 +1,6 @@
 {
     "replace": false,
     "values": [
-        "randomdimensions:portal_controller"
+        "${modId}:portal_controller"
     ]
 }

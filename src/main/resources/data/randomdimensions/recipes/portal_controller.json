@@ -5,7 +5,7 @@
     ],
     "key": {
         "F": {
-            "item": "randomdimensions:portal_frame"
+            "item": "${modId}:portal_frame"
         },
         "B": {
             "tag": "forge:bookshelves"
@@ -18,7 +18,7 @@
         }
     },
     "result": {
-        "item": "randomdimensions:portal_controller",
+        "item": "${modId}:portal_controller",
         "count": 1
     },
     "overrides": [

@@ -1,6 +1,6 @@
 {
     "replace": false,
     "values": [
-        "randomdimensions:portal", "randomdimensions:indestructible_portal"
+        "${modId}:portal", "${modId}:indestructible_portal"
     ]
 }

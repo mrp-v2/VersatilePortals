@@ -1,7 +1,7 @@
 {
     "replace": false,
     "values": [
-        "randomdimensions:portal_frame", "randomdimensions:indestructible_portal_frame",
-        "#randomdimensions:portal_controllers"
+        "${modId}:portal_frame", "${modId}:indestructible_portal_frame",
+        "#${modId}:portal_controllers"
     ]
 }

@@ -1,10 +1,10 @@
 {
   "variants": {
     "axis=x": {
-      "model": "randomdimensions:block/portal_ns"
+      "model": "${modId}:block/portal_ns"
     },
     "axis=z": {
-      "model": "randomdimensions:block/portal_ew"
+      "model": "${modId}:block/portal_ew"
     }
   }
 }

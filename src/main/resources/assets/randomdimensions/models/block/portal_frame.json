@@ -1,6 +1,6 @@
 {
     "parent": "block/block", "textures": {
-    "base": "randomdimensions:block/frame", "particle": "#base"
+    "base": "${modId}:block/frame", "particle": "#base"
 }, "elements": [
     {
         "from": [ 0, 0, 0 ], "to": [ 16, 16, 16 ], "faces": {
