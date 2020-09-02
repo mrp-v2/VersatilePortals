@@ -24,12 +24,16 @@
     "overrides": [
         {
             "condition": "${modId}:harder_crafting",
-            "original": {
-                "tag": "forge:dusts/redstone"
-            },
-            "replacement": {
-                "tag": "forge:storage_blocks/redstone"
-            }
+            "overrides": [
+                {
+                    "original": {
+                        "tag": "forge:dusts/redstone"
+                    },
+                    "replacement": {
+                        "tag": "forge:storage_blocks/redstone"
+                    }
+                }
+            ]
         }
     ]
 }
