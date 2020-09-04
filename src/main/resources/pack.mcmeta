@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "Random Dimensions resources",
+        "description": "${modDisplayName} resources",
         "pack_format": 6
     }
 }

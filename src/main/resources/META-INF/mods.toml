@@ -4,13 +4,13 @@ license="All rights reserved"
 [[mods]]
 	modId="${modId}"
 	version="${version}"
-	displayName="Random Dimensions"
-	#logoFile="RandomDimensionsLogo.png"
-	updateJSONURL="https://raw.githubusercontent.com/mrp-v2/ModUpdateFiles/master/RandomDimensions.json"
-	issueTrackerURL="https://www.curseforge.com/minecraft/mc-mods/random-dimensions/issues"
-	displayURL="https://minecraft.curseforge.com/projects/random-dimensions"
-	authors="mrp_v2"
-	description='''Adds portals that take you wherever you want.'''
+	displayName="${modDisplayName}"
+	logoFile="${logo}"
+	updateJSONURL="${updateURL}"
+	issueTrackerURL="${issuesURL}"
+	displayURL="${homepageURL}"
+	authors="${author}"
+	description='''${modDescription}'''
 [[dependencies.${modId}]]
     modId="forge"
     mandatory=true
