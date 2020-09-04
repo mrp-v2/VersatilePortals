@@ -20,7 +20,7 @@ group = "${author}.${archivesBaseName}"
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' +
         System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'snapshot', version: '20200723-1.16.1'
+    mappings channel: mappingsChannel, version: mappingsVersion
     runs {
         client {
             workingDirectory project.file('run')
@@ -61,7 +61,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
+    minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}-teleporterfix"
     compile "mrp_v2.configurablerecipeslibrary:ConfigurableRecipesLibrary:${mcVersion}-1.0.0.0:dev"
 }
 
@@ -85,14 +85,12 @@ processResources {
     inputs.property 'forgeMajor', forgeMajor
     inputs.property 'mcVersion', mcVersion
     from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
         include '**/*'
         exclude '**/*.png'
         expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor,
                 'mcVersion': mcVersion
     }
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
         exclude '**/*'
     }
 }
