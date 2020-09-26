@@ -94,48 +94,45 @@ public class PortalBlock extends BasicBlock
 
     @Override public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn)
     {
-        if (worldIn instanceof ServerWorld &&
-                !entityIn.isPassenger() &&
-                !entityIn.isBeingRidden() &&
-                entityIn.isNonBoss())
+        if (!(worldIn instanceof ServerWorld) ||
+                entityIn.isPassenger() ||
+                entityIn.isBeingRidden() ||
+                !entityIn.isNonBoss())
         {
-            if (!entityIn.getBoundingBox().intersects(this.getBoundingBox(state, worldIn, pos)))
-            {
-                return;
-            }
-            IPortalDataCapability portalData = Util.getPortalData(entityIn);
-            if (portalData.getRemainingPortalCooldown() > 0)
-            {
-                portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
-                return;
-            }
-            if (portalData.incrementInPortalTime() < entityIn.getMaxInPortalTime())
-            {
-                return;
-            }
-            RegistryKey<World> registryKey = World.field_234918_g_;
-            if (worldIn.func_234923_W_() == World.field_234918_g_)
-            {
-                PortalControllerTileEntity controller = new PortalSize(worldIn, pos,
-                        state.get(BlockStateProperties.HORIZONTAL_AXIS)).getPortalController(worldIn).getLeft();
-                if (controller == null)
-                {
-                    return;
-                }
-                registryKey = controller.getTeleportDestination();
-            }
-            if (registryKey == null)
-            {
-                return;
-            }
-            ServerWorld serverWorld = ((ServerWorld) worldIn).getServer().getWorld(registryKey);
-            if (serverWorld == null)
-            {
-                return;
-            }
-            entityIn.changeDimension(serverWorld,
-                    new Teleporter(serverWorld, state.get(BlockStateProperties.HORIZONTAL_AXIS)));
+            return;
         }
+        if (!entityIn.getBoundingBox().intersects(this.getBoundingBox(state, worldIn, pos)))
+        {
+            return;
+        }
+        IPortalDataCapability portalData = Util.getPortalData(entityIn);
+        if (portalData.getRemainingPortalCooldown() > 0)
+        {
+            portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
+            return;
+        }
+        if (portalData.incrementInPortalTime() < entityIn.getMaxInPortalTime())
+        {
+            return; // TODO teleporting in ... message
+        }
+        PortalSize originPortalSize = new PortalSize(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS));
+        PortalControllerTileEntity originPortalController = originPortalSize.getPortalController(worldIn).getLeft();
+        if (originPortalController == null)
+        {
+            return; // TODO missing controller message
+        }
+        ServerWorld originWorld = (ServerWorld) worldIn;
+        RegistryKey<World> destinationWorldKey = originPortalController.getTeleportDestination(originWorld);
+        if (destinationWorldKey == null)
+        {
+            return; // TODO could not get destination message, invalid control item
+        }
+        ServerWorld destinationWorld = originWorld.getServer().getWorld(destinationWorldKey);
+        if (destinationWorld == null)
+        {
+            return; // TODO could not get destination world message, invalid control item
+        }
+        entityIn.changeDimension(destinationWorld, new Teleporter(destinationWorld, originWorld, originPortalSize));
     }
 
     public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader worldIn, BlockPos pos)

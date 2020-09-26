@@ -23,6 +23,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -68,13 +69,13 @@ public class PortalControllerTileEntity extends TileEntity
         return itemStackHandler;
     }
 
-    @Nullable @SuppressWarnings("static-method") public RegistryKey<World> getTeleportDestination()
+    @Nullable public RegistryKey<World> getTeleportDestination(ServerWorld originWorld)
     {
         if (this.itemStackHandler.getStackInSlot(0).isEmpty())
         {
             return null;
         }
-        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0));
+        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0), originWorld);
     }
 
     @Override public ITextComponent getDisplayName()
@@ -147,7 +148,7 @@ public class PortalControllerTileEntity extends TileEntity
         return this.portalColor;
     }
 
-    public void onScreenClosed(int newPortalColor)
+    public void setPortalColor(int newPortalColor)
     {
         if (this.portalColor != newPortalColor)
         {

@@ -11,6 +11,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -36,6 +37,7 @@ import javax.annotation.Nullable;
 public class PortalControllerBlock extends PortalFrameBlock
 {
     public static final String ID = "portal_controller";
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     private static final VoxelShape BASE_SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D),
             makeCuboidShape(0.0D, 13.0D, 0.0D, 16.0D, 16.0D, 16.0D));
     private static final VoxelShape SHAPE_NS =
@@ -48,8 +50,7 @@ public class PortalControllerBlock extends PortalFrameBlock
     public PortalControllerBlock()
     {
         super(ID, Properties::notSolid);
-        this.setDefaultState(
-                this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
+        this.setDefaultState(this.stateContainer.getBaseState().with(AXIS, Direction.Axis.X));
     }
 
     public static void animateTick(BlockState stateIn, World worldIn, BlockPos pos)
@@ -62,7 +63,7 @@ public class PortalControllerBlock extends PortalFrameBlock
         double noMotion = 0.0D;
         worldIn.addParticle(data, x, y, z, noMotion, motion, noMotion);
         worldIn.addParticle(data, x, y, z, noMotion, -motion, noMotion);
-        if (stateIn.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.Z)
+        if (stateIn.get(AXIS) == Direction.Axis.Z)
         {
             worldIn.addParticle(data, x, y, z, motion, noMotion, noMotion);
             worldIn.addParticle(data, x, y, z, -motion, noMotion, noMotion);
@@ -73,7 +74,7 @@ public class PortalControllerBlock extends PortalFrameBlock
         }
     }
 
-    @Override public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
+    public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
     {
         return state.isSolidSide(reader, pos, side);
     }
@@ -137,13 +138,12 @@ public class PortalControllerBlock extends PortalFrameBlock
 
     private VoxelShape getShape(BlockState state)
     {
-        return state.get(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
+        return state.get(AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
     }
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        return this.getDefaultState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, context.getPlacementHorizontalFacing().getAxis());
+        return this.getDefaultState().with(AXIS, context.getPlacementHorizontalFacing().getAxis());
     }
 
     @Override
@@ -163,6 +163,6 @@ public class PortalControllerBlock extends PortalFrameBlock
 
     @Override protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        builder.add(BlockStateProperties.HORIZONTAL_AXIS);
+        builder.add(AXIS);
     }
 }

@@ -1,7 +1,0 @@
-{
-    "replace": false,
-    "values": [
-        "${modId}:portal_frame", "${modId}:indestructible_portal_frame",
-        "#${modId}:portal_controllers"
-    ]
-}

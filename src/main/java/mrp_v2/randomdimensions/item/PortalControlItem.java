@@ -1,11 +1,16 @@
 package mrp_v2.randomdimensions.item;
 
+import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.Dimension;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.function.Function;
 
@@ -14,30 +19,35 @@ public abstract class PortalControlItem extends BasicSingleItem
     public static final String WORLD_ID_NBT_ID = "WorldID";
     protected static final String ID = "control";
 
-    protected PortalControlItem(String id)
+    protected PortalControlItem(String id, Function<Properties, Properties> propertiesModifier)
     {
-        super(id);
-    }
-    
-    protected PortalControlItem(String id, Function<Properties, Properties> propertiesModifer){
-        super(id, propertiesModifer);
+        super(id, propertiesModifier);
     }
 
-    public static void addTeleportDataToItem(ItemStack stack, String worldID)
+    public static void addTeleportDataToItem(ItemStack stack, ResourceLocation worldID)
     {
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(WORLD_ID_NBT_ID, worldID);
+        compound.putString(WORLD_ID_NBT_ID, worldID.toString());
         stack.setTag(compound);
-        stack.setDisplayName(new StringTextComponent(worldID));
+        stack.setDisplayName(new StringTextComponent(worldID.getPath()));
     }
 
-    public static RegistryKey<World> getTeleportDestination(ItemStack stack)
+    public static RegistryKey<World> getTeleportDestination(ItemStack stack, ServerWorld originWorld)
     {
-        return Util.createWorldKey(stack.getOrCreateTag().getString(WORLD_ID_NBT_ID));
-    }
-
-    @Override public boolean shouldSyncTag()
-    {
-        return false;
+        String worldID = stack.getOrCreateTag().getString(WORLD_ID_NBT_ID);
+        if (worldID.equals(""))
+        {
+            if (stack.getItem() == ObjectHolder.RANDOM_WORLD_CONTROL_ITEM)
+            {
+                ResourceLocation worldIDLoc = RandomWorldControlItem.generateRandomWorld(stack);
+                mrp_v2.randomdimensions.world.Util.makeWorld(originWorld.getServer(),
+                        RegistryKey.func_240903_a_(Registry.DIMENSION_KEY, worldIDLoc),
+                        originWorld.getServer().field_240768_i_.getDimensionGeneratorSettings()
+                                .func_236224_e_()
+                                .getValueForKey(Dimension.OVERWORLD));
+                worldID = worldIDLoc.toString();
+            }
+        }
+        return Util.createWorldKey(worldID);
     }
 }

@@ -1,9 +1,9 @@
 package mrp_v2.randomdimensions.client.renderer.color;
 
-import mrp_v2.randomdimensions.block.IPortalFrameBlock;
 import mrp_v2.randomdimensions.block.PortalBlock;
 import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
+import mrp_v2.randomdimensions.util.ObjectHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.chunk.ChunkRenderCache;
 import net.minecraft.client.renderer.color.IBlockColor;
@@ -51,11 +51,11 @@ import java.lang.reflect.Field;
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
-        if (blockState.getBlock() instanceof IPortalFrameBlock)
+        if (blockState.isIn(ObjectHolder.PORTAL_FRAME_BLOCK) || blockState.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
         {
             return PortalFrameUtil.getColor(world, pos);
         }
-        if (blockState.getBlock() instanceof PortalBlock)
+        if (blockState.isIn(ObjectHolder.PORTAL_BLOCK))
         {
             return PortalBlock.getColor(blockState, world, pos);
         }

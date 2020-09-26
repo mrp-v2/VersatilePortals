@@ -27,9 +27,8 @@ public class RegistryHandler
     @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)
     {
         event.getBlockColors()
-                .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK,
-                        ObjectHolder.PORTAL_FRAME_BLOCK, ObjectHolder.PORTAL_CONTROLLER_BLOCK,
-                        ObjectHolder.INDESTRUCTIBLE_PORTAL_FRAME_BLOCK);
+                .register(PortalColorer.INSTANCE, ObjectHolder.PORTAL_BLOCK, ObjectHolder.PORTAL_FRAME_BLOCK,
+                        ObjectHolder.PORTAL_CONTROLLER_BLOCK);
     }
 
     @SubscribeEvent public static void registerItemColors(final ColorHandlerEvent.Item event)

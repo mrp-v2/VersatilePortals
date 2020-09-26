@@ -32,26 +32,25 @@ public class PortalSize
             (state, reader, pos, side) ->
             {
                 Block block = state.getBlock();
-                if (!state.isIn(ObjectHolder.PORTAL_FRAME_BLOCKS))
+                if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
                 {
-                    //return false;
-                }
-                if (!(block instanceof IPortalFrameBlock))
+                    return ((PortalControllerBlock) block).isSideValidForPortal(state, reader, pos, side);
+                } else
                 {
-                    return false;
+                    return state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK);
                 }
-                return ((IPortalFrameBlock) block).isSideValidForPortal(state, reader, pos, side);
             };
-    private static final AbstractBlock.IPositionPredicate PORTAL_CONTROLLER_PREDICATE =
-            (state, reader, pos) -> state.getBlock() instanceof PortalControllerBlock;
+    private static final Function<BlockState, Boolean> PORTAL_CONTROLLER_PREDICATE =
+            (state) -> state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK);
     private static final Function<BlockState, Boolean> PORTAL_PREDICATE =
-            (state) -> state.getBlock() instanceof PortalBlock;
+            (state) -> state.isIn(ObjectHolder.PORTAL_BLOCK);
     private final Direction.Axis axis;
     private final Direction rightDir;
     private int height;
     private int width;
     private int portalBlockCount;
     @Nullable private BlockPos bottomLeft;
+    @Nullable private BlockPos portalControllerRelativePos;
 
     public PortalSize(IWorld world, BlockPos pos, Direction.Axis axis)
     {
@@ -72,9 +71,17 @@ public class PortalSize
                 this.invalidate();
             }
         }
-        if (this.isValid() && !this.getPortalController(world).getRight())
+        if (this.isValid())
         {
-            this.invalidate();
+            Pair<PortalControllerTileEntity, Boolean> portalControllerResult = this.getPortalController(world);
+            if (!portalControllerResult.getRight())
+            {
+                this.invalidate();
+            }
+            if (portalControllerResult.getLeft() != null)
+            {
+                this.portalControllerRelativePos = portalControllerResult.getLeft().getPos().subtract(this.bottomLeft);
+            }
         }
     }
 
@@ -149,6 +156,21 @@ public class PortalSize
                 this.height <= MAX_HEIGHT;
     }
 
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public int getWidth()
+    {
+        return width;
+    }
+
+    @Nullable public BlockPos getPortalControllerRelativePos()
+    {
+        return portalControllerRelativePos;
+    }
+
     private void invalidate()
     {
         this.bottomLeft = null;
@@ -174,7 +196,7 @@ public class PortalSize
             for (Pair<BlockPos, Optional<Direction>> frame : this.getFrameBlocks())
             {
                 BlockState state = world.getBlockState(frame.getLeft());
-                if (PORTAL_CONTROLLER_PREDICATE.test(state, world, frame.getLeft()))
+                if (PORTAL_CONTROLLER_PREDICATE.apply(state))
                 {
                     if (found)
                     {
@@ -257,7 +279,7 @@ public class PortalSize
                 {
                     return i;
                 }
-                if (state.isIn(ObjectHolder.PORTAL_BLOCKS))
+                if (state.isIn(ObjectHolder.PORTAL_BLOCK))
                 {
                     this.portalBlockCount++;
                 }
@@ -350,5 +372,10 @@ public class PortalSize
                 width == that.width &&
                 axis == that.axis &&
                 Objects.equals(bottomLeft, that.bottomLeft);
+    }
+
+    public Direction.Axis getAxis()
+    {
+        return axis;
     }
 }

@@ -1,7 +1,11 @@
 package mrp_v2.randomdimensions.item;
 
+import mrp_v2.randomdimensions.util.ObjectHolder;
+import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 public class ExistingWorldControlItem extends PortalControlItem
 {
@@ -10,7 +14,22 @@ public class ExistingWorldControlItem extends PortalControlItem
 
     public ExistingWorldControlItem()
     {
+        //noinspection ConstantConditions
         super(ID, (properties -> properties.group(null)));
+    }
+
+    public static int getColorDataFromItem(ItemStack stack)
+    {
+        CompoundNBT compound = stack.getOrCreateTag();
+        return compound.contains(COLOR_NBT_ID) ? compound.getInt(COLOR_NBT_ID) : 0x808080;
+    }
+
+    public static ItemStack getItemForWorld(World world)
+    {
+        ItemStack itemStack = new ItemStack(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
+        PortalControlItem.addTeleportDataToItem(itemStack, new ResourceLocation(Util.getWorldID(world)));
+        ExistingWorldControlItem.addColorDataToItem(itemStack, getColorFromWorld(world));
+        return itemStack;
     }
 
     public static void addColorDataToItem(ItemStack stack, int color)
@@ -20,9 +39,8 @@ public class ExistingWorldControlItem extends PortalControlItem
         stack.setTag(compound);
     }
 
-    public static int getColorDataFromItem(ItemStack stack)
+    private static int getColorFromWorld(World world)
     {
-        CompoundNBT compound = stack.getOrCreateTag();
-        return compound.contains(COLOR_NBT_ID) ? compound.getInt(COLOR_NBT_ID) : 0x808080;
+        return world.func_234923_W_().toString().hashCode() & 0xFFFFFF;
     }
 }

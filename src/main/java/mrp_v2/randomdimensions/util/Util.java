@@ -87,7 +87,12 @@ public class Util
 
     public static String getWorldID(World world)
     {
-        return world.func_234923_W_().func_240901_a_().toString();
+        return getWorldID(world.func_234923_W_());
+    }
+
+    public static String getWorldID(RegistryKey<World> world)
+    {
+        return world.func_240901_a_().toString();
     }
 
     public static BlockPos[] getCollidingBlocks(AxisAlignedBB box)

@@ -110,7 +110,7 @@ public class Packet
                             (PortalControllerTileEntity) player.world.getTileEntity(this.pos);
                     if (portalController != null)
                     {
-                        portalController.onScreenClosed(this.portalColor);
+                        portalController.setPortalColor(this.portalColor);
                     }
                 }
             });

@@ -18,7 +18,6 @@ public class EventHandler
     @SubscribeEvent public static void clientSetup(final FMLClientSetupEvent event)
     {
         RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK, RenderType.getTranslucent());
-        RenderTypeLookup.setRenderLayer(ObjectHolder.INDESTRUCTIBLE_PORTAL_BLOCK, RenderType.getTranslucent());
         RandomDimensions.WORLD_SUPPLIER = () -> Minecraft.getInstance().world;
         ClientRegistry.bindTileEntityRenderer(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE,
                 PortalControllerTileEntityRenderer::new);

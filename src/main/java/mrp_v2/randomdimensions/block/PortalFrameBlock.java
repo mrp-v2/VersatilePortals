@@ -3,14 +3,12 @@ package mrp_v2.randomdimensions.block;
 import mrp_v2.randomdimensions.block.util.PortalFrameUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import java.util.function.Function;
 
-public class PortalFrameBlock extends BasicBlock implements IPortalFrameBlock
+public class PortalFrameBlock extends BasicBlock
 {
     public static final String ID = "portal_frame";
 
@@ -27,11 +25,6 @@ public class PortalFrameBlock extends BasicBlock implements IPortalFrameBlock
     protected PortalFrameBlock(String id, Function<Properties, Properties> propertiesModifier)
     {
         super(id, propertiesModifier.apply(Properties.from(Blocks.LAPIS_BLOCK)));
-    }
-
-    @Override public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
-    {
-        return true;
     }
 
     /**
