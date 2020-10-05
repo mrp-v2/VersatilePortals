@@ -1,0 +1,7 @@
+{
+	"variants": {
+		"": {
+			"model": "${modId}:block/portal_frame"
+		}
+	}
+}
