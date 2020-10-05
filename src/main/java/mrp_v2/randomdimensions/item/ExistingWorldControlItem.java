@@ -41,6 +41,6 @@ public class ExistingWorldControlItem extends PortalControlItem
 
     private static int getColorFromWorld(World world)
     {
-        return world.func_234923_W_().toString().hashCode() & 0xFFFFFF;
+        return world.getDimensionKey().toString().hashCode() & 0xFFFFFF;
     }
 }

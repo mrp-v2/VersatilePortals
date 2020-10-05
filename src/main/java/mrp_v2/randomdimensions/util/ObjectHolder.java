@@ -9,12 +9,10 @@ import mrp_v2.randomdimensions.inventory.container.PortalControllerContainer;
 import mrp_v2.randomdimensions.item.EmptyExistingWorldControlItem;
 import mrp_v2.randomdimensions.item.ExistingWorldControlItem;
 import mrp_v2.randomdimensions.item.PortalLighter;
-import mrp_v2.randomdimensions.item.RandomWorldControlItem;
 import mrp_v2.randomdimensions.particles.PortalControllerParticleData;
 import mrp_v2.randomdimensions.particles.PortalParticleData;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.village.PortalPointOfInterestType;
-import mrp_v2.randomdimensions.world.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
@@ -36,7 +34,6 @@ import net.minecraftforge.fml.common.Mod;
     public static final PortalLighter PORTAL_LIGHTER_ITEM;
     public static final EmptyExistingWorldControlItem EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
     public static final ExistingWorldControlItem EXISTING_WORLD_TELEPORT_ITEM;
-    public static final RandomWorldControlItem RANDOM_WORLD_CONTROL_ITEM;
     public static final ContainerType<PortalControllerContainer> PORTAL_CONTROLLER_CONTAINER_TYPE;
     public static final ParticleType<PortalParticleData> PORTAL_PARTICLE_TYPE;
     public static final ParticleType<PortalControllerParticleData> PORTAL_CONTROLLER_PARTICLE_TYPE;
@@ -46,7 +43,6 @@ import net.minecraftforge.fml.common.Mod;
 
     static
     {
-        WorldUtil.addInvalidBlockSupertypes(PortalBlock.class);
         PORTAL_BLOCK = new PortalBlock();
         PORTAL_CONTROLLER_BLOCK = new PortalControllerBlock();
         PORTAL_FRAME_BLOCK = new PortalFrameBlock();
@@ -55,7 +51,6 @@ import net.minecraftforge.fml.common.Mod;
         PORTAL_LIGHTER_ITEM = new PortalLighter();
         EMPTY_EXISTING_WORLD_TELEPORT_ITEM = new EmptyExistingWorldControlItem();
         EXISTING_WORLD_TELEPORT_ITEM = new ExistingWorldControlItem();
-        RANDOM_WORLD_CONTROL_ITEM = new RandomWorldControlItem();
         PORTAL_CONTROLLER_CONTAINER_TYPE = new PortalControllerContainer.Type();
         PORTAL_PARTICLE_TYPE = PortalParticleData.createParticleType();
         PORTAL_CONTROLLER_PARTICLE_TYPE = PortalControllerParticleData.createParticleType();
@@ -73,7 +68,7 @@ import net.minecraftforge.fml.common.Mod;
     {
         event.getRegistry()
                 .registerAll(PORTAL_CONTROLLER_BLOCK_ITEM, PORTAL_FRAME_BLOCK_ITEM, PORTAL_LIGHTER_ITEM,
-                        EMPTY_EXISTING_WORLD_TELEPORT_ITEM, EXISTING_WORLD_TELEPORT_ITEM, RANDOM_WORLD_CONTROL_ITEM);
+                        EMPTY_EXISTING_WORLD_TELEPORT_ITEM, EXISTING_WORLD_TELEPORT_ITEM);
     }
 
     @SubscribeEvent public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event)

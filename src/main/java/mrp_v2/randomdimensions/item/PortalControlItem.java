@@ -1,14 +1,11 @@
 package mrp_v2.randomdimensions.item;
 
-import mrp_v2.randomdimensions.util.ObjectHolder;
 import mrp_v2.randomdimensions.util.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.Dimension;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
@@ -35,19 +32,6 @@ public abstract class PortalControlItem extends BasicSingleItem
     public static RegistryKey<World> getTeleportDestination(ItemStack stack, ServerWorld originWorld)
     {
         String worldID = stack.getOrCreateTag().getString(WORLD_ID_NBT_ID);
-        if (worldID.equals(""))
-        {
-            if (stack.getItem() == ObjectHolder.RANDOM_WORLD_CONTROL_ITEM)
-            {
-                ResourceLocation worldIDLoc = RandomWorldControlItem.generateRandomWorld(stack);
-                mrp_v2.randomdimensions.world.Util.makeWorld(originWorld.getServer(),
-                        RegistryKey.func_240903_a_(Registry.DIMENSION_KEY, worldIDLoc),
-                        originWorld.getServer().field_240768_i_.getDimensionGeneratorSettings()
-                                .func_236224_e_()
-                                .getValueForKey(Dimension.OVERWORLD));
-                worldID = worldIDLoc.toString();
-            }
-        }
         return Util.createWorldKey(worldID);
     }
 }

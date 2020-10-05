@@ -1,4 +1,4 @@
-package mrp_v2.randomdimensions.world.util;
+package mrp_v2.randomdimensions.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -54,11 +54,6 @@ public class WorldWrapper implements IWorld
         return this.world.getPendingFluidTicks();
     }
 
-    public World getWorld()
-    {
-        return this.world;
-    }
-
     @Override public IWorldInfo getWorldInfo()
     {
         return this.world.getWorldInfo();
@@ -96,6 +91,11 @@ public class WorldWrapper implements IWorld
     @Override public void playEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data)
     {
         this.world.playEvent(player, type, pos, data);
+    }
+
+    public World getWorld()
+    {
+        return this.world;
     }
 
     @Override public float func_230487_a_(Direction direction, boolean b)
@@ -148,9 +148,9 @@ public class WorldWrapper implements IWorld
         return this.world.getSeaLevel();
     }
 
-    @Override public DimensionType func_230315_m_()
+    @Override public DimensionType getDimensionType()
     {
-        return this.world.func_230315_m_();
+        return this.world.getDimensionType();
     }
 
     @Nullable @Override public TileEntity getTileEntity(BlockPos pos)

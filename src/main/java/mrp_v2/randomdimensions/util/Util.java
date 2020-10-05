@@ -82,17 +82,17 @@ public class Util
         {
             return null;
         }
-        return RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(worldID));
+        return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(worldID));
     }
 
     public static String getWorldID(World world)
     {
-        return getWorldID(world.func_234923_W_());
+        return getWorldID(world.getDimensionKey());
     }
 
     public static String getWorldID(RegistryKey<World> world)
     {
-        return world.func_240901_a_().toString();
+        return world.getLocation().toString();
     }
 
     public static BlockPos[] getCollidingBlocks(AxisAlignedBB box)

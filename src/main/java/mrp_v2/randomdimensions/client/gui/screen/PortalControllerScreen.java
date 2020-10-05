@@ -44,7 +44,7 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
     {
         this.renderBackground(stack);
         super.render(stack, i1, i2, f1);
-        this.func_230459_a_(stack, i1, i2);
+        this.renderHoveredTooltip(stack, i1, i2);
     }
 
     @Override protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y)

@@ -65,8 +65,8 @@ public class Teleporter implements ITeleporter
             currentWorld.getProfiler().startSection("placing");
             player.setWorld(destinationWorld);
             destinationWorld.addDuringPortalTeleport(player);
-            player.rotationYaw = portalInfo.field_242960_c;
-            player.rotationPitch = portalInfo.field_242961_d;
+            player.rotationYaw = portalInfo.rotationYaw;
+            player.rotationPitch = portalInfo.rotationPitch;
             player.setPositionAndUpdate(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
             player.connection.captureCurrentPosition();
             currentWorld.getProfiler().endSection();
@@ -79,7 +79,7 @@ public class Teleporter implements ITeleporter
             {
                 newEntity.copyDataFromOld(entityIn);
                 newEntity.setLocationAndAngles(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z,
-                        portalInfo.field_242960_c, entityIn.rotationPitch);
+                        portalInfo.rotationYaw, entityIn.rotationPitch);
                 newEntity.setMotion(portalInfo.motion);
                 destinationWorld.addFromAnotherDimension(newEntity);
             }
@@ -99,8 +99,8 @@ public class Teleporter implements ITeleporter
         double minZ = Math.max(-2.9999872E7D, worldborder.minZ() + 16.0D);
         double maxX = Math.min(2.9999872E7D, worldborder.maxX() - 16.0D);
         double maxZ = Math.min(2.9999872E7D, worldborder.maxZ() - 16.0D);
-        double coordinateMultiplier =
-                DimensionType.func_242715_a(entity.world.func_230315_m_(), this.destinationWorld.func_230315_m_());
+        double coordinateMultiplier = DimensionType.getCoordinateDifference(entity.world.getDimensionType(),
+                this.destinationWorld.getDimensionType());
         BlockPos pos =
                 new BlockPos(MathHelper.clamp(entity.getPosX() * coordinateMultiplier, minX, maxX), entity.getPosY(),
                         MathHelper.clamp(entity.getPosZ() * coordinateMultiplier, minZ, maxZ));
@@ -139,8 +139,8 @@ public class Teleporter implements ITeleporter
             BlockPos poiPos = pointOfInterest.getPos();
             this.destinationWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(poiPos), 3, poiPos);
             BlockState poiState = this.destinationWorld.getBlockState(poiPos);
-            return TeleportationRepositioner.func_243676_a(poiPos, poiState.get(BlockStateProperties.HORIZONTAL_AXIS),
-                    PortalSize.MAX_WIDTH, Direction.Axis.Y, 21,
+            return TeleportationRepositioner.findLargestRectangle(poiPos,
+                    poiState.get(BlockStateProperties.HORIZONTAL_AXIS), PortalSize.MAX_WIDTH, Direction.Axis.Y, 21,
                     (blockState2) -> this.destinationWorld.getBlockState(blockState2) == poiState);
         });
     }
@@ -235,7 +235,7 @@ public class Teleporter implements ITeleporter
                         BlockState blockState = y < 0 ?
                                 ObjectHolder.PORTAL_FRAME_BLOCK.getDefaultState() :
                                 Blocks.AIR.getDefaultState();
-                        mutableOriginPos.func_239621_a_(availablePortalLoc,
+                        mutableOriginPos.setAndOffset(availablePortalLoc,
                                 portalXZ * positiveAxisDir.getXOffset() + floorXZ * rotated.getXOffset(), y,
                                 portalXZ * positiveAxisDir.getZOffset() + floorXZ * rotated.getZOffset());
                         this.destinationWorld.setBlockState(mutableOriginPos, blockState);
@@ -249,7 +249,7 @@ public class Teleporter implements ITeleporter
             {
                 if (xz == -1 | xz == portalWidth || y == -1 || y == portalHeight)
                 {
-                    mutableOriginPos.func_239621_a_(availablePortalLoc, xz * positiveAxisDir.getXOffset(), y,
+                    mutableOriginPos.setAndOffset(availablePortalLoc, xz * positiveAxisDir.getXOffset(), y,
                             xz * positiveAxisDir.getZOffset());
                     if (this.originPortalSize.getPortalControllerRelativePos()
                             .equals(new BlockPos(xz * positiveAxisDir.getXOffset(), y,
@@ -278,7 +278,7 @@ public class Teleporter implements ITeleporter
         {
             for (int y = 0; y < portalHeight; y++)
             {
-                mutableOriginPos.func_239621_a_(availablePortalLoc, xz * positiveAxisDir.getXOffset(), y,
+                mutableOriginPos.setAndOffset(availablePortalLoc, xz * positiveAxisDir.getXOffset(), y,
                         xz * positiveAxisDir.getZOffset());
                 this.destinationWorld.setBlockState(mutableOriginPos, portalBlockState, 18);
             }
@@ -294,7 +294,7 @@ public class Teleporter implements ITeleporter
         {
             for (int j = -1; j < this.originPortalSize.getHeight(); j++)
             {
-                mutable.func_239621_a_(origin, axis.getXOffset() * i + rotated.getXOffset() * offset, j,
+                mutable.setAndOffset(origin, axis.getXOffset() * i + rotated.getXOffset() * offset, j,
                         axis.getZOffset() * i + rotated.getZOffset() * offset);
                 if (j < 0 && !this.destinationWorld.getBlockState(mutable).getMaterial().isSolid())
                 {

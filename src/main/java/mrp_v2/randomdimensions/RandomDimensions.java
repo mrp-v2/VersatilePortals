@@ -3,7 +3,6 @@ package mrp_v2.randomdimensions;
 import mrp_v2.randomdimensions.client.util.RegistryHandler;
 import mrp_v2.randomdimensions.common.capabilities.CapabilityHandler;
 import mrp_v2.randomdimensions.network.Packet;
-import mrp_v2.randomdimensions.world.util.WorldUtil;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -34,6 +33,5 @@ import java.util.function.Supplier;
     {
         Packet.Handler.createChannel();
         CapabilityHandler.registerCapabilities();
-        WorldUtil.init();
     }
 }

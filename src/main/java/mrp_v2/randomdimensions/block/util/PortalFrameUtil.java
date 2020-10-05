@@ -5,7 +5,7 @@ import mrp_v2.randomdimensions.block.PortalSize;
 import mrp_v2.randomdimensions.network.Packet;
 import mrp_v2.randomdimensions.tileentity.PortalControllerTileEntity;
 import mrp_v2.randomdimensions.util.Util;
-import mrp_v2.randomdimensions.world.util.WorldWrapper;
+import mrp_v2.randomdimensions.world.WorldWrapper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Direction;
