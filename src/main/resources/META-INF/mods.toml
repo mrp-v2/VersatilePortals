@@ -23,3 +23,9 @@ license="All rights reserved"
     versionRange="[${mcVersion}]"
     ordering="NONE"
     side="BOTH"
+[[dependencies.${modId}]]
+    modId="configurablerecipeslibrary"
+    mandatory=true
+    versionRange="[${mcVersion}-${crlVersion},]"
+    ordering="NONE"
+    side="BOTH"

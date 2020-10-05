@@ -99,13 +99,14 @@ processResources {
     inputs.property 'updateURL', updateURL
     inputs.property 'issuesURL', issuesURL
     inputs.property 'logo', logo
+    inputs.property 'crlVersion', crlVersion
     from(sourceSets.main.resources.srcDirs) {
         include '**/*'
         exclude '**/*.png'
         expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
                 'homepageURL': homepageURL, 'modDisplayName': modDisplayName, 'capitalizedModId': capitalizedModId,
                 'modDescription': modDescription, 'author': author, 'updateURL': updateURL, 'issuesURL': issuesURL,
-                'logo': logo
+                'logo': logo, 'crlVersion': crlVersion
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*'
