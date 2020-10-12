@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "versatileportals:block/portal_controller",
+      "y": 90
+    },
+    "axis=z": {
+      "model": "versatileportals:block/portal_controller"
+    }
+  }
+}

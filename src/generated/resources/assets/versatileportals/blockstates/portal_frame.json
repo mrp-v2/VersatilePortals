@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "versatileportals:block/portal_frame"
+    }
+  }
+}

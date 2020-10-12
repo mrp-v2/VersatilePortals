@@ -21,5 +21,9 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
             helper.addLootTables(lootTables);
             helper.addRecipeGenerator(RecipeGenerator::new);
         }
+        if (event.includeClient())
+        {
+            helper.addBlockStateProvider(BlockStateGenerator::new);
+        }
     }
 }

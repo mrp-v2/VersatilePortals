@@ -1,8 +1,0 @@
-{
-    "parent": "${modId}:block/controller_template",
-    "textures": {
-        "base": "${modId}:block/frame",
-        "end": "${modId}:block/controller",
-        "sub": "${modId}:block/portal"
-    }
-}
