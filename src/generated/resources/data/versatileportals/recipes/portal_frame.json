@@ -1,0 +1,34 @@
+{
+  "type": "configurablerecipeslibrary:crafting_shaped_configurable",
+  "pattern": [
+    "LLL",
+    "LOL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "tag": "forge:gems/lapis"
+    },
+    "O": {
+      "tag": "forge:obsidian"
+    }
+  },
+  "result": {
+    "item": "versatileportals:portal_frame"
+  },
+  "overrides": [
+    {
+      "condition": "versatileportals:harder_crafting",
+      "overrides": [
+        {
+          "original": {
+            "tag": "forge:gems/lapis"
+          },
+          "replacement": {
+            "tag": "forge:storage_blocks/lapis"
+          }
+        }
+      ]
+    }
+  ]
+}

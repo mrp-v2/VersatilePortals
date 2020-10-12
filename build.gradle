@@ -25,6 +25,15 @@ group = "${author}.${archivesBaseName}"
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' +
         System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
+sourceSets {
+    main {
+        resources {
+            srcDirs 'src/generated/resources'
+        }
+    }
+}
+
 minecraft {
     mappings channel: mappingsChannel, version: mappingsVersion
     accessTransformer = file 'src/main/resources/META-INF/accesstransformer.cfg'
@@ -34,7 +43,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
-                randomdimensions {
+                versatileportals {
                     source sourceSets.main
                 }
             }
@@ -44,7 +53,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
-                randomdimensions {
+                versatileportals {
                     source sourceSets.main
                 }
             }
@@ -53,10 +62,11 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', modId, '--all', '--output', file('src/generated/resources/')
+            args '--mod', modId, '--all', '--output', file('src/generated/resources/'), '--existing',
+                    sourceSets.main.output.resourcesDir
             mods {
-                randomdimensions {
-                    source sourceSets.main
+                versatileportals {
+                    sources sourceSets.main, sourceSets.test
                 }
             }
         }
@@ -69,7 +79,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
-    compile "mrp_v2.configurablerecipeslibrary:ConfigurableRecipesLibrary:${mcVersion}-2.0.0.0:dev"
+    compile fg.deobf("mrp_v2.configurablerecipeslibrary:ConfigurableRecipesLibrary:${mcVersion}-2.0.1.0:dev")
+    compile fg.deobf("mrp_v2.mrp_v2datagenlibrary:MRP_V2DataGenLibrary:${mcVersion}-0.1.0.0")
 }
 
 jar {
