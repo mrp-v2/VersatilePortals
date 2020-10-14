@@ -1,6 +1,8 @@
 package mrp_v2.versatileportals.block;
 
+import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
+import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.Util;
@@ -24,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -38,6 +41,17 @@ import java.util.function.Function;
 public class PortalBlock extends BasicBlock
 {
     public static final String ID = "portal";
+    public static final TranslationTextComponent invalidControlItemNoKey, invalidControlItemWorldDoesNotExist;
+
+    static
+    {
+        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "message",
+                "invalidControlItem");
+        invalidControlItemNoKey = EN_USTranslationGenerator.makeTextTranslation(stem + ".hasNoKey",
+                "There is no control item or it is invalid");
+        invalidControlItemWorldDoesNotExist = EN_USTranslationGenerator.makeTextTranslation(stem + ".worldDoesNotExist",
+                "There is no world matching the control item");
+    }
 
     public PortalBlock()
     {
@@ -120,9 +134,9 @@ public class PortalBlock extends BasicBlock
         }
         ServerPlayerEntity serverPlayerEntity =
                 entityIn instanceof ServerPlayerEntity ? (ServerPlayerEntity) entityIn : null;
-        Consumer<String> messageSender = serverPlayerEntity != null ?
-                (message) -> serverPlayerEntity.func_241151_a_(Util.makeTranslation("message", message),
-                        ChatType.GAME_INFO, net.minecraft.util.Util.DUMMY_UUID) :
+        Consumer<TranslationTextComponent> messageSender = serverPlayerEntity != null ?
+                (message) -> serverPlayerEntity.func_241151_a_(message, ChatType.GAME_INFO,
+                        net.minecraft.util.Util.DUMMY_UUID) :
                 (message) ->
                 {
                 };
@@ -136,13 +150,13 @@ public class PortalBlock extends BasicBlock
         RegistryKey<World> destinationWorldKey = originPortalController.getTeleportDestination(originWorld);
         if (destinationWorldKey == null)
         {
-            messageSender.accept("invalidControlItem.hasNoKey");
+            messageSender.accept(invalidControlItemNoKey);
             return;
         }
         ServerWorld destinationWorld = originWorld.getServer().getWorld(destinationWorldKey);
         if (destinationWorld == null)
         {
-            messageSender.accept("invalidControlItem.worldDoesNotExist");
+            messageSender.accept(invalidControlItemWorldDoesNotExist);
             return;
         }
         entityIn.changeDimension(destinationWorld, new Teleporter(destinationWorld, originWorld, originPortalSize));

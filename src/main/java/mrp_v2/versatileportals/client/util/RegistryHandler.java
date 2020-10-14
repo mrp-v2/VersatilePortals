@@ -22,6 +22,7 @@ public class RegistryHandler
     public static void init()
     {
         ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, PortalControllerScreen::new);
+        PortalControllerScreen.staticInit();
     }
 
     @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)

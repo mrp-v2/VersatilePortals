@@ -1,6 +1,7 @@
 package mrp_v2.versatileportals.inventory.container;
 
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
@@ -19,7 +20,6 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class PortalControllerContainer extends Container
 {
-    public static final String ID = "portal_controller";
     public static final int Y_SIZE = 218;
     private final PortalControllerItemStackHandler inventory;
     private final int color;
@@ -109,11 +109,10 @@ public class PortalControllerContainer extends Container
     public static class Type extends ContainerType<PortalControllerContainer>
             implements IContainerFactory<PortalControllerContainer>
     {
-
         public Type()
         {
             super(Type::factory);
-            this.setRegistryName(VersatilePortals.ID, ID);
+            this.setRegistryName(VersatilePortals.ID, PortalControllerBlock.ID);
         }
 
         private static PortalControllerContainer factory(int windowId, PlayerInventory playerInv)

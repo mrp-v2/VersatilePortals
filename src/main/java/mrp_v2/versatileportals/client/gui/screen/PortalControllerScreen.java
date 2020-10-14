@@ -3,24 +3,41 @@ package mrp_v2.versatileportals.client.gui.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.block.PortalControllerBlock;
+import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalControllerScreenClosedPacket;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.widget.Slider;
 
 @OnlyIn(Dist.CLIENT) public class PortalControllerScreen extends ContainerScreen<PortalControllerContainer>
 {
-    public static final String ID = "portal_controller";
     public static final ResourceLocation GUI_TEXTURE =
             new ResourceLocation(VersatilePortals.ID, "textures/gui/container/portal_controller.png");
+    public static final TranslationTextComponent colorRLabel, colorGLabel, colorBLabel, controlItemLabel;
+
+    static
+    {
+        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "gui");
+        controlItemLabel =
+                EN_USTranslationGenerator.makeTextTranslation(stem + ".slotLabel.controlItem", "Control Item");
+        String nameStem = "Portal Color ";
+        stem = String.join(".", stem, "color");
+        colorRLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".r", nameStem + "R: ");
+        colorGLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".g", nameStem + "G: ");
+        colorBLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".b", nameStem + "B: ");
+    }
+
     private Slider colorR;
     private Slider colorG;
     private Slider colorB;
@@ -31,6 +48,13 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
         super(screenContainer, inv, titleIn);
         this.ySize = PortalControllerContainer.Y_SIZE;
         this.playerInventoryTitleY = this.ySize - 94;
+    }
+
+    /**
+     * For static initialization
+     */
+    public static void staticInit()
+    {
     }
 
     @Override protected void init()
@@ -51,7 +75,7 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
     @Override protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y)
     {
         super.drawGuiContainerForegroundLayer(stack, x, y);
-        this.font.func_243248_b(stack, Util.makeTranslation(ID, "slot_label", "control_item"), 8, 92, 4210752);
+        this.font.func_243248_b(stack, controlItemLabel, 8, 92, 4210752);
     }
 
     @Override protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float f1, int i1, int i2)
@@ -83,22 +107,18 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
         int sliderYOffset = 19;
         int sliderXOffset = 28;
         int color = this.container.getColor();
+        Button.IPressable buttonAction = (button) ->
+        {
+        };
+        StringTextComponent suffix = new StringTextComponent("");
         this.colorR = this.addButton(
-                new Slider(xStart + sliderXOffset, yStart + sliderYOffset, 120, 20, Util.makeTranslation(ID, "color.r"),
-                        new StringTextComponent(""), 0, 255, Util.iGetColorR(color), false, true, (button) ->
-                {
-                }));
+                new Slider(xStart + sliderXOffset, yStart + sliderYOffset, 120, 20, colorRLabel, suffix, 0, 255,
+                        Util.iGetColorR(color), false, true, buttonAction));
         this.colorG = this.addButton(
-                new Slider(xStart + sliderXOffset, yStart + sliderYOffset + 20 + sliderYSpacing, 120, 20,
-                        Util.makeTranslation(ID, "color.g"), new StringTextComponent(""), 0, 255,
-                        Util.iGetColorG(color), false, true, (button) ->
-                {
-                }));
+                new Slider(xStart + sliderXOffset, yStart + sliderYOffset + 20 + sliderYSpacing, 120, 20, colorGLabel,
+                        suffix, 0, 255, Util.iGetColorG(color), false, true, buttonAction));
         this.colorB = this.addButton(
                 new Slider(xStart + sliderXOffset, yStart + sliderYOffset + 20 * 2 + sliderYSpacing * 2, 120, 20,
-                        Util.makeTranslation(ID, "color.b"), new StringTextComponent(""), 0, 255,
-                        Util.iGetColorB(color), false, true, (button) ->
-                {
-                }));
+                        colorBLabel, suffix, 0, 255, Util.iGetColorB(color), false, true, buttonAction));
     }
 }

@@ -1,0 +1,14 @@
+{
+  "block.versatileportals.portal": "Portal",
+  "block.versatileportals.portal_controller": "Portal Controller",
+  "block.versatileportals.portal_controller.gui.color.b": "Portal Color B: ",
+  "block.versatileportals.portal_controller.gui.color.g": "Portal Color G: ",
+  "block.versatileportals.portal_controller.gui.color.r": "Portal Color R: ",
+  "block.versatileportals.portal_controller.gui.slotLabel.controlItem": "Control Item",
+  "block.versatileportals.portal_controller.message.invalidControlItem.hasNoKey": "There is no control item or it is invalid",
+  "block.versatileportals.portal_controller.message.invalidControlItem.worldDoesNotExist": "There is no world matching the control item",
+  "block.versatileportals.portal_frame": "Portal Frame",
+  "item.versatileportals.empty_existing_world_control": "Empty Existing World Control",
+  "item.versatileportals.portal_lighter": "Portal Lighter",
+  "itemGroup.versatileportals": "Versatile Portals"
+}

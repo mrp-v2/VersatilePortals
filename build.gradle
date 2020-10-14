@@ -79,8 +79,10 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
-    compile fg.deobf("mrp_v2.configurablerecipeslibrary:ConfigurableRecipesLibrary:${mcVersion}-2.0.1.0:dev")
-    compile fg.deobf("mrp_v2.mrp_v2datagenlibrary:MRP_V2DataGenLibrary:${mcVersion}-0.1.0.0")
+    compile fg.
+            deobf("mrp_v2.configurablerecipeslibrary:ConfigurableRecipesLibrary:${mcVersion}-${crlAPIVersion}.${crlPatchVersion}:dev")
+    compile fg.
+            deobf("mrp_v2.mrp_v2datagenlibrary:MRP_V2DataGenLibrary:${mcVersion}-${dglAPIVersion}.${dglPatchVersion}")
 }
 
 jar {
@@ -110,14 +112,15 @@ processResources {
     inputs.property 'updateURL', updateURL
     inputs.property 'issuesURL', issuesURL
     inputs.property 'logo', logo
-    inputs.property 'crlVersion', crlVersion
+    inputs.property 'crlAPIVersion', crlAPIVersion
+    inputs.property 'dglAPIVersion', dglAPIVersion
     from(sourceSets.main.resources.srcDirs) {
         include '**/*'
         exclude '**/*.png'
         expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
                 'homepageURL': homepageURL, 'modDisplayName': modDisplayName, 'capitalizedModId': capitalizedModId,
                 'modDescription': modDescription, 'author': author, 'updateURL': updateURL, 'issuesURL': issuesURL,
-                'logo': logo, 'crlVersion': crlVersion
+                'logo': logo, 'crlAPIVersion': crlAPIVersion, 'dglAPIVersion': dglAPIVersion
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*'

@@ -7,7 +7,6 @@ import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.item.PortalControlItem;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import mrp_v2.versatileportals.util.Util;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -22,6 +21,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
@@ -80,7 +80,7 @@ public class PortalControllerTileEntity extends TileEntity
 
     @Override public ITextComponent getDisplayName()
     {
-        return this.customName != null ? this.customName : Util.makeTranslation("container", ID);
+        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.getTranslationKey());
     }
 
     public void setCustomName(@Nullable ITextComponent name)

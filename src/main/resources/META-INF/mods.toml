@@ -26,6 +26,12 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="configurablerecipeslibrary"
     mandatory=true
-    versionRange="[${mcVersion}-${crlVersion},]"
+    versionRange="[${mcVersion}-${crlAPIVersion},]"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.${modId}]]
+    modId="mrp_v2datagenlibrary"
+    mandatory=true
+    versionRange="[${mcVersion}-${dglAPIVersion},]"
     ordering="NONE"
     side="BOTH"
