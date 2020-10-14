@@ -1,14 +1,17 @@
 package mrp_v2.versatileportals.datagen;
 
+import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.util.ObjectHolder;
+import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class BlockStateGenerator extends BlockStateProvider
@@ -27,18 +30,15 @@ public class BlockStateGenerator extends BlockStateProvider
 
     private void registerPortal()
     {
-        registerPortalModel();
-        registerPortalBlockStates();
-    }
-
-    private void registerPortalModel()
-    {
-        //todo
-    }
-
-    private void registerPortalBlockStates()
-    {
-        //todo
+        ModelBuilder<BlockModelBuilder> modelBuilder = models().getBuilder("block/" + PortalBlock.ID)
+                .texture("portal", "block/" + PortalBlock.ID)
+                .texture("particle", "block/" + PortalBlock.ID);
+        ModelBuilder<BlockModelBuilder>.ElementBuilder elementBuilder =
+                modelBuilder.element().from(6, 0, 0).to(10, 16, 16);
+        noCullTintedFace(elementBuilder, Direction.EAST);
+        noCullTintedFace(elementBuilder, Direction.WEST);
+        elementBuilder.texture("#portal");
+        horizontalAxisBlock(ObjectHolder.PORTAL_BLOCK, modelBuilder);
     }
 
     private void registerPortalFrame()
@@ -96,17 +96,7 @@ public class BlockStateGenerator extends BlockStateProvider
         sameCullTintedFace(elementBuilder, Direction.NORTH);
         sameCullTintedFace(elementBuilder, Direction.SOUTH);
         elementBuilder.texture("#end").end();
-        getVariantBuilder(ObjectHolder.PORTAL_CONTROLLER_BLOCK).partialState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X)
-                .modelForState()
-                .modelFile(modelBuilder)
-                .rotationY(90)
-                .addModel()
-                .partialState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.Z)
-                .modelForState()
-                .modelFile(modelBuilder)
-                .addModel();
+        horizontalAxisBlock(ObjectHolder.PORTAL_CONTROLLER_BLOCK, modelBuilder);
     }
 
     private <T extends ModelBuilder<T>> ModelBuilder<T>.ElementBuilder noCullTintedFace(
@@ -125,6 +115,21 @@ public class BlockStateGenerator extends BlockStateProvider
             ModelBuilder<T>.ElementBuilder builder, Direction face, Direction cullface)
     {
         return builder.face(face).cullface(cullface).tintindex(0).end();
+    }
+
+    private void horizontalAxisBlock(Block block, ModelFile model)
+    {
+        getVariantBuilder(block).partialState()
+                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X)
+                .modelForState()
+                .modelFile(model)
+                .rotationY(90)
+                .addModel()
+                .partialState()
+                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.Z)
+                .modelForState()
+                .modelFile(model)
+                .addModel();
     }
 }
 
