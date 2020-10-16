@@ -6,13 +6,16 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 
+import javax.annotation.Nullable;
+
 public class PortalDataStorage implements IStorage<IPortalDataCapability>
 {
     private static final String REMAINING_PORTAL_COOLDOWN_NBT_ID = "PortalCooldown";
     private static final String IN_PORTAL_TIME_NBT_ID = "InPortalTime";
 
     @Override
-    public INBT writeNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance, Direction side)
+    public INBT writeNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
+            @Nullable Direction side)
     {
         return write(instance);
     }
@@ -26,8 +29,8 @@ public class PortalDataStorage implements IStorage<IPortalDataCapability>
     }
 
     @Override
-    public void readNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance, Direction side,
-            INBT nbt)
+    public void readNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
+            @Nullable Direction side, INBT nbt)
     {
         read(instance, (CompoundNBT) nbt);
     }
