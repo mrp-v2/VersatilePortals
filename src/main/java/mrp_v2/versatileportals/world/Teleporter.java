@@ -11,8 +11,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PortalInfo;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.TeleportationRepositioner;
@@ -51,45 +49,19 @@ public class Teleporter implements ITeleporter
     public Entity placeEntity(Entity entityIn, ServerWorld currentWorld, ServerWorld destinationWorld, float yaw,
             Function<Boolean, Entity> repositionEntity)
     {
-        PortalInfo portalInfo = getPortalInfo(entityIn);
-        if (portalInfo == null)
-        {
-            return null;
-        }
-        Entity returnEntity;
-        if (entityIn instanceof PlayerEntity)
-        {
-            ServerPlayerEntity player = (ServerPlayerEntity) entityIn;
-            currentWorld.getProfiler().startSection("moving");
-            currentWorld.getProfiler().endSection();
-            currentWorld.getProfiler().startSection("placing");
-            player.setWorld(destinationWorld);
-            destinationWorld.addDuringPortalTeleport(player);
-            player.rotationYaw = portalInfo.rotationYaw;
-            player.rotationPitch = portalInfo.rotationPitch;
-            player.setPositionAndUpdate(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
-            player.connection.captureCurrentPosition();
-            currentWorld.getProfiler().endSection();
-            returnEntity = player;
-        } else
-        {
-            this.destinationWorld.getProfiler().endStartSection("reloading");
-            Entity newEntity = entityIn.getType().create(destinationWorld);
-            if (newEntity != null)
-            {
-                newEntity.copyDataFromOld(entityIn);
-                newEntity.setLocationAndAngles(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z,
-                        portalInfo.rotationYaw, entityIn.rotationPitch);
-                newEntity.setMotion(portalInfo.motion);
-                destinationWorld.addFromAnotherDimension(newEntity);
-            }
-            returnEntity = newEntity;
-        }
-        IPortalDataCapability portalData = Util.getPortalData(returnEntity);
-        portalData.setRemainingPortalCooldown(returnEntity.getPortalCooldown());
+        Entity repositionedEntity = repositionEntity.apply(false); //don't let vanilla make a portal
+        IPortalDataCapability portalData = Util.getPortalData(repositionedEntity);
+        portalData.setRemainingPortalCooldown(repositionedEntity.getPortalCooldown());
         portalData.setInPortalTime(0);
-        returnEntity.getMaxInPortalTime();
-        return returnEntity;
+        repositionedEntity.getMaxInPortalTime();
+        return repositionedEntity;
+    }
+
+    @Nullable @Override
+    public PortalInfo getPortalInfo(Entity entity, ServerWorld destWorld,
+            Function<ServerWorld, PortalInfo> defaultPortalInfo)
+    {
+        return this.getPortalInfo(entity);
     }
 
     @Nullable private PortalInfo getPortalInfo(Entity entity)
