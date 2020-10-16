@@ -80,7 +80,7 @@ public class PortalSize
             }
             if (portalControllerResult.getLeft() != null)
             {
-                this.portalControllerRelativePos = this.bottomLeft.subtract(portalControllerResult.getLeft().getPos());
+                this.portalControllerRelativePos = portalControllerResult.getLeft().getPos().subtract(this.bottomLeft);
             }
         }
     }
