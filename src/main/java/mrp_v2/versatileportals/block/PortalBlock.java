@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -35,7 +36,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PortalBlock extends BasicBlock
@@ -132,14 +132,6 @@ public class PortalBlock extends BasicBlock
         {
             return;
         }
-        ServerPlayerEntity serverPlayerEntity =
-                entityIn instanceof ServerPlayerEntity ? (ServerPlayerEntity) entityIn : null;
-        Consumer<TranslationTextComponent> messageSender = serverPlayerEntity != null ?
-                (message) -> serverPlayerEntity.func_241151_a_(message, ChatType.GAME_INFO,
-                        net.minecraft.util.Util.DUMMY_UUID) :
-                (message) ->
-                {
-                };
         PortalSize originPortalSize = new PortalSize(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS));
         PortalControllerTileEntity originPortalController = originPortalSize.getPortalController(worldIn).getLeft();
         if (originPortalController == null)
@@ -150,16 +142,27 @@ public class PortalBlock extends BasicBlock
         RegistryKey<World> destinationWorldKey = originPortalController.getTeleportDestination(originWorld);
         if (destinationWorldKey == null)
         {
-            messageSender.accept(invalidControlItemNoKey);
+            if (entityIn instanceof ServerPlayerEntity)
+            {
+                sendMessage((ServerPlayerEntity) entityIn, invalidControlItemNoKey);
+            }
             return;
         }
         ServerWorld destinationWorld = originWorld.getServer().getWorld(destinationWorldKey);
         if (destinationWorld == null)
         {
-            messageSender.accept(invalidControlItemWorldDoesNotExist);
+            if (entityIn instanceof ServerPlayerEntity)
+            {
+                sendMessage((ServerPlayerEntity) entityIn, invalidControlItemWorldDoesNotExist);
+            }
             return;
         }
         entityIn.changeDimension(destinationWorld, new Teleporter(destinationWorld, originWorld, originPortalSize));
+    }
+
+    private void sendMessage(ServerPlayerEntity player, ITextComponent message)
+    {
+        player.func_241151_a_(message, ChatType.GAME_INFO, net.minecraft.util.Util.DUMMY_UUID);
     }
 
     public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader worldIn, BlockPos pos)
