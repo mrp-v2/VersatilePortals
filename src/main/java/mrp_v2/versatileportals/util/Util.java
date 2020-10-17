@@ -4,27 +4,22 @@ import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class Util
 {
-    public static final Random RAND = new Random();
-
-    public static TranslationTextComponent makeTranslation(String... idParts)
-    {
-        return makeTranslation(String.join(".", idParts));
-    }
-
     public static TranslationTextComponent makeTranslation(String id)
     {
         return new TranslationTextComponent(VersatilePortals.ID + "." + id);
@@ -63,11 +58,6 @@ public class Util
     public static int createColor(int r, int g, int b)
     {
         return (r << 16) | (g << 8) | b;
-    }
-
-    public static BlockPos[] getNeighbors(BlockPos pos)
-    {
-        return new BlockPos[]{pos.up(), pos.down(), pos.north(), pos.south(), pos.east(), pos.west()};
     }
 
     public static IPortalDataCapability getPortalData(Entity entity)
@@ -147,8 +137,8 @@ public class Util
         return mergedArray;
     }
 
-    public static ResourceLocation makeResourceLocation(String... parts)
+    public static void sendMessage(ServerPlayerEntity player, ITextComponent message)
     {
-        return new ResourceLocation(VersatilePortals.ID, String.join("/", parts));
+        player.func_241151_a_(message, ChatType.GAME_INFO, net.minecraft.util.Util.DUMMY_UUID);
     }
 }

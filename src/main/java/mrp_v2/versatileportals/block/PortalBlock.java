@@ -1,37 +1,25 @@
 package mrp_v2.versatileportals.block;
 
-import mrp_v2.versatileportals.VersatilePortals;
-import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
-import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
-import mrp_v2.versatileportals.util.Util;
-import mrp_v2.versatileportals.world.Teleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -41,17 +29,6 @@ import java.util.function.Function;
 public class PortalBlock extends BasicBlock
 {
     public static final String ID = "portal";
-    public static final TranslationTextComponent invalidControlItemNoKey, invalidControlItemWorldDoesNotExist;
-
-    static
-    {
-        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "message",
-                "invalidControlItem");
-        invalidControlItemNoKey = EN_USTranslationGenerator.makeTextTranslation(stem + ".hasNoKey",
-                "There is no control item or it is invalid");
-        invalidControlItemWorldDoesNotExist = EN_USTranslationGenerator.makeTextTranslation(stem + ".worldDoesNotExist",
-                "There is no world matching the control item");
-    }
 
     public PortalBlock()
     {
@@ -107,62 +84,6 @@ public class PortalBlock extends BasicBlock
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
         return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
-    }
-
-    @Override public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn)
-    {
-        if (!(worldIn instanceof ServerWorld) ||
-                entityIn.isPassenger() ||
-                entityIn.isBeingRidden() ||
-                !entityIn.isNonBoss())
-        {
-            return;
-        }
-        if (!entityIn.getBoundingBox().intersects(this.getBoundingBox(state, worldIn, pos)))
-        {
-            return;
-        }
-        IPortalDataCapability portalData = Util.getPortalData(entityIn);
-        if (portalData.getRemainingPortalCooldown() > 0)
-        {
-            portalData.setRemainingPortalCooldown(entityIn.getPortalCooldown());
-            return;
-        }
-        if (portalData.incrementInPortalTime() < entityIn.getMaxInPortalTime())
-        {
-            return;
-        }
-        PortalSize originPortalSize = new PortalSize(worldIn, pos, state.get(BlockStateProperties.HORIZONTAL_AXIS));
-        PortalControllerTileEntity originPortalController = originPortalSize.getPortalController(worldIn).getLeft();
-        if (originPortalController == null)
-        {
-            return;
-        }
-        ServerWorld originWorld = (ServerWorld) worldIn;
-        RegistryKey<World> destinationWorldKey = originPortalController.getTeleportDestination(originWorld);
-        if (destinationWorldKey == null)
-        {
-            if (entityIn instanceof ServerPlayerEntity)
-            {
-                sendMessage((ServerPlayerEntity) entityIn, invalidControlItemNoKey);
-            }
-            return;
-        }
-        ServerWorld destinationWorld = originWorld.getServer().getWorld(destinationWorldKey);
-        if (destinationWorld == null)
-        {
-            if (entityIn instanceof ServerPlayerEntity)
-            {
-                sendMessage((ServerPlayerEntity) entityIn, invalidControlItemWorldDoesNotExist);
-            }
-            return;
-        }
-        entityIn.changeDimension(destinationWorld, new Teleporter(destinationWorld, originWorld, originPortalSize));
-    }
-
-    private void sendMessage(ServerPlayerEntity player, ITextComponent message)
-    {
-        player.func_241151_a_(message, ChatType.GAME_INFO, net.minecraft.util.Util.DUMMY_UUID);
     }
 
     public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader worldIn, BlockPos pos)

@@ -53,7 +53,6 @@ public class Teleporter implements ITeleporter
         IPortalDataCapability portalData = Util.getPortalData(repositionedEntity);
         portalData.setRemainingPortalCooldown(repositionedEntity.getPortalCooldown());
         portalData.setInPortalTime(0);
-        repositionedEntity.getMaxInPortalTime();
         return repositionedEntity;
     }
 
