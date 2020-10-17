@@ -1,5 +1,6 @@
 {
   "block.versatileportals.portal": "Portal",
+  "block.versatileportals.portal.message.noPortalController": "A Portal Controller could not be found for this portal",
   "block.versatileportals.portal_controller": "Portal Controller",
   "block.versatileportals.portal_controller.gui.color.b": "Portal Color B: ",
   "block.versatileportals.portal_controller.gui.color.g": "Portal Color G: ",
