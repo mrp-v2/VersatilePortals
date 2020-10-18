@@ -1,5 +1,6 @@
 package mrp_v2.versatileportals.block;
 
+import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.Block;

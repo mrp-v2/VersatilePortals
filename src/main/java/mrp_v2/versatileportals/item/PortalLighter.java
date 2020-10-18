@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.item;
 
-import mrp_v2.versatileportals.block.PortalSize;
+import mrp_v2.versatileportals.block.util.PortalSize;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;

@@ -3,7 +3,7 @@ package mrp_v2.versatileportals.world;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
-import mrp_v2.versatileportals.block.PortalSize;
+import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;

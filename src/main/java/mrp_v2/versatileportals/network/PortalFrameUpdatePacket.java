@@ -1,7 +1,7 @@
 package mrp_v2.versatileportals.network;
 
 import mrp_v2.versatileportals.VersatilePortals;
-import mrp_v2.versatileportals.block.PortalSize;
+import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;

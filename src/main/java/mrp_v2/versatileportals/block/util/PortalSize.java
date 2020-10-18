@@ -1,6 +1,7 @@
-package mrp_v2.versatileportals.block;
+package mrp_v2.versatileportals.block.util;
 
 import com.google.common.collect.Lists;
+import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.AbstractBlock;
@@ -83,7 +84,7 @@ public class PortalSize
                 this.portalControllerRelativePos = portalControllerResult.getLeft().getPos().subtract(this.bottomLeft);
                 this.portalControllerRelativePos =
                         new BlockPos(-this.portalControllerRelativePos.getX(), this.portalControllerRelativePos.getY(),
-                                -this.portalControllerRelativePos.getZ());
+                                this.portalControllerRelativePos.getZ());
             }
         }
     }

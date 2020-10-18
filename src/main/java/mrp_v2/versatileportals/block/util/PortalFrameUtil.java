@@ -1,7 +1,6 @@
 package mrp_v2.versatileportals.block.util;
 
 import com.google.common.collect.Lists;
-import mrp_v2.versatileportals.block.PortalSize;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalFrameUpdatePacket;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;

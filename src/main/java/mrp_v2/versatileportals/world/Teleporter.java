@@ -1,7 +1,7 @@
 package mrp_v2.versatileportals.world;
 
 import mrp_v2.versatileportals.block.PortalControllerBlock;
-import mrp_v2.versatileportals.block.PortalSize;
+import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
