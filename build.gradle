@@ -103,6 +103,8 @@ processResources {
     inputs.property 'version', project.version
     inputs.property 'modId', modId
     inputs.property 'forgeMajor', forgeMajor
+    inputs.property 'forgeMinor', forgeMinor
+    inputs.property 'forgePatch', forgePatch
     inputs.property 'mcVersion', mcVersion
     inputs.property 'homepageURL', homepageURL
     inputs.property 'modDisplayName', modDisplayName
@@ -117,7 +119,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include '**/*'
         exclude '**/*.png'
-        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
+        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'forgeMinor': forgeMinor, 'forgePatch': forgePatch, 'mcVersion': mcVersion,
                 'homepageURL': homepageURL, 'modDisplayName': modDisplayName, 'capitalizedModId': capitalizedModId,
                 'modDescription': modDescription, 'author': author, 'updateURL': updateURL, 'issuesURL': issuesURL,
                 'logo': logo, 'crlAPIVersion': crlAPIVersion, 'dglAPIVersion': dglAPIVersion
