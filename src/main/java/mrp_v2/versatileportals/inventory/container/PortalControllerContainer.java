@@ -27,6 +27,7 @@ public class PortalControllerContainer extends Container
 
     public PortalControllerContainer(int id, PlayerInventory playerInventoryIn)
     {
+        //noinspection ConstantConditions
         this(id, playerInventoryIn, PortalControllerTileEntity.DEFAULT_PORTAL_COLOR, null);
     }
 

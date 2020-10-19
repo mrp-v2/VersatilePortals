@@ -9,6 +9,8 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 
+import javax.annotation.Nullable;
+
 public class PortalDataProvider implements ICapabilitySerializable<CompoundNBT>
 {
     protected final PortalDataHandler portalDataHandler;
@@ -26,7 +28,7 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundNBT>
         event.addListener(this.portalDataHandlerLazyOptional::invalidate);
     }
 
-    @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
+    @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
         if (cap == CapabilityHandler.PORTAL_DATA_CAPABILITY)
         {
@@ -37,12 +39,14 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundNBT>
 
     @Override public CompoundNBT serializeNBT()
     {
+        //noinspection ConstantConditions
         return (CompoundNBT) ObjectHolder.PORTAL_DATA_STORAGE.writeNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY,
                 this.portalDataHandler, null);
     }
 
     @Override public void deserializeNBT(CompoundNBT nbt)
     {
+        //noinspection ConstantConditions
         ObjectHolder.PORTAL_DATA_STORAGE.readNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY, this.portalDataHandler, null,
                 nbt);
     }

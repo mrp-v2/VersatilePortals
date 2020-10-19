@@ -19,6 +19,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.INameable;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -32,7 +33,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class PortalControllerTileEntity extends TileEntity
-        implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity
+        implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity, INameable
 {
     public static final String ID = "portal_controller";
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
@@ -49,6 +50,7 @@ public class PortalControllerTileEntity extends TileEntity
 
     public static TileEntityType<PortalControllerTileEntity> createTileEntity()
     {
+        //noinspection ConstantConditions
         TileEntityType<PortalControllerTileEntity> tileEntityType =
                 TileEntityType.Builder.create(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK)
                         .build(null);
@@ -75,10 +77,15 @@ public class PortalControllerTileEntity extends TileEntity
         {
             return null;
         }
-        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0), originWorld);
+        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0));
     }
 
-    @Override public ITextComponent getDisplayName()
+    @Override public ITextComponent getName()
+    {
+        return this.customName != null ? this.customName : this.getDefaultName();
+    }
+
+    public ITextComponent getDefaultName()
     {
         return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.getTranslationKey());
     }
@@ -188,5 +195,10 @@ public class PortalControllerTileEntity extends TileEntity
             }
             PortalControllerBlock.animateTick(this.getBlockState(), this.world, this.pos);
         }
+    }
+
+    @Override public ITextComponent getDisplayName()
+    {
+        return INameable.super.getDisplayName();
     }
 }

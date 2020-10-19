@@ -1,6 +1,5 @@
 package mrp_v2.versatileportals.util;
 
-import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
@@ -12,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,11 +18,6 @@ import javax.annotation.Nullable;
 
 public class Util
 {
-    public static TranslationTextComponent makeTranslation(String id)
-    {
-        return new TranslationTextComponent(VersatilePortals.ID + "." + id);
-    }
-
     public static int iGetColorR(int color)
     {
         return (color & 0xFF0000) >> 16;
@@ -62,6 +55,7 @@ public class Util
 
     public static IPortalDataCapability getPortalData(Entity entity)
     {
+        //noinspection ConstantConditions
         return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
                 .orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
     }
@@ -118,7 +112,8 @@ public class Util
         return objects;
     }
 
-    @SafeVarargs public static <L, R> Pair<L, R>[] mergePairArrays(Pair<L, R>[]... arrays)
+    @SuppressWarnings("unchecked") @SafeVarargs
+    public static <L, R> Pair<L, R>[] mergePairArrays(Pair<L, R>[]... arrays)
     {
         int totalLength = 0;
         for (Pair<L, R>[] array : arrays)

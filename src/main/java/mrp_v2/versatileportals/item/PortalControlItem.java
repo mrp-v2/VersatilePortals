@@ -7,7 +7,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
 import java.util.function.Function;
 
@@ -29,7 +28,7 @@ public abstract class PortalControlItem extends BasicSingleItem
         stack.setDisplayName(new StringTextComponent(worldID.getPath()));
     }
 
-    public static RegistryKey<World> getTeleportDestination(ItemStack stack, ServerWorld originWorld)
+    public static RegistryKey<World> getTeleportDestination(ItemStack stack)
     {
         String worldID = stack.getOrCreateTag().getString(WORLD_ID_NBT_ID);
         return Util.createWorldKey(worldID);
