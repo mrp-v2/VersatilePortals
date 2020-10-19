@@ -8,6 +8,8 @@
   "block.versatileportals.portal_controller.gui.slotLabel.controlItem": "Control Item",
   "block.versatileportals.portal_controller.message.invalidControlItem.hasNoKey": "There is no control item or it is invalid",
   "block.versatileportals.portal_controller.message.invalidControlItem.worldDoesNotExist": "There is no world matching the control item",
+  "block.versatileportals.portal_controller.message.teleported": "Teleported",
+  "block.versatileportals.portal_controller.message.teleportingIn": "Teleporting in %s...",
   "block.versatileportals.portal_frame": "Portal Frame",
   "item.versatileportals.empty_existing_world_control": "Empty Existing World Control",
   "item.versatileportals.portal_lighter": "Portal Lighter",

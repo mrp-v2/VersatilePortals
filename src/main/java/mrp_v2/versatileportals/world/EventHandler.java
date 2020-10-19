@@ -9,6 +9,7 @@ import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.RegistryKey;
@@ -21,17 +22,23 @@ import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
+import java.util.function.Function;
+
 @EventBusSubscriber public class EventHandler
 {
-    public static final TranslationTextComponent noPortalController, noKey, worldDoesNotExist;
+    public static final TranslationTextComponent noPortalController, noKey, worldDoesNotExist, teleported;
+    public static final Function<Object[], TranslationTextComponent> teleportingInFunction;
 
     static
     {
         noPortalController = EN_USTranslationGenerator.makeTextTranslation(
                 String.join(".", "block", VersatilePortals.ID, PortalBlock.ID, "message", "noPortalController"),
                 "A Portal Controller could not be found for this portal");
-        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "message",
-                "invalidControlItem");
+        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "message");
+        teleportingInFunction =
+                EN_USTranslationGenerator.makeFormattedTextTranslation(stem + ".teleportingIn", "Teleporting in %s...");
+        teleported = EN_USTranslationGenerator.makeTextTranslation(stem + ".teleported", "Teleported");
+        stem = String.join(".", stem, "invalidControlItem");
         noKey = EN_USTranslationGenerator.makeTextTranslation(stem + ".hasNoKey",
                 "There is no control item or it is invalid");
         worldDoesNotExist = EN_USTranslationGenerator.makeTextTranslation(stem + ".worldDoesNotExist",
@@ -85,7 +92,18 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
                         portalData.setRemainingPortalCooldown(entity.getPortalCooldown());
                         return;
                     }
-                    if (portalData.incrementInPortalTime() >= entity.getMaxInPortalTime())
+                    if (portalData.incrementInPortalTime() < entity.getMaxInPortalTime())
+                    {
+                        if (entity.getMaxInPortalTime() > 1)
+                        {
+                            if (entity instanceof ServerPlayerEntity)
+                            {
+                                int remainingInPortalTime = entity.getMaxInPortalTime() - portalData.getInPortalTime();
+                                Util.sendMessage((ServerPlayerEntity) entity, teleportingInFunction.apply(
+                                        new Object[]{Math.ceil(remainingInPortalTime / 2.0F) / 10.0F}));
+                            }
+                        }
+                    } else
                     {
                         PortalSize portalSize = new PortalSize(world, portalBlockPos,
                                 world.getBlockState(portalBlockPos).get(BlockStateProperties.HORIZONTAL_AXIS));
@@ -116,7 +134,12 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
                             }
                             return;
                         }
-                        entity.changeDimension(destinationWorld, new Teleporter(destinationWorld, world, portalSize));
+                        Entity teleportedEntity = entity.changeDimension(destinationWorld,
+                                new Teleporter(destinationWorld, world, portalSize));
+                        if (teleportedEntity instanceof ServerPlayerEntity)
+                        {
+                            Util.sendMessage((ServerPlayerEntity) teleportedEntity, teleported);
+                        }
                     }
                 } else
                 {

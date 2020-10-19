@@ -8,6 +8,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 public class EN_USTranslationGenerator extends TranslationGenerator
 {
@@ -27,6 +28,12 @@ public class EN_USTranslationGenerator extends TranslationGenerator
     {
         translations.put(key, name);
         return key;
+    }
+
+    public static Function<Object[], TranslationTextComponent> makeFormattedTextTranslation(String key, String name)
+    {
+        String addedName = makeStringTranslation(key, name);
+        return (Object[] args) -> new TranslationTextComponent(addedName, args);
     }
 
     @Override protected void addTranslations()
