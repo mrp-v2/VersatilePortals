@@ -11,6 +11,7 @@ import net.minecraft.particles.ParticleType;
 
 import java.util.Locale;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class ColorParticleData implements IParticleData
 {
@@ -21,26 +22,25 @@ public abstract class ColorParticleData implements IParticleData
         this.color = color;
     }
 
-    protected static <T extends ColorParticleData> ParticleType<T> createParticleType(Function<Integer, T> constructor,
-            String id)
+    protected static <T extends ColorParticleData> ParticleType<T> createParticleType(Supplier<Codec<T>> codecSupplier,
+            IDeserializer<T> deserializerSupplier, String id)
     {
-        ParticleType<T> particleType = new ParticleType<T>(false, makeDeserializer(constructor))
+        ParticleType<T> particleType = new ParticleType<T>(false, deserializerSupplier)
         {
-
             @Override public Codec<T> func_230522_e_()
             {
-                return makeCodec(constructor);
+                return codecSupplier.get();
             }
         };
         particleType.setRegistryName(VersatilePortals.ID, id);
         return particleType;
     }
 
-    private static <T extends ColorParticleData> Codec<T> makeCodec(Function<Integer, T> constructor)
+    protected static <T extends ColorParticleData> Codec<T> makeCodec(Function<Integer, T> constructor)
     {
         return RecordCodecBuilder.create(
-                (instance1) -> instance1.group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor))
-                                        .apply(instance1, constructor));
+                (instance) -> instance.group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor))
+                        .apply(instance, constructor));
     }
 
     public int getColor()
@@ -48,18 +48,16 @@ public abstract class ColorParticleData implements IParticleData
         return this.color;
     }
 
-    private static <T extends ColorParticleData> IParticleData.IDeserializer<T> makeDeserializer(
+    protected static <T extends ColorParticleData> IParticleData.IDeserializer<T> makeDeserializer(
             Function<Integer, T> constructor)
     {
         return new IParticleData.IDeserializer<T>()
         {
-
             @Override public T deserialize(ParticleType<T> particleTypeIn, StringReader reader)
                     throws CommandSyntaxException
             {
                 reader.expect(' ');
-                int color = reader.readInt();
-                return constructor.apply(color);
+                return constructor.apply(reader.readInt());
             }
 
             @Override public T read(ParticleType<T> particleTypeIn, PacketBuffer buffer)
