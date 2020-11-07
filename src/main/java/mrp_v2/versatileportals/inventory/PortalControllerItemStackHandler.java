@@ -3,14 +3,12 @@ package mrp_v2.versatileportals.inventory;
 import mrp_v2.versatileportals.item.PortalControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class PortalControllerItemStackHandler extends ItemStackHandler implements NonNullSupplier<IItemHandler>
+public class PortalControllerItemStackHandler extends ItemStackHandler
 {
     private final PortalControllerTileEntity portalController;
 
@@ -32,10 +30,5 @@ public class PortalControllerItemStackHandler extends ItemStackHandler implement
         {
             portalController.onInventorySlotChanged();
         }
-    }
-
-    @Override public IItemHandler get()
-    {
-        return this;
     }
 }

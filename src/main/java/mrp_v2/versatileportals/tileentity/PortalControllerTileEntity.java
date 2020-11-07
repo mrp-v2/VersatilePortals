@@ -1,11 +1,13 @@
 package mrp_v2.versatileportals.tileentity;
 
+import com.mojang.serialization.DataResult;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.item.PortalControlItem;
+import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -24,7 +27,6 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -38,11 +40,9 @@ public class PortalControllerTileEntity extends TileEntity
     public static final String ID = "portal_controller";
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
-    public static final int PORTAL_CONTROLLER_UPDATE_FLAGS = 0;
     public static final int TICKS_PER_RENDER_REVOLUTION = 120;
-    private static final String INVENTORY_NBT_ID = "Inventory";
-    private static final String PORTAL_COLOR_NBT_ID = "PortalColor";
-    private final PortalControllerItemStackHandler itemStackHandler;
+    private static final String DATA_NBT_ID = "PortalControllerData";
+    private final PortalControllerItemStackHandler inventory;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
     public int ticks;
     private ITextComponent customName;
@@ -61,23 +61,23 @@ public class PortalControllerTileEntity extends TileEntity
     public PortalControllerTileEntity()
     {
         super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
-        this.itemStackHandler = new PortalControllerItemStackHandler(this);
-        this.inventoryLazyOptional = LazyOptional.of(() -> this.itemStackHandler);
+        this.inventory = new PortalControllerItemStackHandler(this);
+        this.inventoryLazyOptional = LazyOptional.of(() -> this.inventory);
         this.portalColor = DEFAULT_PORTAL_COLOR;
     }
 
-    public PortalControllerItemStackHandler getItemStackHandler()
+    public PortalControllerItemStackHandler getInventory()
     {
-        return itemStackHandler;
+        return inventory;
     }
 
-    @Nullable public RegistryKey<World> getTeleportDestination(ServerWorld originWorld)
+    @Nullable public RegistryKey<World> getTeleportDestination()
     {
-        if (this.itemStackHandler.getStackInSlot(0).isEmpty())
+        if (this.inventory.getStackInSlot(0).isEmpty())
         {
             return null;
         }
-        return PortalControlItem.getTeleportDestination(this.itemStackHandler.getStackInSlot(0));
+        return PortalControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
     }
 
     @Override public ITextComponent getName()
@@ -85,9 +85,9 @@ public class PortalControllerTileEntity extends TileEntity
         return this.customName != null ? this.customName : this.getDefaultName();
     }
 
-    public ITextComponent getDefaultName()
+    @Nullable @Override public ITextComponent getCustomName()
     {
-        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.getTranslationKey());
+        return this.customName;
     }
 
     public void setCustomName(@Nullable ITextComponent name)
@@ -95,10 +95,14 @@ public class PortalControllerTileEntity extends TileEntity
         this.customName = name;
     }
 
+    public ITextComponent getDefaultName()
+    {
+        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.getTranslationKey());
+    }
+
     @Override public Container createMenu(int id, PlayerInventory playerInventoryIn, PlayerEntity playerIn)
     {
-        return new PortalControllerContainer(id, playerInventoryIn, this.itemStackHandler, this.portalColor,
-                this.getPos());
+        return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor, this.getPos());
     }
 
     @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
@@ -122,15 +126,26 @@ public class PortalControllerTileEntity extends TileEntity
     @Override public void read(BlockState state, CompoundNBT compound)
     {
         super.read(state, compound);
-        this.portalColor = compound.getInt(PORTAL_COLOR_NBT_ID);
-        this.itemStackHandler.deserializeNBT(compound.getCompound(INVENTORY_NBT_ID));
+        if (compound.contains(DATA_NBT_ID, 10))
+        {
+            CompoundNBT dataNBT = compound.getCompound(DATA_NBT_ID);
+            DataResult<PortalControllerData> dataResult =
+                    PortalControllerData.CODEC.parse(NBTDynamicOps.INSTANCE, dataNBT);
+            dataResult.resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) ->
+            {
+                this.portalColor = data.getPortalColor();
+                this.inventory.deserializeNBT(data.getInventoryData());
+                this.customName = data.getCustomName();
+            });
+        }
     }
 
     @Override public CompoundNBT write(CompoundNBT compound)
     {
         super.write(compound);
-        compound.put(INVENTORY_NBT_ID, this.itemStackHandler.serializeNBT());
-        compound.putInt(PORTAL_COLOR_NBT_ID, this.portalColor);
+        PortalControllerData.CODEC.encodeStart(NBTDynamicOps.INSTANCE, new PortalControllerData(this))
+                .resultOrPartial(VersatilePortals.LOGGER::error)
+                .ifPresent((data) -> compound.put(DATA_NBT_ID, data));
         return compound;
     }
 
@@ -168,7 +183,7 @@ public class PortalControllerTileEntity extends TileEntity
     private void sendUpdateToClient()
     {
         BlockState state = this.getBlockState();
-        this.world.notifyBlockUpdate(this.getPos(), state, state, 2 | PORTAL_CONTROLLER_UPDATE_FLAGS);
+        this.world.notifyBlockUpdate(this.getPos(), state, state, 2);
     }
 
     public void onInventorySlotChanged()
@@ -189,7 +204,7 @@ public class PortalControllerTileEntity extends TileEntity
         }
         if (this.ticks % 4 == 0)
         {
-            if (this.itemStackHandler.getStackInSlot(0).isEmpty())
+            if (this.inventory.getStackInSlot(0).isEmpty())
             {
                 return;
             }

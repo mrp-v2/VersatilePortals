@@ -39,8 +39,8 @@ public abstract class ColorParticleData implements IParticleData
     protected static <T extends ColorParticleData> Codec<T> makeCodec(Function<Integer, T> constructor)
     {
         return RecordCodecBuilder.create(
-                (instance) -> instance.group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor))
-                        .apply(instance, constructor));
+                (builder) -> builder.group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor))
+                        .apply(builder, constructor));
     }
 
     public int getColor()

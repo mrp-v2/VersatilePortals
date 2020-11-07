@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
@@ -18,7 +17,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -26,11 +24,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -82,22 +77,24 @@ public class PortalControllerBlock extends PortalFrameBlock
     @Override
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
-        if (!state.isIn(newState.getBlock()))
+        if (state.hasTileEntity() && (state.getBlock() != newState.getBlock() || !newState.hasTileEntity()))
         {
-            TileEntity tileEntity = worldIn.getTileEntity(pos);
-            if (tileEntity instanceof PortalControllerTileEntity)
-            {
-                LazyOptional<IItemHandler> itemHandler =
-                        tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-                if (itemHandler.isPresent())
-                {
-                    NonNullList<ItemStack> itemStacks = NonNullList.create();
-                    itemStacks.add(itemHandler.orElse(new ItemStackHandler()).getStackInSlot(0));
-                    InventoryHelper.dropItems(worldIn, pos, itemStacks);
-                }
-            }
+            worldIn.getTileEntity(pos)
+                    .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                    .ifPresent(itemHandler ->
+                    {
+                        for (int i = 0; i < itemHandler.getSlots(); i++)
+                        {
+                            Block.spawnAsEntity(worldIn, pos, itemHandler.getStackInSlot(i));
+                        }
+                    });
         }
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    @Override public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state)
+    {
+        return super.getItem(worldIn, pos, state);
     }
 
     @Override public boolean hasTileEntity(BlockState state)

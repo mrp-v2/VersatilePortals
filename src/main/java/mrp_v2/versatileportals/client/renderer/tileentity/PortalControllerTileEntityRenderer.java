@@ -24,7 +24,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
     public void render(PortalControllerTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
             IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn)
     {
-        ItemStack itemStack = tileEntityIn.getItemStackHandler().getStackInSlot(0);
+        ItemStack itemStack = tileEntityIn.getInventory().getStackInSlot(0);
         if (itemStack != ItemStack.EMPTY)
         {
             matrixStackIn.push();

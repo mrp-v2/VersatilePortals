@@ -231,7 +231,7 @@ public class Teleporter implements ITeleporter
                                         .with(PortalControllerBlock.AXIS, positiveAxisDir.rotateY().getAxis()), 3);
                         PortalControllerTileEntity portalControllerTileEntity =
                                 (PortalControllerTileEntity) this.destinationWorld.getTileEntity(mutableOriginPos);
-                        portalControllerTileEntity.getItemStackHandler()
+                        portalControllerTileEntity.getInventory()
                                 .insertItem(0, ExistingWorldControlItem.getItemForWorld(this.originWorld), false);
                         portalControllerTileEntity.setPortalColor(
                                 this.originPortalSize.getPortalController(this.originWorld).getLeft().getPortalColor());

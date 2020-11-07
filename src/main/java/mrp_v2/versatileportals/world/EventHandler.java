@@ -116,7 +116,7 @@ import java.util.function.Function;
                             }
                             return;
                         }
-                        RegistryKey<World> destinationKey = controller.getTeleportDestination(world);
+                        RegistryKey<World> destinationKey = controller.getTeleportDestination();
                         if (destinationKey == null)
                         {
                             if (entity instanceof ServerPlayerEntity)
