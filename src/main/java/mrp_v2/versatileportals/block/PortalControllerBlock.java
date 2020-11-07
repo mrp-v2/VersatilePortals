@@ -92,11 +92,6 @@ public class PortalControllerBlock extends PortalFrameBlock
         super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 
-    @Override public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state)
-    {
-        return super.getItem(worldIn, pos, state);
-    }
-
     @Override public boolean hasTileEntity(BlockState state)
     {
         return true;
