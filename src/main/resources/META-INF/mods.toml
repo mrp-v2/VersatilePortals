@@ -20,18 +20,18 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[${mcVersion}]"
+    versionRange="[${mcVersion},${mcNextVersion})"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${modId}]]
     modId="configurablerecipeslibrary"
     mandatory=true
-    versionRange="[${mcVersion}-${crlAPIVersion},)"
+    versionRange="[${mcVersion}-${crlAPI},${mcVersion}-${crlNextAPI})"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${modId}]]
     modId="mrp_v2datagenlibrary"
     mandatory=true
-    versionRange="[${mcVersion}-${dglAPIVersion},)"
+    versionRange="[${mcVersion}-${dglAPI},${mcVersion}-${dglNextAPI})"
     ordering="NONE"
     side="BOTH"
