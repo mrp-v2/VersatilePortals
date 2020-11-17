@@ -97,7 +97,7 @@ public class Teleporter implements ITeleporter
         int i = coordinateMultiplier == 0.125D ? 16 : 128;
         pointOfInterestManager.ensureLoadedAndValid(this.destinationWorld, searchOrigin, i);
         Optional<PointOfInterest> optionalPointOfInterest = pointOfInterestManager.getInSquare(
-                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE,
+                (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE.get(),
                 searchOrigin, i, PointOfInterestManager.Status.ANY)
                 .sorted(Comparator.<PointOfInterest>comparingDouble(
                         (pointOfInterest) -> pointOfInterest.getPos().distanceSq(searchOrigin)).thenComparingInt(
@@ -204,7 +204,7 @@ public class Teleporter implements ITeleporter
                     for (int y = -1; y < portalHeight; y++)
                     {
                         BlockState blockState = y < 0 ?
-                                ObjectHolder.PORTAL_FRAME_BLOCK.getDefaultState() :
+                                ObjectHolder.PORTAL_FRAME_BLOCK.get().getDefaultState() :
                                 Blocks.AIR.getDefaultState();
                         mutableOriginPos.setAndOffset(availablePortalLoc,
                                 portalXZ * positiveAxisDir.getXOffset() + floorXZ * rotated.getXOffset(), y,
@@ -226,9 +226,9 @@ public class Teleporter implements ITeleporter
                             .equals(new BlockPos(xz * positiveAxisDir.getXOffset(), y,
                                     xz * positiveAxisDir.getZOffset())))
                     {
-                        this.destinationWorld.setBlockState(mutableOriginPos,
-                                ObjectHolder.PORTAL_CONTROLLER_BLOCK.getDefaultState()
-                                        .with(PortalControllerBlock.AXIS, positiveAxisDir.rotateY().getAxis()), 3);
+                        this.destinationWorld.setBlockState(mutableOriginPos, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()
+                                .getDefaultState()
+                                .with(PortalControllerBlock.AXIS, positiveAxisDir.rotateY().getAxis()), 3);
                         PortalControllerTileEntity portalControllerTileEntity =
                                 (PortalControllerTileEntity) this.destinationWorld.getTileEntity(mutableOriginPos);
                         portalControllerTileEntity.getInventory()
@@ -238,12 +238,13 @@ public class Teleporter implements ITeleporter
                     } else
                     {
                         this.destinationWorld.setBlockState(mutableOriginPos,
-                                ObjectHolder.PORTAL_FRAME_BLOCK.getDefaultState(), 3);
+                                ObjectHolder.PORTAL_FRAME_BLOCK.get().getDefaultState(), 3);
                     }
                 }
             }
         }
-        BlockState portalBlockState = ObjectHolder.PORTAL_BLOCK.getDefaultState()
+        BlockState portalBlockState = ObjectHolder.PORTAL_BLOCK.get()
+                .getDefaultState()
                 .with(BlockStateProperties.HORIZONTAL_AXIS, this.originPortalSize.getAxis());
         for (int xz = 0; xz < portalWidth; xz++) // creates portal
         {

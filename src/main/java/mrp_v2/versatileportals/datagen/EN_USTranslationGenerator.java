@@ -2,6 +2,7 @@ package mrp_v2.versatileportals.datagen;
 
 import mrp_v2.mrp_v2datagenlibrary.datagen.TranslationGenerator;
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.client.gui.screen.PortalControllerScreen;
 import mrp_v2.versatileportals.item.BasicSingleItem;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.data.DataGenerator;
@@ -38,12 +39,13 @@ public class EN_USTranslationGenerator extends TranslationGenerator
 
     @Override protected void addTranslations()
     {
-        add(ObjectHolder.PORTAL_BLOCK, "Portal");
-        add(ObjectHolder.PORTAL_FRAME_BLOCK, "Portal Frame");
-        add(ObjectHolder.PORTAL_CONTROLLER_BLOCK, "Portal Controller");
-        add(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM, "Empty Existing World Control");
-        add(ObjectHolder.PORTAL_LIGHTER_ITEM, "Portal Lighter");
+        add(ObjectHolder.PORTAL_BLOCK.get(), "Portal");
+        add(ObjectHolder.PORTAL_FRAME_BLOCK.get(), "Portal Frame");
+        add(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get(), "Portal Controller");
+        add(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get(), "Empty Existing World Control");
+        add(ObjectHolder.PORTAL_LIGHTER_ITEM.get(), "Portal Lighter");
         add(BasicSingleItem.MAIN_ITEM_GROUP, VersatilePortals.DISPLAY_NAME);
+        PortalControllerScreen.staticInit();
         translations.forEach(this::add);
     }
 }

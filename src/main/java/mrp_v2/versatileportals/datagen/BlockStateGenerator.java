@@ -38,12 +38,12 @@ public class BlockStateGenerator extends BlockStateProvider
         noCullTintedFace(elementBuilder, Direction.EAST);
         noCullTintedFace(elementBuilder, Direction.WEST);
         elementBuilder.texture("#portal");
-        horizontalAxisBlock(ObjectHolder.PORTAL_BLOCK, modelBuilder);
+        horizontalAxisBlock(ObjectHolder.PORTAL_BLOCK.get(), modelBuilder);
     }
 
     private void registerPortalFrame()
     {
-        simpleBlock(ObjectHolder.PORTAL_FRAME_BLOCK,
+        simpleBlock(ObjectHolder.PORTAL_FRAME_BLOCK.get(),
                 models().withExistingParent("block/" + PortalFrameBlock.ID, "block")
                         .texture("frame", "block/" + PortalFrameBlock.ID)
                         .texture("particle", "block/" + PortalFrameBlock.ID)
@@ -96,7 +96,7 @@ public class BlockStateGenerator extends BlockStateProvider
         sameCullTintedFace(elementBuilder, Direction.NORTH);
         sameCullTintedFace(elementBuilder, Direction.SOUTH);
         elementBuilder.texture("#end").end();
-        horizontalAxisBlock(ObjectHolder.PORTAL_CONTROLLER_BLOCK, modelBuilder);
+        horizontalAxisBlock(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get(), modelBuilder);
     }
 
     private <T extends ModelBuilder<T>> ModelBuilder<T>.ElementBuilder noCullTintedFace(

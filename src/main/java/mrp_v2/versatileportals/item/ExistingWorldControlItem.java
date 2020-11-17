@@ -15,7 +15,7 @@ public class ExistingWorldControlItem extends PortalControlItem
     public ExistingWorldControlItem()
     {
         //noinspection ConstantConditions
-        super(ID, (properties -> properties.group(null)));
+        super(properties -> properties.group(null));
     }
 
     public static int getColorDataFromItem(ItemStack stack)
@@ -26,7 +26,7 @@ public class ExistingWorldControlItem extends PortalControlItem
 
     public static ItemStack getItemForWorld(World world)
     {
-        ItemStack itemStack = new ItemStack(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM);
+        ItemStack itemStack = new ItemStack(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get());
         PortalControlItem.addTeleportDataToItem(itemStack, new ResourceLocation(Util.getWorldID(world)));
         ExistingWorldControlItem.addColorDataToItem(itemStack, getColorFromWorld(world));
         return itemStack;

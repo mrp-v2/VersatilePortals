@@ -51,11 +51,11 @@ import java.lang.reflect.Field;
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
-        if (blockState.isIn(ObjectHolder.PORTAL_FRAME_BLOCK) || blockState.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
+        if (blockState.isIn(ObjectHolder.PORTAL_FRAME_BLOCK.get()) || blockState.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
         {
             return PortalFrameUtil.getColor(world, pos);
         }
-        if (blockState.isIn(ObjectHolder.PORTAL_BLOCK))
+        if (blockState.isIn(ObjectHolder.PORTAL_BLOCK.get()))
         {
             return PortalBlock.getColor(blockState, world, pos);
         }

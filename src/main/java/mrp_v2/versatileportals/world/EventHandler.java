@@ -26,7 +26,8 @@ import java.util.function.Function;
 
 @EventBusSubscriber public class EventHandler
 {
-    public static final TranslationTextComponent noPortalController, noKey, worldDoesNotExist, teleported;
+    public static final TranslationTextComponent noPortalController, noKey, worldDoesNotExist, teleported,
+            noTeleportSelf;
     public static final Function<Object[], TranslationTextComponent> teleportingInFunction;
 
     static
@@ -43,6 +44,8 @@ import java.util.function.Function;
                 "There is no control item or it is invalid");
         worldDoesNotExist = EN_USTranslationGenerator.makeTextTranslation(stem + ".worldDoesNotExist",
                 "There is no world matching the control item");
+        noTeleportSelf = EN_USTranslationGenerator.makeTextTranslation(stem + ".noTeleportSelf",
+                "The control item must be for a different dimension");
     }
 
     @SubscribeEvent public static void worldTick(final WorldTickEvent event)
@@ -74,9 +77,8 @@ import java.util.function.Function;
                         if (world.getBlockState(pos).getBlock() instanceof PortalBlock)
                         {
                             if (entity.getBoundingBox()
-                                    .intersects(
-                                            ObjectHolder.PORTAL_BLOCK.getBoundingBox(world.getBlockState(pos), world,
-                                                    pos)))
+                                    .intersects(ObjectHolder.PORTAL_BLOCK.get()
+                                            .getBoundingBox(world.getBlockState(pos), world, pos)))
                             {
                                 collidingWithPortal = true;
                                 portalBlockPos = pos;
@@ -131,6 +133,14 @@ import java.util.function.Function;
                             if (entity instanceof ServerPlayerEntity)
                             {
                                 Util.sendMessage((ServerPlayerEntity) entity, worldDoesNotExist);
+                            }
+                            return;
+                        }
+                        if (world == destinationWorld)
+                        {
+                            if (entity instanceof ServerPlayerEntity)
+                            {
+                                Util.sendMessage((ServerPlayerEntity) entity, noTeleportSelf);
                             }
                             return;
                         }

@@ -15,9 +15,9 @@ public abstract class PortalControlItem extends BasicSingleItem
     public static final String WORLD_ID_NBT_ID = "WorldID";
     protected static final String ID = "control";
 
-    protected PortalControlItem(String id, Function<Properties, Properties> propertiesModifier)
+    protected PortalControlItem(Function<Properties, Properties> propertiesModifier)
     {
-        super(id, propertiesModifier);
+        super(propertiesModifier);
     }
 
     public static void addTeleportDataToItem(ItemStack stack, ResourceLocation worldID)

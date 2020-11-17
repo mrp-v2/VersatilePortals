@@ -33,18 +33,18 @@ public class PortalSize
             (state, reader, pos, side) ->
             {
                 Block block = state.getBlock();
-                if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK))
+                if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
                 {
                     return ((PortalControllerBlock) block).isSideValidForPortal(state, reader, pos, side);
                 } else
                 {
-                    return state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK);
+                    return state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK.get());
                 }
             };
     private static final Function<BlockState, Boolean> PORTAL_CONTROLLER_PREDICATE =
-            (state) -> state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK);
+            (state) -> state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
     private static final Function<BlockState, Boolean> PORTAL_PREDICATE =
-            (state) -> state.isIn(ObjectHolder.PORTAL_BLOCK);
+            (state) -> state.isIn(ObjectHolder.PORTAL_BLOCK.get());
     private final Direction.Axis axis;
     private final Direction rightDir;
     private int height;
@@ -185,7 +185,7 @@ public class PortalSize
     public void placePortalBlocks(IWorld world)
     {
         BlockState state =
-                ObjectHolder.PORTAL_BLOCK.getDefaultState().with(BlockStateProperties.HORIZONTAL_AXIS, this.axis);
+                ObjectHolder.PORTAL_BLOCK.get().getDefaultState().with(BlockStateProperties.HORIZONTAL_AXIS, this.axis);
         BlockPos.getAllInBoxMutable(this.bottomLeft,
                 this.bottomLeft.offset(Direction.UP, this.height - 1).offset(this.rightDir, this.width - 1))
                 .forEach((pos) -> world.setBlockState(pos, state, 18));
@@ -283,7 +283,7 @@ public class PortalSize
                 {
                     return i;
                 }
-                if (state.isIn(ObjectHolder.PORTAL_BLOCK))
+                if (state.isIn(ObjectHolder.PORTAL_BLOCK.get()))
                 {
                     this.portalBlockCount++;
                 }

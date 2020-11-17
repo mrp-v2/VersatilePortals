@@ -16,18 +16,17 @@ public class BasicSingleItem extends Item
     {
         @Override @OnlyIn(Dist.CLIENT) public ItemStack createIcon()
         {
-            return new ItemStack(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
+            return new ItemStack(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM.get());
         }
     };
 
-    public BasicSingleItem(String id)
+    public BasicSingleItem()
     {
-        this(id, (properties) -> properties);
+        this(properties -> properties);
     }
 
-    public BasicSingleItem(String id, Function<Properties, Properties> propertiesModifier)
+    public BasicSingleItem(Function<Properties, Properties> propertiesModifier)
     {
         super(propertiesModifier.apply(new Properties().maxStackSize(1).group(MAIN_ITEM_GROUP)));
-        this.setRegistryName(VersatilePortals.ID, id);
     }
 }

@@ -34,7 +34,7 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
     private void makePortalFrameRecipe(Consumer<IFinishedRecipe> consumer)
     {
         ConfigurableShapedRecipeBuilder recipeBuilder =
-                ConfigurableShapedRecipeBuilder.configurableShapedRecipe(ObjectHolder.PORTAL_FRAME_BLOCK);
+                ConfigurableShapedRecipeBuilder.configurableShapedRecipe(ObjectHolder.PORTAL_FRAME_BLOCK.get());
         recipeBuilder.patternLine("LLL");
         recipeBuilder.patternLine("LOL");
         recipeBuilder.patternLine("LLL");
@@ -52,15 +52,15 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
     private void makePortalControllerRecipe(Consumer<IFinishedRecipe> consumer)
     {
         ConfigurableShapedRecipeBuilder recipeBuilder =
-                ConfigurableShapedRecipeBuilder.configurableShapedRecipe(ObjectHolder.PORTAL_CONTROLLER_BLOCK);
+                ConfigurableShapedRecipeBuilder.configurableShapedRecipe(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
         recipeBuilder.patternLine("FBF");
         recipeBuilder.patternLine("BRB");
         recipeBuilder.patternLine("FEF");
-        recipeBuilder.key('F', ObjectHolder.PORTAL_FRAME_BLOCK);
+        recipeBuilder.key('F', ObjectHolder.PORTAL_FRAME_BLOCK.get());
         recipeBuilder.key('B', Tags.Items.BOOKSHELVES);
         recipeBuilder.key('R', Tags.Items.DUSTS_REDSTONE);
         recipeBuilder.key('E', Blocks.ENCHANTING_TABLE);
-        recipeBuilder.addCriterion("has_portal_frame", hasItem(ObjectHolder.PORTAL_FRAME_BLOCK));
+        recipeBuilder.addCriterion("has_portal_frame", hasItem(ObjectHolder.PORTAL_FRAME_BLOCK.get()));
         recipeBuilder.addOverride(HARDER_CRAFTING_ID)
                 .override(Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
                         Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE))
@@ -71,7 +71,7 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
     private void makeEmptyExistingWorldControlRecipe(Consumer<IFinishedRecipe> consumer)
     {
         ShapedRecipeBuilder recipeBuilder =
-                ShapedRecipeBuilder.shapedRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM);
+                ShapedRecipeBuilder.shapedRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
         recipeBuilder.patternLine(" L ");
         recipeBuilder.patternLine("KMS");
         recipeBuilder.patternLine(" R ");
@@ -80,16 +80,17 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
         recipeBuilder.key('M', Items.MAP);
         recipeBuilder.key('S', Items.COMPASS);
         recipeBuilder.key('R', Tags.Items.DUSTS_REDSTONE);
-        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK));
+        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
         recipeBuilder.build(consumer);
     }
 
     private void makePortalLighterRecipe(Consumer<IFinishedRecipe> consumer)
     {
-        ShapelessRecipeBuilder recipeBuilder = ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.PORTAL_LIGHTER_ITEM);
+        ShapelessRecipeBuilder recipeBuilder =
+                ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.PORTAL_LIGHTER_ITEM.get());
         recipeBuilder.addIngredient(Items.FLINT_AND_STEEL);
         recipeBuilder.addIngredient(Tags.Items.GEMS_LAPIS);
-        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK));
+        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
         recipeBuilder.build(consumer);
     }
 }

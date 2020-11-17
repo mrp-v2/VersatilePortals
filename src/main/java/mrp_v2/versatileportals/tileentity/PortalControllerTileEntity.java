@@ -37,7 +37,7 @@ import javax.annotation.Nullable;
 public class PortalControllerTileEntity extends TileEntity
         implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity, INameable
 {
-    public static final String ID = "portal_controller";
+    public static final String ID = PortalControllerBlock.ID;
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
     public static final int TICKS_PER_RENDER_REVOLUTION = 120;
@@ -51,16 +51,13 @@ public class PortalControllerTileEntity extends TileEntity
     public static TileEntityType<PortalControllerTileEntity> createTileEntity()
     {
         //noinspection ConstantConditions
-        TileEntityType<PortalControllerTileEntity> tileEntityType =
-                TileEntityType.Builder.create(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK)
-                        .build(null);
-        tileEntityType.setRegistryName(VersatilePortals.ID, ID);
-        return tileEntityType;
+        return TileEntityType.Builder.create(PortalControllerTileEntity::new,
+                ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()).build(null);
     }
 
     public PortalControllerTileEntity()
     {
-        super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE);
+        super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE.get());
         this.inventory = new PortalControllerItemStackHandler(this);
         this.inventoryLazyOptional = LazyOptional.of(() -> this.inventory);
         this.portalColor = DEFAULT_PORTAL_COLOR;
@@ -97,7 +94,7 @@ public class PortalControllerTileEntity extends TileEntity
 
     public ITextComponent getDefaultName()
     {
-        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.getTranslationKey());
+        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getTranslationKey());
     }
 
     @Override public Container createMenu(int id, PlayerInventory playerInventoryIn, PlayerEntity playerIn)

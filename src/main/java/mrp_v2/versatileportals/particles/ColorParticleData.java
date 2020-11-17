@@ -4,7 +4,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mrp_v2.versatileportals.VersatilePortals;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
@@ -23,7 +22,7 @@ public abstract class ColorParticleData implements IParticleData
     }
 
     protected static <T extends ColorParticleData> ParticleType<T> createParticleType(Supplier<Codec<T>> codecSupplier,
-            IDeserializer<T> deserializerSupplier, String id)
+            IDeserializer<T> deserializerSupplier)
     {
         ParticleType<T> particleType = new ParticleType<T>(false, deserializerSupplier)
         {
@@ -32,7 +31,6 @@ public abstract class ColorParticleData implements IParticleData
                 return codecSupplier.get();
             }
         };
-        particleType.setRegistryName(VersatilePortals.ID, id);
         return particleType;
     }
 

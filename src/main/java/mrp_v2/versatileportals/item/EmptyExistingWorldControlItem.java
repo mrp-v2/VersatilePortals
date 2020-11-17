@@ -12,7 +12,7 @@ public class EmptyExistingWorldControlItem extends BasicSingleItem
 
     public EmptyExistingWorldControlItem()
     {
-        super(ID);
+        super();
     }
 
     @Override public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)

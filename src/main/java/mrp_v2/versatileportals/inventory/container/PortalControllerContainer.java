@@ -1,7 +1,5 @@
 package mrp_v2.versatileportals.inventory.container;
 
-import mrp_v2.versatileportals.VersatilePortals;
-import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
@@ -39,7 +37,7 @@ public class PortalControllerContainer extends Container
     public PortalControllerContainer(int id, PlayerInventory playerInventoryIn,
             PortalControllerItemStackHandler inventoryIn, int color, BlockPos pos)
     {
-        super(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE, id);
+        super(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), id);
         this.inventory = inventoryIn;
         this.color = color;
         this.pos = pos;
@@ -113,7 +111,6 @@ public class PortalControllerContainer extends Container
         public Type()
         {
             super(Type::factory);
-            this.setRegistryName(VersatilePortals.ID, PortalControllerBlock.ID);
         }
 
         private static PortalControllerContainer factory(int windowId, PlayerInventory playerInv)
