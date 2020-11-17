@@ -1,7 +1,9 @@
 package mrp_v2.versatileportals.common.capabilities;
 
+import mrp_v2.versatileportals.VersatilePortals;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
@@ -10,9 +12,6 @@ import javax.annotation.Nullable;
 
 public class PortalDataStorage implements IStorage<IPortalDataCapability>
 {
-    private static final String REMAINING_PORTAL_COOLDOWN_NBT_ID = "PortalCooldown";
-    private static final String IN_PORTAL_TIME_NBT_ID = "InPortalTime";
-
     @Override
     public INBT writeNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
             @Nullable Direction side)
@@ -20,24 +19,28 @@ public class PortalDataStorage implements IStorage<IPortalDataCapability>
         return write(instance);
     }
 
-    public static CompoundNBT write(IPortalDataCapability instance)
+    public static INBT write(IPortalDataCapability instance)
     {
-        CompoundNBT compound = new CompoundNBT();
-        compound.putInt(REMAINING_PORTAL_COOLDOWN_NBT_ID, instance.getRemainingPortalCooldown());
-        compound.putInt(IN_PORTAL_TIME_NBT_ID, instance.getInPortalTime());
-        return compound;
+        return IPortalDataCapability.CODEC.encodeStart(NBTDynamicOps.INSTANCE, instance)
+                .resultOrPartial(VersatilePortals.LOGGER::error)
+                .orElse(new CompoundNBT());
     }
 
     @Override
     public void readNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
             @Nullable Direction side, INBT nbt)
     {
-        read(instance, (CompoundNBT) nbt);
+        read(instance, nbt);
     }
 
-    public static void read(IPortalDataCapability instance, CompoundNBT compound)
+    public static void read(IPortalDataCapability instance, INBT compound)
     {
-        instance.setRemainingPortalCooldown(compound.getInt(REMAINING_PORTAL_COOLDOWN_NBT_ID));
-        instance.setInPortalTime(compound.getInt(IN_PORTAL_TIME_NBT_ID));
+        IPortalDataCapability.CODEC.parse(NBTDynamicOps.INSTANCE, compound)
+                .resultOrPartial(VersatilePortals.LOGGER::error)
+                .ifPresent(data ->
+                {
+                    instance.setRemainingPortalCooldown(data.getRemainingPortalCooldown());
+                    instance.setInPortalTime(data.getInPortalTime());
+                });
     }
 }

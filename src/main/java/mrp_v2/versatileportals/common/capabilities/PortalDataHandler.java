@@ -7,8 +7,13 @@ public class PortalDataHandler implements IPortalDataCapability
 
     public PortalDataHandler()
     {
-        this.remainingPortalCooldown = 0;
-        this.inPortalTime = 0;
+        this(0, 0);
+    }
+
+    public PortalDataHandler(int remainingPortalCooldown, int inPortalTime)
+    {
+        this.remainingPortalCooldown = remainingPortalCooldown;
+        this.inPortalTime = inPortalTime;
     }
 
     @Override public void decrementRemainingPortalCooldown()
