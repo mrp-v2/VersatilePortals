@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 buildscript {
     repositories {
         maven {
@@ -12,21 +14,34 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+def forgeVersions = new File('build/tmp/forge-versions.json')
+new URL('https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json').
+        withInputStream { stream ->
+            forgeVersions.withOutputStream {
+                it << stream
+            }
+        }
+if (forgeVersion == "latest" || forgeVersion == "recommended")
+{
+    forgeVersion = new JsonSlurper().parseText(forgeVersions.text).get("promos").get(mcVersion + "-" + forgeVersion)
+    assert forgeVersion != null
+}
 def capitalizedModId = modDisplayName.replace(' ', '')
 def modId = capitalizedModId.toLowerCase()
-def forgeVersion = "${forgeMajor}.${forgeMinor}.${forgePatch}"
+def forgeMajor = forgeVersion.split("\\.")[0]
 def mcNextVersion = "1." + ((mcVersion.split("\\.")[1] as int) + 1)
 def homepageURL = "https://www.curseforge.com/minecraft/mc-mods/${modDisplayName.replace(' ', '-').toLowerCase()}"
 def issuesURL = "${homepageURL}/issues"
 def updateURL = "https://raw.githubusercontent.com/mrp-v2/${capitalizedModId}/master/update.json"
 def crlNextAPI = crlAPI.split("\\.")[0] + "." + ((crlAPI.split("\\.")[1] as int) + 1)
 def dglNextAPI = dglAPI.split("\\.")[0] + "." + ((dglAPI.split("\\.")[1] as int) + 1)
-version = "${mcVersion}-${modMajorMod}.${modMajorAPI}.${modMinor}.${modPatch}"
 archivesBaseName = modId
 group = "${author}.${archivesBaseName}"
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' +
         System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println('Minecraft: ' + mcVersion + ' Forge: ' + forgeVersion + ' Mappings: ' + mappingsChannel + '-' +
+        mappingsVersion + ' Mod: ' + version)
 
 sourceSets {
     main {
@@ -103,8 +118,6 @@ processResources {
     inputs.property 'version', project.version
     inputs.property 'modId', modId
     inputs.property 'forgeMajor', forgeMajor
-    inputs.property 'forgeMinor', forgeMinor
-    inputs.property 'forgePatch', forgePatch
     inputs.property 'mcVersion', mcVersion
     inputs.property 'mcNextVersion', mcNextVersion
     inputs.property 'homepageURL', homepageURL
@@ -121,11 +134,11 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include '**/*'
         exclude '**/*.png'
-        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'forgeMinor': forgeMinor,
-                'forgePatch': forgePatch, 'mcVersion': mcVersion, 'mcNextVersion': mcNextVersion, 'homepageURL': homepageURL,
-                'modDisplayName': modDisplayName, 'capitalizedModId': capitalizedModId,
-                'modDescription': modDescription, 'author': author, 'updateURL': updateURL, 'issuesURL': issuesURL,
-                'crlAPI': crlAPI, 'crlNextAPI': crlNextAPI, 'dglAPI': dglAPI, 'dglNextAPI': dglNextAPI
+        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
+                'mcNextVersion': mcNextVersion, 'homepageURL': homepageURL, 'modDisplayName': modDisplayName,
+                'capitalizedModId': capitalizedModId, 'modDescription': modDescription, 'author': author,
+                'updateURL': updateURL, 'issuesURL': issuesURL, 'crlAPI': crlAPI, 'crlNextAPI': crlNextAPI,
+                'dglAPI': dglAPI, 'dglNextAPI': dglNextAPI
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*'
