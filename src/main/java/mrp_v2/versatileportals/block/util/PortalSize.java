@@ -308,6 +308,10 @@ public class PortalSize
 
     @Nullable private BlockPos getBottomLeft(BlockPos pos, IWorld world)
     {
+        if (!canConnect(world.getBlockState(pos)))
+        {
+            return null;
+        }
         for (int i = Math.max(0, pos.getY() - MAX_HEIGHT);
              pos.getY() > i && canConnect(world.getBlockState(pos.down()));
              pos = pos.down())

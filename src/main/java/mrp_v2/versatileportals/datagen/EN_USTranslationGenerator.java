@@ -43,6 +43,7 @@ public class EN_USTranslationGenerator extends TranslationGenerator
         add(ObjectHolder.PORTAL_FRAME_BLOCK.get(), "Portal Frame");
         add(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get(), "Portal Controller");
         add(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get(), "Empty Existing World Control");
+        add(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get(), "Existing World Control");
         add(ObjectHolder.PORTAL_LIGHTER_ITEM.get(), "Portal Lighter");
         add(BasicSingleItem.MAIN_ITEM_GROUP, VersatilePortals.DISPLAY_NAME);
         PortalControllerScreen.staticInit();

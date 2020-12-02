@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "versatileportals:existing_world_control"
+    }
+  ],
+  "result": {
+    "item": "versatileportals:empty_existing_world_control"
+  }
+}

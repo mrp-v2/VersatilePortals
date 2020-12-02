@@ -6,10 +6,10 @@ import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
@@ -70,18 +70,21 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
 
     private void makeEmptyExistingWorldControlRecipe(Consumer<IFinishedRecipe> consumer)
     {
-        ShapedRecipeBuilder recipeBuilder =
-                ShapedRecipeBuilder.shapedRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
-        recipeBuilder.patternLine(" L ");
-        recipeBuilder.patternLine("KMS");
-        recipeBuilder.patternLine(" R ");
-        recipeBuilder.key('L', Ingredient.fromTag(Tags.Items.GEMS_LAPIS));
-        recipeBuilder.key('K', Items.CLOCK);
-        recipeBuilder.key('M', Items.MAP);
-        recipeBuilder.key('S', Items.COMPASS);
-        recipeBuilder.key('R', Tags.Items.DUSTS_REDSTONE);
+        // normal recipe
+        ShapelessRecipeBuilder recipeBuilder =
+                ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.addIngredient(Ingredient.fromTag(Tags.Items.GEMS_LAPIS));
+        recipeBuilder.addIngredient(Items.CLOCK);
+        recipeBuilder.addIngredient(Items.MAP);
+        recipeBuilder.addIngredient(Items.COMPASS);
+        recipeBuilder.addIngredient(Tags.Items.DUSTS_REDSTONE);
         recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
         recipeBuilder.build(consumer);
+        // recipe from existing world control
+        recipeBuilder = ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.addIngredient(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
+        recipeBuilder.build(consumer, new ResourceLocation(VersatilePortals.ID, "empty_control_from_existing"));
     }
 
     private void makePortalLighterRecipe(Consumer<IFinishedRecipe> consumer)

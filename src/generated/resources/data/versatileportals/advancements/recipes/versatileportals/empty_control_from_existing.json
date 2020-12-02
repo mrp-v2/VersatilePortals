@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "versatileportals:empty_control_from_existing"
+    ]
+  },
+  "criteria": {
+    "has_portal_controller": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "versatileportals:portal_controller"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "versatileportals:empty_control_from_existing"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_portal_controller",
+      "has_the_recipe"
+    ]
+  ]
+}

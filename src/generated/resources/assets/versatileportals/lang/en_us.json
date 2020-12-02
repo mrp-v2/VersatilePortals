@@ -13,6 +13,7 @@
   "block.versatileportals.portal_controller.message.teleportingIn": "Teleporting in %s...",
   "block.versatileportals.portal_frame": "Portal Frame",
   "item.versatileportals.empty_existing_world_control": "Empty Existing World Control",
+  "item.versatileportals.existing_world_control": "Existing World Control",
   "item.versatileportals.portal_lighter": "Portal Lighter",
   "itemGroup.versatileportals": "Versatile Portals"
 }
