@@ -18,6 +18,7 @@ apply plugin: 'net.minecraftforge.gradle'
 String mcVersion = version.split('-')[0]
 if (forgeVersion == 'latest' || forgeVersion == 'recommended')
 {
+    println 'Grabbing ' + forgeVersion + ' forge version for MC ' + mcVersion
     forgeVersion = new JsonSlurper().
             parse(new URL('https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json')).
             get('promos').get(mcVersion + '-' + forgeVersion)
@@ -160,23 +161,25 @@ task regenerateUpdateJson {
     doLast {
         String updateJsonLocation = './update.json'
         println 'Regenerating update.json from version: ' + version
-        JsonObject updateJson = new JsonObject()
-        updateJson.addProperty('homepage', homepageURL)
+        JsonObject newUpdateJson = new JsonObject()
+        newUpdateJson.addProperty('homepage', homepageURL)
         JsonObject promos = new JsonObject()
-        updateJson.add('promos', promos)
+        newUpdateJson.add('promos', promos)
         JsonObject oldUpdateJson = new JsonParser().
                 parse(new File(updateJsonLocation).text).getAsJsonObject().
                 getAsJsonObject('promos')
         for (Map.Entry<String, JsonElement> entry : oldUpdateJson.entrySet())
         {
-            if (entry.key.contains(mcVersion) || !entry.key.contains('-'))
-            {
-                promos.addProperty(entry.key, (String)version)
-                continue
-            }
             promos.addProperty(entry.key, entry.value.asString)
         }
-        String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(updateJson)
+        promos.addProperty("${mcVersion}-recommended", (String) version)
+        promos.addProperty("${mcVersion}-latest", (String) version)
+        if (mcVersion == new JsonSlurper().parse(new File('../secrets.json')).get('latest-mc-version'))
+        {
+            promos.addProperty("recommended", (String) version)
+            promos.addProperty("latest", (String) version)
+        }
+        String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(newUpdateJson)
         new File(updateJsonLocation).text = jsonString
     }
 }
