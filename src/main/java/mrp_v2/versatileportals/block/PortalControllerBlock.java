@@ -35,16 +35,16 @@ public class PortalControllerBlock extends PortalFrameBlock
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     private static final VoxelShape BASE_SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D),
             makeCuboidShape(0.0D, 13.0D, 0.0D, 16.0D, 16.0D, 16.0D));
-    private static final VoxelShape SHAPE_NS =
-            VoxelShapes.or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 3.0D, 13.0, 16.0D),
+    private static final VoxelShape SHAPE_NS = VoxelShapes
+            .or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 3.0D, 13.0, 16.0D),
                     makeCuboidShape(13.0D, 3.0D, 0.0D, 16.0D, 13.0D, 16.0D)).simplify();
-    private static final VoxelShape SHAPE_EW =
-            VoxelShapes.or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 16.0D, 13.0D, 3.0D),
+    private static final VoxelShape SHAPE_EW = VoxelShapes
+            .or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 16.0D, 13.0D, 3.0D),
                     makeCuboidShape(0.0D, 3.0D, 13.0D, 16.0D, 13.0D, 16.0D)).simplify();
 
     public PortalControllerBlock()
     {
-        super(ID, Properties::notSolid);
+        super(Properties::notSolid);
         this.setDefaultState(this.stateContainer.getBaseState().with(AXIS, Direction.Axis.X));
     }
 
@@ -79,8 +79,7 @@ public class PortalControllerBlock extends PortalFrameBlock
     {
         if (state.hasTileEntity() && (state.getBlock() != newState.getBlock() || !newState.hasTileEntity()))
         {
-            worldIn.getTileEntity(pos)
-                    .getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            worldIn.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                     .ifPresent(itemHandler ->
                     {
                         for (int i = 0; i < itemHandler.getSlots(); i++)
@@ -138,8 +137,7 @@ public class PortalControllerBlock extends PortalFrameBlock
         return this.getDefaultState().with(AXIS, context.getPlacementHorizontalFacing().getAxis());
     }
 
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+    @Override public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
             ItemStack stack)
     {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);

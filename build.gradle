@@ -31,8 +31,7 @@ String mcNextVersion = '1.' + ((mcVersion.split('\\.')[1] as int) + 1)
 String homepageURL = "https://www.curseforge.com/minecraft/mc-mods/${modDisplayName.replace(' ', '-').toLowerCase()}"
 String issuesURL = "${homepageURL}/issues"
 String updateURL = "https://raw.githubusercontent.com/mrp-v2/${capitalizedModId}/master/update.json"
-String crlNextAPI = crlAPI.split('\\.')[0] + '.' + ((crlAPI.split('\\.')[1] as int) + 1)
-String dglNextAPI = dglAPI.split('\\.')[0] + '.' + ((dglAPI.split('\\.')[1] as int) + 1)
+String mrplibNextAPI = mrplibAPI.split('\\.')[0] + '.' + ((mrplibAPI.split('\\.')[1] as int) + 1)
 archivesBaseName = modId
 group = "${author}.${archivesBaseName}"
 
@@ -89,16 +88,8 @@ minecraft {
 
 repositories {
     maven {
-        name = 'Configurable Recipes Library'
-        url = new URL('https://maven.pkg.github.com/mrp-v2/ConfigurableRecipesLibrary')
-        credentials {
-            username = 'mrp-v2'
-            password = new JsonSlurper().parse(new File('../secrets.json')).get('github-packages-token')
-        }
-    }
-    maven {
-        name = 'mrp_v2 DataGen Library'
-        url = new URL('https://maven.pkg.github.com/mrp-v2/mrp_v2DataGenLibrary')
+        name = 'mrp Library'
+        url = new URL('https://maven.pkg.github.com/mrp-v2/mrpLibrary')
         credentials {
             username = 'mrp-v2'
             password = new JsonSlurper().parse(new File('../secrets.json')).get('github-packages-token')
@@ -108,8 +99,7 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
-    compile fg.deobf("mrp_v2.configurablerecipeslibrary-forge:configurablerecipeslibrary:${mcVersion}-${crlAPI}.${crlPatch}")
-    compile fg.deobf("mrp_v2.mrp_v2datagenlibrary-forge:mrp_v2datagenlibrary:${mcVersion}-${dglAPI}.${dglPatch}")
+    compile fg.deobf("mrp_v2.mrplibrary:mrplibrary:${mcVersion}-${mrplibAPI}.${mrplibPatch}-forge")
 }
 
 jar {
@@ -139,18 +129,15 @@ processResources {
     inputs.property 'author', author
     inputs.property 'updateURL', updateURL
     inputs.property 'issuesURL', issuesURL
-    inputs.property 'crlAPI', crlAPI
-    inputs.property 'crlNextAPI', crlNextAPI
-    inputs.property 'dglAPI', dglAPI
-    inputs.property 'dglNextAPI', dglNextAPI
+    inputs.property 'mrplibAPI', mrplibAPI
+    inputs.property 'mrplibNextAPI', mrplibNextAPI
     from(sourceSets.main.resources.srcDirs) {
         include '**/*'
         exclude '**/*.png'
         expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
                 'mcNextVersion': mcNextVersion, 'homepageURL': homepageURL, 'modDisplayName': modDisplayName,
                 'capitalizedModId': capitalizedModId, 'modDescription': modDescription, 'author': author,
-                'updateURL': updateURL, 'issuesURL': issuesURL, 'crlAPI': crlAPI, 'crlNextAPI': crlNextAPI,
-                'dglAPI': dglAPI, 'dglNextAPI': dglNextAPI
+                'updateURL': updateURL, 'issuesURL': issuesURL, 'mrplibAPI': mrplibAPI, 'mrplibNextAPI': mrplibNextAPI
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*'

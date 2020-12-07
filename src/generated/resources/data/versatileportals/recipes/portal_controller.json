@@ -1,17 +1,15 @@
 {
-  "type": "configurablerecipeslibrary:crafting_shaped_configurable",
-  "pattern": [
-    "FBF",
-    "BRB",
-    "FEF"
-  ],
-  "key": {
-    "F": {
-      "item": "versatileportals:portal_frame"
-    },
-    "B": {
-      "tag": "forge:bookshelves"
-    },
+    "type": "mrplibrary:crafting_shaped_configurable",
+    "pattern": [
+        "FBF", "BRB", "FEF"
+    ],
+    "key": {
+        "F": {
+            "item": "versatileportals:portal_frame"
+        },
+        "B": {
+            "tag": "forge:bookshelves"
+        },
     "R": {
       "tag": "forge:dusts/redstone"
     },

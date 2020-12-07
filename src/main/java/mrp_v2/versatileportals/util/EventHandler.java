@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.util;
 
-import mrp_v2.configurablerecipeslibrary.item.crafting.ConfigurableCraftingRecipe;
+import mrp_v2.mrplibrary.item.crafting.ConfigurableCraftingRecipe;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.config.ServerConfig;
 import mrp_v2.versatileportals.datagen.RecipeGenerator;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 {
     @SubscribeEvent public static void setup(FMLCommonSetupEvent event)
     {
-        ConfigurableCraftingRecipe.addConditionMapping(RecipeGenerator.HARDER_CRAFTING_ID,
-                ServerConfig.SERVER.harderCrafting::get);
+        ConfigurableCraftingRecipe
+                .addConditionMapping(RecipeGenerator.HARDER_CRAFTING_ID, ServerConfig.SERVER.harderCrafting::get);
     }
 }

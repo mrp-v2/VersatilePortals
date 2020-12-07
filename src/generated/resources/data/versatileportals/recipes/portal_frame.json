@@ -1,17 +1,15 @@
 {
-  "type": "configurablerecipeslibrary:crafting_shaped_configurable",
-  "pattern": [
-    "LLL",
-    "LOL",
-    "LLL"
-  ],
-  "key": {
-    "L": {
-      "tag": "forge:gems/lapis"
-    },
-    "O": {
-      "tag": "forge:obsidian"
-    }
+    "type": "mrplibrary:crafting_shaped_configurable",
+    "pattern": [
+        "LLL", "LOL", "LLL"
+    ],
+    "key": {
+        "L": {
+            "tag": "forge:gems/lapis"
+        },
+        "O": {
+            "tag": "forge:obsidian"
+        }
   },
   "result": {
     "item": "versatileportals:portal_frame"

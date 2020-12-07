@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.datagen;
 
-import mrp_v2.mrp_v2datagenlibrary.datagen.DataGeneratorHelper;
+import mrp_v2.mrplibrary.datagen.DataGeneratorHelper;
 import mrp_v2.versatileportals.VersatilePortals;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

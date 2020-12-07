@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.datagen;
 
-import mrp_v2.configurablerecipeslibrary.datagen.ConfigurableShapedRecipeBuilder;
+import mrp_v2.mrplibrary.datagen.ConfigurableShapedRecipeBuilder;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.Blocks;
@@ -14,7 +14,7 @@ import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
 
-public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeGenerator
+public class RecipeGenerator extends mrp_v2.mrplibrary.datagen.RecipeProvider
 {
     public static final String HARDER_CRAFTING_ID = VersatilePortals.ID + ":harder_crafting";
 
@@ -42,10 +42,8 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
         recipeBuilder.key('O', Tags.Items.OBSIDIAN);
         recipeBuilder.addCriterion("has_obsidian", hasItem(Tags.Items.OBSIDIAN));
         recipeBuilder.addCriterion("has_lapis", hasItem(Tags.Items.GEMS_LAPIS));
-        recipeBuilder.addOverride(HARDER_CRAFTING_ID)
-                .override(Ingredient.fromTag(Tags.Items.GEMS_LAPIS),
-                        Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS))
-                .end();
+        recipeBuilder.addOverride(HARDER_CRAFTING_ID).override(Ingredient.fromTag(Tags.Items.GEMS_LAPIS),
+                Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_LAPIS)).end();
         recipeBuilder.build(consumer);
     }
 
@@ -61,10 +59,8 @@ public class RecipeGenerator extends mrp_v2.mrp_v2datagenlibrary.datagen.RecipeG
         recipeBuilder.key('R', Tags.Items.DUSTS_REDSTONE);
         recipeBuilder.key('E', Blocks.ENCHANTING_TABLE);
         recipeBuilder.addCriterion("has_portal_frame", hasItem(ObjectHolder.PORTAL_FRAME_BLOCK.get()));
-        recipeBuilder.addOverride(HARDER_CRAFTING_ID)
-                .override(Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
-                        Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE))
-                .end();
+        recipeBuilder.addOverride(HARDER_CRAFTING_ID).override(Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+                Ingredient.fromTag(Tags.Items.STORAGE_BLOCKS_REDSTONE)).end();
         recipeBuilder.build(consumer);
     }
 

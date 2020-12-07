@@ -1,13 +1,12 @@
 package mrp_v2.versatileportals.block;
 
+import mrp_v2.mrplibrary.mixininterfaces.IAdjustableAbstractBlockProperties;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -27,22 +26,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.Random;
 import java.util.function.Function;
 
-public class PortalBlock extends BasicBlock
+public class PortalBlock extends Block
 {
     public static final String ID = "portal";
 
     public PortalBlock()
     {
-        this(ID, (properties) -> properties);
+        this((properties) -> properties);
     }
 
-    protected PortalBlock(String id, Function<Properties, Properties> propertiesModifier)
+    protected PortalBlock(Function<Properties, Properties> propertiesModifier)
     {
-        super(id, propertiesModifier.apply(Properties.create(Material.PORTAL)
-                .doesNotBlockMovement()
-                .hardnessAndResistance(-1.0F)
-                .sound(SoundType.GLASS)
-                .setLightLevel((i) -> 11)));
+        super(propertiesModifier.apply(((IAdjustableAbstractBlockProperties) Properties.from(Blocks.NETHER_PORTAL))
+                .setTicksRandomly(false)));
         this.setDefaultState(
                 this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
     }
@@ -54,10 +50,8 @@ public class PortalBlock extends BasicBlock
         Direction.Axis updateAxis = facing.getAxis();
         Direction.Axis thisAxis = stateIn.get(BlockStateProperties.HORIZONTAL_AXIS);
         boolean isUpdateFromOtherAxis = thisAxis != updateAxis && updateAxis.isHorizontal();
-        return !isUpdateFromOtherAxis &&
-                !facingState.isIn(this) &&
-                !(new PortalSize(worldIn, currentPos, thisAxis)).validate() ?
-                Blocks.AIR.getDefaultState() :
+        return !isUpdateFromOtherAxis && !facingState.isIn(this) &&
+                !(new PortalSize(worldIn, currentPos, thisAxis)).validate() ? Blocks.AIR.getDefaultState() :
                 super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
 

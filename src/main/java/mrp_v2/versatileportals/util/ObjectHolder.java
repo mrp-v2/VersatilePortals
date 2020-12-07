@@ -14,12 +14,17 @@ import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.village.PortalPointOfInterestType;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.village.PointOfInterestType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -47,6 +52,13 @@ import net.minecraftforge.registries.ForgeRegistries;
     public static final RegistryObject<PortalControllerBlock> PORTAL_CONTROLLER_BLOCK;
     public static final RegistryObject<PortalFrameBlock> PORTAL_FRAME_BLOCK;
     public static final RegistryObject<BlockItem> PORTAL_CONTROLLER_BLOCK_ITEM;
+    public static final ItemGroup MAIN_ITEM_GROUP = new ItemGroup(VersatilePortals.ID)
+    {
+        @Override @OnlyIn(Dist.CLIENT) public ItemStack createIcon()
+        {
+            return new ItemStack(PORTAL_CONTROLLER_BLOCK_ITEM.get());
+        }
+    };
     public static final RegistryObject<BlockItem> PORTAL_FRAME_BLOCK_ITEM;
     public static final RegistryObject<PortalLighter> PORTAL_LIGHTER_ITEM;
     public static final RegistryObject<EmptyExistingWorldControlItem> EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
@@ -64,8 +76,8 @@ import net.minecraftforge.registries.ForgeRegistries;
         PORTAL_CONTROLLER_BLOCK = BLOCKS.register(PortalControllerBlock.ID, PortalControllerBlock::new);
         PORTAL_FRAME_BLOCK = BLOCKS.register(PortalFrameBlock.ID, PortalFrameBlock::new);
         PORTAL_CONTROLLER_BLOCK_ITEM =
-                ITEMS.register(PortalControllerBlock.ID, () -> PORTAL_CONTROLLER_BLOCK.get().createBlockItem());
-        PORTAL_FRAME_BLOCK_ITEM = ITEMS.register(PortalFrameBlock.ID, () -> PORTAL_FRAME_BLOCK.get().createBlockItem());
+                ITEMS.register(PortalControllerBlock.ID, () -> createBlockItem(PORTAL_CONTROLLER_BLOCK.get()));
+        PORTAL_FRAME_BLOCK_ITEM = ITEMS.register(PortalFrameBlock.ID, () -> createBlockItem(PORTAL_FRAME_BLOCK.get()));
         PORTAL_LIGHTER_ITEM = ITEMS.register(PortalLighter.ID, PortalLighter::new);
         EMPTY_EXISTING_WORLD_TELEPORT_ITEM =
                 ITEMS.register(EmptyExistingWorldControlItem.ID, EmptyExistingWorldControlItem::new);
@@ -95,5 +107,13 @@ import net.minecraftforge.registries.ForgeRegistries;
     public static void registerPOIs(RegistryEvent.Register<PointOfInterestType> event)
     {
         PORTAL_POINT_OF_INTEREST_TYPE.get().register();
+    }
+
+    public static BlockItem createBlockItem(Block block)
+    {
+        BlockState defaultState = block.getDefaultState();
+        return new BlockItem(block, new Item.Properties()
+                .addToolType(block.getHarvestTool(defaultState), block.getHarvestLevel(defaultState))
+                .group(MAIN_ITEM_GROUP));
     }
 }

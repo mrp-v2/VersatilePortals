@@ -1,30 +1,29 @@
 package mrp_v2.versatileportals.block;
 
+import mrp_v2.mrplibrary.mixininterfaces.IAdjustableAbstractBlockProperties;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.function.Function;
 
-public class PortalFrameBlock extends BasicBlock
+public class PortalFrameBlock extends Block
 {
     public static final String ID = "portal_frame";
 
     public PortalFrameBlock()
     {
-        this(ID);
+        this((properties) -> properties);
     }
 
-    protected PortalFrameBlock(String id)
+    protected PortalFrameBlock(Function<Properties, Properties> propertiesModifier)
     {
-        this(id, (properties) -> properties);
-    }
-
-    protected PortalFrameBlock(String id, Function<Properties, Properties> propertiesModifier)
-    {
-        super(id, propertiesModifier.apply(Properties.from(Blocks.LAPIS_BLOCK)));
+        super(propertiesModifier.apply(((IAdjustableAbstractBlockProperties) Properties.from(Blocks.LAPIS_BLOCK))
+                .setMaterialColor(MaterialColor.LIGHT_GRAY)));
     }
 
     /**
