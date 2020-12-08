@@ -4,16 +4,17 @@ import mrp_v2.mrplibrary.mixininterfaces.IAdjustableAbstractBlockProperties;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.util.Util;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -81,9 +82,12 @@ public class PortalBlock extends Block
         return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
     }
 
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader worldIn, BlockPos pos)
+    @Override public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn)
     {
-        return getShape(state, worldIn, pos, ISelectionContext.dummy()).toBoundingBoxList().get(0).offset(pos);
+        if (!entityIn.isPassenger() && !entityIn.isBeingRidden() && entityIn.isNonBoss())
+        {
+            Util.getPortalData(entityIn).setPortal(pos);
+        }
     }
 
     @Override @OnlyIn(Dist.CLIENT) public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand)

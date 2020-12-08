@@ -12,8 +12,7 @@ import javax.annotation.Nullable;
 
 public class PortalDataStorage implements IStorage<IPortalDataCapability>
 {
-    @Override
-    public INBT writeNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
+    @Override public INBT writeNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
             @Nullable Direction side)
     {
         return write(instance);
@@ -22,12 +21,10 @@ public class PortalDataStorage implements IStorage<IPortalDataCapability>
     public static INBT write(IPortalDataCapability instance)
     {
         return IPortalDataCapability.CODEC.encodeStart(NBTDynamicOps.INSTANCE, instance)
-                .resultOrPartial(VersatilePortals.LOGGER::error)
-                .orElse(new CompoundNBT());
+                .resultOrPartial(VersatilePortals.LOGGER::error).orElse(new CompoundNBT());
     }
 
-    @Override
-    public void readNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
+    @Override public void readNBT(Capability<IPortalDataCapability> capability, IPortalDataCapability instance,
             @Nullable Direction side, INBT nbt)
     {
         read(instance, nbt);
@@ -36,11 +33,12 @@ public class PortalDataStorage implements IStorage<IPortalDataCapability>
     public static void read(IPortalDataCapability instance, INBT compound)
     {
         IPortalDataCapability.CODEC.parse(NBTDynamicOps.INSTANCE, compound)
-                .resultOrPartial(VersatilePortals.LOGGER::error)
-                .ifPresent(data ->
-                {
-                    instance.setRemainingPortalCooldown(data.getRemainingPortalCooldown());
-                    instance.setInPortalTime(data.getInPortalTime());
-                });
+                .resultOrPartial(VersatilePortals.LOGGER::error).ifPresent(data ->
+        {
+            instance.setRemainingPortalCooldown(data.getRemainingPortalCooldown());
+            instance.setInPortalTime(data.getInPortalTime());
+            instance.setInPortal(data.getInPortal());
+            instance.setPortalPos(data.getPortalPos());
+        });
     }
 }
