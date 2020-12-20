@@ -17,6 +17,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'maven-publish'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 String mcVersion = version.split('-')[0]
 if (forgeVersion == 'latest' || forgeVersion == 'recommended')
@@ -152,6 +153,25 @@ processResources {
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*'
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/mrp-v2/' + capitalizedModId)
+            credentials {
+                username = 'mrp-v2'
+                password = System.getenv('GITHUB_TOKEN')
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            artifactId modId
+            artifact jar
+        }
     }
 }
 
