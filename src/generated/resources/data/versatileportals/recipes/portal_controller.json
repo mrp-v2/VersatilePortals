@@ -1,24 +1,26 @@
 {
-    "type": "mrplibrary:crafting_shaped_configurable",
-    "pattern": [
-        "FBF", "BRB", "FEF"
-    ],
-    "key": {
-        "F": {
-            "item": "versatileportals:portal_frame"
-        },
-        "B": {
-            "tag": "forge:bookshelves"
-        },
+  "type": "mrplibrary:crafting_shaped_configurable",
+  "result": {
+    "item": "versatileportals:portal_controller"
+  },
+  "pattern": [
+    "FBF",
+    "BRB",
+    "FEF"
+  ],
+  "key": {
+    "F": {
+      "item": "versatileportals:portal_frame"
+    },
+    "B": {
+      "tag": "forge:bookshelves"
+    },
     "R": {
       "tag": "forge:dusts/redstone"
     },
     "E": {
       "item": "minecraft:enchanting_table"
     }
-  },
-  "result": {
-    "item": "versatileportals:portal_controller"
   },
   "overrides": [
     {

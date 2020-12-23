@@ -1,8 +1,9 @@
 package mrp_v2.versatileportals.datagen;
 
+import mrp_v2.mrplibrary.datagen.BlockLootTables;
 import mrp_v2.versatileportals.util.ObjectHolder;
 
-public class LootTables extends mrp_v2.mrplibrary.datagen.BlockLootTables
+public class LootTables extends BlockLootTables
 {
     public LootTables()
     {

@@ -1,6 +1,7 @@
 package mrp_v2.versatileportals.datagen;
 
-import mrp_v2.mrplibrary.datagen.ConfigurableShapedRecipeBuilder;
+import mrp_v2.mrplibrary.datagen.providers.RecipeProvider;
+import mrp_v2.mrplibrary.datagen.recipe.ConfigurableShapedRecipeBuilder;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.Blocks;
@@ -14,7 +15,7 @@ import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
 
-public class RecipeGenerator extends mrp_v2.mrplibrary.datagen.RecipeProvider
+public class RecipeGenerator extends RecipeProvider
 {
     public static final String HARDER_CRAFTING_ID = VersatilePortals.ID + ":harder_crafting";
 
