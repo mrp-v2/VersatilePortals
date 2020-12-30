@@ -12,10 +12,4 @@ public class PortalPointOfInterestType extends PointOfInterestType
     {
         super(ID, getAllStates(ObjectHolder.PORTAL_BLOCK.get()), 0, 1);
     }
-
-    public PortalPointOfInterestType register()
-    {
-        PointOfInterestType.registerBlockStates(this);
-        return this;
-    }
 }

@@ -53,7 +53,6 @@ sourceSets {
 
 minecraft {
     mappings channel: mapping.split('\\|')[0], version: mapping.split('\\|')[1]
-    accessTransformer = file 'src/main/resources/META-INF/accesstransformer.cfg'
     runs {
         client {
             workingDirectory project.file('run')

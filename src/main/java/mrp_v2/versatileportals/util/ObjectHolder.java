@@ -14,7 +14,6 @@ import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.village.PortalPointOfInterestType;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -25,10 +24,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.village.PointOfInterestType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
@@ -103,17 +99,8 @@ import net.minecraftforge.registries.ForgeRegistries;
         TILE_ENTITIES.register(bus);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void registerPOIs(RegistryEvent.Register<PointOfInterestType> event)
-    {
-        PORTAL_POINT_OF_INTEREST_TYPE.get().register();
-    }
-
     public static BlockItem createBlockItem(Block block)
     {
-        BlockState defaultState = block.getDefaultState();
-        return new BlockItem(block, new Item.Properties()
-                .addToolType(block.getHarvestTool(defaultState), block.getHarvestLevel(defaultState))
-                .group(MAIN_ITEM_GROUP));
+        return new BlockItem(block, new Item.Properties().group(MAIN_ITEM_GROUP));
     }
 }

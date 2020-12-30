@@ -14,7 +14,7 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="forge"
     mandatory=true
-    versionRange="[${forgeMajor},)"
+    versionRange="[35.1.20)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${modId}]]
