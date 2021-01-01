@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.inventory;
 
-import mrp_v2.versatileportals.item.PortalControlItem;
+import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
@@ -20,7 +20,7 @@ public class PortalControllerItemStackHandler extends ItemStackHandler
 
     @Override public boolean isItemValid(int slot, @Nonnull ItemStack stack)
     {
-        return stack.getItem() instanceof PortalControlItem;
+        return stack.getItem() instanceof IPortalControlItem;
     }
 
     @Override protected void onContentsChanged(int slot)

@@ -6,14 +6,14 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
+import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
@@ -26,8 +26,9 @@ import java.util.stream.Collectors;
 
 @EventBusSubscriber public class EventHandler
 {
-    public static final TranslationTextComponent noPortalController, noKey, worldDoesNotExist, teleported,
-            noTeleportSelf;
+    public static final TranslationTextComponent noPortalController;
+    public static final TranslationTextComponent noControlItem;
+    public static final TranslationTextComponent teleported;
     public static final Function<Object[], TranslationTextComponent> teleportingInFunction;
 
     static
@@ -39,13 +40,8 @@ import java.util.stream.Collectors;
         teleportingInFunction =
                 EN_USTranslationGenerator.makeFormattedTextTranslation(stem + ".teleportingIn", "Teleporting in %s...");
         teleported = EN_USTranslationGenerator.makeTextTranslation(stem + ".teleported", "Teleported");
-        stem = String.join(".", stem, "invalidControlItem");
-        noKey = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".hasNoKey", "There is no control item or it is invalid");
-        worldDoesNotExist = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".worldDoesNotExist", "There is no world matching the control item");
-        noTeleportSelf = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".noTeleportSelf", "The control item must be for a different dimension");
+        noControlItem = EN_USTranslationGenerator
+                .makeTextTranslation(stem + ".noControlItem", "There is no control item or it is invalid");
     }
 
     @SubscribeEvent public static void worldTick(final WorldTickEvent event)
@@ -95,34 +91,25 @@ import java.util.stream.Collectors;
                             }
                             return;
                         }
-                        RegistryKey<World> destinationKey = controller.getTeleportDestination();
-                        if (destinationKey == null)
+                        ItemStack portalControlItemStack = controller.getControlItemStack();
+                        IPortalControlItem portalControlItem = null;
+                        if (!portalControlItemStack.isEmpty())
+                        {
+                            if (portalControlItemStack.getItem() instanceof IPortalControlItem)
+                            {
+                                portalControlItem = (IPortalControlItem) portalControlItemStack.getItem();
+                            }
+                        }
+                        if (portalControlItem == null)
                         {
                             if (entity instanceof ServerPlayerEntity)
                             {
-                                Util.sendMessage((ServerPlayerEntity) entity, noKey);
+                                Util.sendMessage((ServerPlayerEntity) entity, noControlItem);
                             }
                             return;
                         }
-                        ServerWorld destinationWorld = world.getServer().getWorld(destinationKey);
-                        if (destinationWorld == null)
-                        {
-                            if (entity instanceof ServerPlayerEntity)
-                            {
-                                Util.sendMessage((ServerPlayerEntity) entity, worldDoesNotExist);
-                            }
-                            return;
-                        }
-                        if (world == destinationWorld)
-                        {
-                            if (entity instanceof ServerPlayerEntity)
-                            {
-                                Util.sendMessage((ServerPlayerEntity) entity, noTeleportSelf);
-                            }
-                            return;
-                        }
-                        Entity teleportedEntity = entity.changeDimension(destinationWorld,
-                                new Teleporter(destinationWorld, world, portalSize));
+                        Entity teleportedEntity =
+                                portalControlItem.teleportEntity(entity, world, portalSize, portalControlItemStack);
                         if (teleportedEntity instanceof ServerPlayerEntity)
                         {
                             Util.sendMessage((ServerPlayerEntity) teleportedEntity, teleported);

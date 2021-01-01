@@ -29,7 +29,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class PortalControllerBlock extends PortalFrameBlock
+public class PortalControllerBlock extends PortalFrameBlock implements IPortalFrame
 {
     public static final String ID = "portal_controller";
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;

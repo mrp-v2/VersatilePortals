@@ -6,7 +6,7 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
-import mrp_v2.versatileportals.item.PortalControlItem;
+import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.block.BlockState;
@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.network.NetworkManager;
@@ -68,13 +69,18 @@ public class PortalControllerTileEntity extends TileEntity
         return inventory;
     }
 
+    public ItemStack getControlItemStack()
+    {
+        return this.inventory.getStackInSlot(0);
+    }
+
     @Nullable public RegistryKey<World> getTeleportDestination()
     {
         if (this.inventory.getStackInSlot(0).isEmpty())
         {
             return null;
         }
-        return PortalControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
+        return ExistingWorldControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
     }
 
     @Override public ITextComponent getName()

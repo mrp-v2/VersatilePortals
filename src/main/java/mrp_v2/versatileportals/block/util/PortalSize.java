@@ -1,6 +1,7 @@
 package mrp_v2.versatileportals.block.util;
 
 import com.google.common.collect.Lists;
+import mrp_v2.versatileportals.block.IPortalFrame;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
@@ -36,9 +37,15 @@ public class PortalSize
                 if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
                 {
                     return ((PortalControllerBlock) block).isSideValidForPortal(state, reader, pos, side);
+                } else if (state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK.get()))
+                {
+                    return true;
+                } else if (state.getBlock() instanceof IPortalFrame)
+                {
+                    return ((IPortalFrame) state.getBlock()).isSideValidForPortal(state, reader, pos, side);
                 } else
                 {
-                    return state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK.get());
+                    return false;
                 }
             };
     private static final Function<BlockState, Boolean> PORTAL_CONTROLLER_PREDICATE =

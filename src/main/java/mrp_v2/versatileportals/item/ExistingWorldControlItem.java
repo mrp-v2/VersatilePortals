@@ -1,16 +1,40 @@
 package mrp_v2.versatileportals.item;
 
+import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.block.util.PortalSize;
+import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
+import mrp_v2.versatileportals.world.BasicWorldTeleporter;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
-public class ExistingWorldControlItem extends PortalControlItem
+import javax.annotation.Nullable;
+
+public class ExistingWorldControlItem extends BasicSingleItem implements IPortalControlItem
 {
-    public static final String ID = "existing_world_" + PortalControlItem.ID;
+    public static final String ID = "existing_world_control";
     public static final String COLOR_NBT_ID = "Color";
+    public static final String WORLD_ID_NBT_ID = "WorldID";
+    public static final TranslationTextComponent worldDoesNotExist;
+    public static final TranslationTextComponent noTeleportSelf;
+
+    static
+    {
+        String stem = String.join(".", "item", VersatilePortals.ID, ID, "message");
+        worldDoesNotExist = EN_USTranslationGenerator
+                .makeTextTranslation(stem + ".worldDoesNotExist", "There is no world matching the control item");
+        noTeleportSelf = EN_USTranslationGenerator
+                .makeTextTranslation(stem + ".noTeleportSelf", "The control item must be for a different dimension");
+    }
 
     public ExistingWorldControlItem()
     {
@@ -27,7 +51,7 @@ public class ExistingWorldControlItem extends PortalControlItem
     public static ItemStack getItemForWorld(World world)
     {
         ItemStack itemStack = new ItemStack(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get());
-        PortalControlItem.addTeleportDataToItem(itemStack, new ResourceLocation(Util.getWorldID(world)));
+        addTeleportDataToItem(itemStack, new ResourceLocation(Util.getWorldID(world)));
         ExistingWorldControlItem.addColorDataToItem(itemStack, getColorFromWorld(world));
         return itemStack;
     }
@@ -42,5 +66,43 @@ public class ExistingWorldControlItem extends PortalControlItem
     private static int getColorFromWorld(World world)
     {
         return world.getDimensionKey().toString().hashCode() & 0xFFFFFF;
+    }
+
+    public static void addTeleportDataToItem(ItemStack stack, ResourceLocation worldID)
+    {
+        CompoundNBT compound = stack.getOrCreateTag();
+        compound.putString(WORLD_ID_NBT_ID, worldID.toString());
+        stack.setTag(compound);
+        stack.setDisplayName(new StringTextComponent(worldID.getPath()));
+    }
+
+    @Nullable @Override
+    public Entity teleportEntity(Entity entity, ServerWorld currentWorld, PortalSize portalSize, ItemStack itemStack)
+    {
+        ServerWorld destinationWorld = currentWorld.getServer().getWorld(getTeleportDestination(itemStack));
+        if (destinationWorld == null)
+        {
+            if (entity instanceof ServerPlayerEntity)
+            {
+                Util.sendMessage((ServerPlayerEntity) entity, worldDoesNotExist);
+            }
+            return null;
+        }
+        if (destinationWorld == currentWorld)
+        {
+            if (entity instanceof ServerPlayerEntity)
+            {
+                Util.sendMessage((ServerPlayerEntity) entity, noTeleportSelf);
+            }
+            return null;
+        }
+        return entity.changeDimension(destinationWorld,
+                new BasicWorldTeleporter(destinationWorld, currentWorld, portalSize));
+    }
+
+    public static RegistryKey<World> getTeleportDestination(ItemStack stack)
+    {
+        String worldID = stack.getOrCreateTag().getString(WORLD_ID_NBT_ID);
+        return Util.createWorldKey(worldID);
     }
 }

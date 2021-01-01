@@ -6,12 +6,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import java.util.function.Function;
 
-public class PortalFrameBlock extends Block
+public class PortalFrameBlock extends Block implements IPortalFrame
 {
     public static final String ID = "portal_frame";
 
@@ -44,5 +46,10 @@ public class PortalFrameBlock extends Block
     {
         super.onReplaced(oldState, world, pos, newState, isMoving);
         PortalFrameUtil.sendUpdatePacket(oldState, pos, world);
+    }
+
+    @Override public boolean isSideValidForPortal(BlockState state, IBlockReader world, BlockPos pos, Direction side)
+    {
+        return true;
     }
 }

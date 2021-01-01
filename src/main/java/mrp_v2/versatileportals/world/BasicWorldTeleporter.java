@@ -32,13 +32,13 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class Teleporter implements ITeleporter
+public class BasicWorldTeleporter implements ITeleporter
 {
     protected final ServerWorld destinationWorld;
     protected final ServerWorld originWorld;
     protected final PortalSize originPortalSize;
 
-    public Teleporter(ServerWorld destinationWorld, ServerWorld originWorld, PortalSize originPortalSize)
+    public BasicWorldTeleporter(ServerWorld destinationWorld, ServerWorld originWorld, PortalSize originPortalSize)
     {
         this.destinationWorld = destinationWorld;
         this.originWorld = originWorld;

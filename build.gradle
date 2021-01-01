@@ -31,11 +31,33 @@ if (forgeVersion == 'latest' || forgeVersion == 'recommended')
 String capitalizedModId = modDisplayName.replace(' ', '')
 String modId = capitalizedModId.toLowerCase()
 String forgeMajor = forgeVersion.split('\\.')[0]
+if (minimumForgeVersion == 'none')
+{
+    minimumForgeVersion = forgeMajor
+}
 String mcNextVersion = '1.' + ((mcVersion.split('\\.')[1] as int) + 1)
 String homepageURL = "https://www.curseforge.com/minecraft/mc-mods/${modDisplayName.replace(' ', '-').toLowerCase()}"
 String issuesURL = "${homepageURL}/issues"
 String updateURL = "https://raw.githubusercontent.com/mrp-v2/${capitalizedModId}/master/update.json"
-String mrplibNextAPI = mrplibAPI.split('\\.')[0] + '.' + ((mrplibAPI.split('\\.')[1] as int) + 1)
+String mrpLibAPI = 'none', mrpLibPatch = 'none'
+if (mrpLibVersion != 'none')
+{
+    if (mrpLibVersion.contains(','))
+    {
+        int splitIndex = mrpLibVersion.indexOf(',')
+        mrpLibAPI = mrpLibVersion.substring(0, splitIndex)
+        mrpLibPatch = '.' + mrpLibVersion.substring(splitIndex + 1)
+    } else
+    {
+        mrpLibAPI = mrpLibVersion
+        mrpLibPatch = ''
+    }
+}
+String mrpLibNextAPI = 'none'
+if (mrpLibAPI != 'none')
+{
+    mrpLibNextAPI = mrpLibAPI.split('\\.')[0] + '.' + ((mrpLibAPI.split('\\.')[1] as int) + 1)
+}
 archivesBaseName = modId
 group = "${author}.${archivesBaseName}"
 
@@ -43,12 +65,8 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
         System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 println('Minecraft: ' + mcVersion + ' Forge: ' + forgeVersion + ' Mapping: ' + mapping + ' Mod: ' + version)
 
-sourceSets {
-    main {
-        resources {
-            srcDirs 'src/generated/resources'
-        }
-    }
+sourceSets.main.resources {
+    srcDirs += 'src/generated/resources'
 }
 
 minecraft {
@@ -110,7 +128,10 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
-    compile fg.deobf("mrp_v2.mrplibrary:mrplibrary:${mcVersion}-${mrplibAPI}.${mrplibPatch}-forge")
+    if (mrpLibAPI != 'none' && mrpLibPatch != 'none')
+    {
+        compile fg.deobf("mrp_v2.mrplibrary:mrplibrary:${mcVersion}-${mrpLibAPI}${mrpLibPatch}-forge")
+    }
 }
 
 jar {
@@ -131,6 +152,7 @@ processResources {
     inputs.property 'version', project.version
     inputs.property 'modId', modId
     inputs.property 'forgeMajor', forgeMajor
+    inputs.property 'minimumForgeVersion', minimumForgeVersion
     inputs.property 'mcVersion', mcVersion
     inputs.property 'mcNextVersion', mcNextVersion
     inputs.property 'homepageURL', homepageURL
@@ -140,18 +162,29 @@ processResources {
     inputs.property 'author', author
     inputs.property 'updateURL', updateURL
     inputs.property 'issuesURL', issuesURL
-    inputs.property 'mrplibAPI', mrplibAPI
-    inputs.property 'mrplibNextAPI', mrplibNextAPI
+    if (mrpLibVersion != 'none')
+    {
+        inputs.property 'mrpLibAPI', mrpLibAPI
+        inputs.property 'mrpLibNextAPI', mrpLibNextAPI
+    }
+    String[] files = new String[2]
+    files[0] = 'META-INF/mods.toml'
+    files[1] = 'pack.mcmeta'
     from(sourceSets.main.resources.srcDirs) {
-        include '**/*'
-        exclude '**/*.png'
-        expand 'version': project.version, 'modId': modId, 'forgeMajor': forgeMajor, 'mcVersion': mcVersion,
-                'mcNextVersion': mcNextVersion, 'homepageURL': homepageURL, 'modDisplayName': modDisplayName,
-                'capitalizedModId': capitalizedModId, 'modDescription': modDescription, 'author': author,
-                'updateURL': updateURL, 'issuesURL': issuesURL, 'mrplibAPI': mrplibAPI, 'mrplibNextAPI': mrplibNextAPI
+        include files
+        Map<String, ?> properties = new HashMap<>()
+        properties.putAll('version': project.version, 'modId': modId, 'forgeMajor': forgeMajor,
+                'minimumForgeVersion': minimumForgeVersion, 'mcVersion': mcVersion, 'mcNextVersion': mcNextVersion,
+                'homepageURL': homepageURL, 'modDisplayName': modDisplayName, 'capitalizedModId': capitalizedModId,
+                'modDescription': modDescription, 'author': author, 'updateURL': updateURL, 'issuesURL': issuesURL)
+        if (mrpLibVersion != 'none')
+        {
+            properties.putAll(mrpLibAPI: mrpLibAPI, 'mrpLibNextAPI': mrpLibNextAPI)
+        }
+        expand properties
     }
     from(sourceSets.main.resources.srcDirs) {
-        exclude '**/*'
+        exclude files
     }
 }
 

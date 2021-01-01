@@ -14,7 +14,7 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="forge"
     mandatory=true
-    versionRange="[35.1.20,)"
+    versionRange="[${minimumForgeVersion},)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${modId}]]
@@ -26,6 +26,6 @@ license="All rights reserved"
 [[dependencies.${modId}]]
     modId="mrplibrary"
     mandatory=true
-    versionRange="[${mcVersion}-${mrplibAPI},${mcVersion}-${mrplibNextAPI})"
+    versionRange="[${mcVersion}-${mrpLibAPI},${mcVersion}-${mrpLibNextAPI})"
     ordering="NONE"
     side="BOTH"
