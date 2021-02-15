@@ -28,14 +28,18 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 
     static
     {
-        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "gui");
-        controlItemLabel =
-                EN_USTranslationGenerator.makeTextTranslation(stem + ".slotLabel.controlItem", "Control Item");
+        controlItemLabel = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
+                PortalControllerBlock.ID + ".gui.slotLabel.controlItem", "en_us", "Control Item");
         String nameStem = "Portal Color ";
-        stem = String.join(".", stem, "color");
-        colorRLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".r", nameStem + "R: ");
-        colorGLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".g", nameStem + "G: ");
-        colorBLabel = EN_USTranslationGenerator.makeTextTranslation(stem + ".b", nameStem + "B: ");
+        colorRLabel = EN_USTranslationGenerator
+                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.r", "en_us",
+                        nameStem + "R: ");
+        colorGLabel = EN_USTranslationGenerator
+                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.g", "en_us",
+                        nameStem + "G: ");
+        colorBLabel = EN_USTranslationGenerator
+                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.b", "en_us",
+                        nameStem + "B: ");
     }
 
     private Slider colorR;
@@ -89,8 +93,8 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 
     @Override public void onClose()
     {
-        PacketHandler.INSTANCE.sendToServer(
-                new PortalControllerScreenClosedPacket(this.getCurrentColor(), this.container.getPos()));
+        PacketHandler.INSTANCE
+                .sendToServer(new PortalControllerScreenClosedPacket(this.getCurrentColor(), this.container.getPos()));
         super.onClose();
         this.minecraft.keyboardListener.enableRepeatEvents(false);
     }

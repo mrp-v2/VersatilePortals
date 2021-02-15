@@ -29,11 +29,12 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
 
     static
     {
-        String stem = String.join(".", "item", VersatilePortals.ID, ID, "message");
         worldDoesNotExist = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".worldDoesNotExist", "There is no world matching the control item");
+                .makeTextTranslation("item.", VersatilePortals.ID, "." + ID + ".message.worldDoesNotExist", "en_us",
+                        "There is no world matching the control item");
         noTeleportSelf = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".noTeleportSelf", "The control item must be for a different dimension");
+                .makeTextTranslation("item.", VersatilePortals.ID, "." + ID + ".message.noTeleportSelf", "en_us",
+                        "The control item must be for a different dimension");
     }
 
     public ExistingWorldControlItem()

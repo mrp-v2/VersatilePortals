@@ -33,15 +33,16 @@ import java.util.stream.Collectors;
 
     static
     {
-        noPortalController = EN_USTranslationGenerator.makeTextTranslation(
-                String.join(".", "block", VersatilePortals.ID, PortalBlock.ID, "message", "noPortalController"),
+        noPortalController = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
+                "." + PortalBlock.ID + ".message.noPortalController", "en_us",
                 "A Portal Controller could not be found for this portal");
-        String stem = String.join(".", "block", VersatilePortals.ID, PortalControllerBlock.ID, "message");
-        teleportingInFunction =
-                EN_USTranslationGenerator.makeFormattedTextTranslation(stem + ".teleportingIn", "Teleporting in %s...");
-        teleported = EN_USTranslationGenerator.makeTextTranslation(stem + ".teleported", "Teleported");
-        noControlItem = EN_USTranslationGenerator
-                .makeTextTranslation(stem + ".noControlItem", "There is no control item or it is invalid");
+        teleportingInFunction = EN_USTranslationGenerator.makeFormattedTextTranslation("block.", VersatilePortals.ID,
+                "." + PortalControllerBlock.ID + ".message.teleportingIn", "en_us", "Teleporting in %s...");
+        teleported = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
+                "." + PortalControllerBlock.ID + ".message.teleported", "en_us", "Teleported");
+        noControlItem = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
+                "." + PortalControllerBlock.ID + ".message.noControlItem", "en_us",
+                "There is no control item or it is invalid");
     }
 
     @SubscribeEvent public static void worldTick(final WorldTickEvent event)

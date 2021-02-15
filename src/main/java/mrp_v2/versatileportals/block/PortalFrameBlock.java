@@ -1,10 +1,10 @@
 package mrp_v2.versatileportals.block;
 
-import mrp_v2.mrplibrary.mixininterfaces.IAdjustableAbstractBlockProperties;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -24,8 +24,9 @@ public class PortalFrameBlock extends Block implements IPortalFrame
 
     protected PortalFrameBlock(Function<Properties, Properties> propertiesModifier)
     {
-        super(propertiesModifier.apply(((IAdjustableAbstractBlockProperties) Properties.from(Blocks.LAPIS_BLOCK))
-                .setMaterialColor(MaterialColor.LIGHT_GRAY)));
+        super(propertiesModifier
+                .apply(AbstractBlock.Properties.create(Material.IRON, MaterialColor.LIGHT_GRAY).setRequiresTool()
+                        .hardnessAndResistance(3.0F, 3.0F)));
     }
 
     /**

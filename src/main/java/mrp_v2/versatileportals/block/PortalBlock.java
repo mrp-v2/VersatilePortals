@@ -1,6 +1,5 @@
 package mrp_v2.versatileportals.block;
 
-import mrp_v2.mrplibrary.mixininterfaces.IAdjustableAbstractBlockProperties;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
@@ -8,6 +7,8 @@ import mrp_v2.versatileportals.util.Util;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
@@ -38,8 +39,9 @@ public class PortalBlock extends Block
 
     protected PortalBlock(Function<Properties, Properties> propertiesModifier)
     {
-        super(propertiesModifier.apply(((IAdjustableAbstractBlockProperties) Properties.from(Blocks.NETHER_PORTAL))
-                .setTicksRandomly(false)));
+        super(propertiesModifier
+                .apply(Properties.create(Material.PORTAL).doesNotBlockMovement().hardnessAndResistance(-1.0F)
+                        .sound(SoundType.GLASS).setLightLevel((state) -> 11)));
         this.setDefaultState(
                 this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
     }

@@ -11,18 +11,12 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
     @SubscribeEvent public static void gatherDataEvent(final GatherDataEvent event)
     {
         DataGeneratorHelper helper = new DataGeneratorHelper(event, VersatilePortals.ID);
-        if (event.includeServer())
-        {
-            helper.addLootTables(new LootTables());
-            helper.addRecipeProvider(RecipeGenerator::new);
-        }
-        if (event.includeClient())
-        {
-            helper.addTextureProvider(TextureGenerator::new);
-            helper.addParticleProvider(ParticleGenerator::new);
-            helper.addBlockStateProvider(BlockStateGenerator::new);
-            helper.addItemModelProvider(ItemModelGenerator::new);
-            helper.addLanguageProvider(EN_USTranslationGenerator::new);
-        }
+        helper.addLootTables(new LootTables());
+        helper.addRecipeProvider(RecipeGenerator::new);
+        helper.addTextureProvider(TextureGenerator::new);
+        helper.addParticleProvider(ParticleGenerator::new);
+        helper.addBlockStateProvider(BlockStateGenerator::new);
+        helper.addItemModelProvider(ItemModelGenerator::new);
+        helper.addLanguageProvider(EN_USTranslationGenerator::new);
     }
 }
