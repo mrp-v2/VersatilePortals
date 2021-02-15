@@ -1,8 +1,5 @@
 {
-  "type": "mrplibrary:crafting_shaped_configurable",
-  "result": {
-    "item": "versatileportals:portal_frame"
-  },
+  "type": "minecraft:crafting_shaped",
   "pattern": [
     "LLL",
     "LOL",
@@ -16,19 +13,7 @@
       "tag": "forge:obsidian"
     }
   },
-  "overrides": [
-    {
-      "condition": "versatileportals:harder_crafting",
-      "overrides": [
-        {
-          "original": {
-            "tag": "forge:gems/lapis"
-          },
-          "replacement": {
-            "tag": "forge:storage_blocks/lapis"
-          }
-        }
-      ]
-    }
-  ]
+  "result": {
+    "item": "versatileportals:portal_frame"
+  }
 }

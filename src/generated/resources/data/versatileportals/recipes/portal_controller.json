@@ -1,8 +1,5 @@
 {
-  "type": "mrplibrary:crafting_shaped_configurable",
-  "result": {
-    "item": "versatileportals:portal_controller"
-  },
+  "type": "minecraft:crafting_shaped",
   "pattern": [
     "FBF",
     "BRB",
@@ -22,19 +19,7 @@
       "item": "minecraft:enchanting_table"
     }
   },
-  "overrides": [
-    {
-      "condition": "versatileportals:harder_crafting",
-      "overrides": [
-        {
-          "original": {
-            "tag": "forge:dusts/redstone"
-          },
-          "replacement": {
-            "tag": "forge:storage_blocks/redstone"
-          }
-        }
-      ]
-    }
-  ]
+  "result": {
+    "item": "versatileportals:portal_controller"
+  }
 }
