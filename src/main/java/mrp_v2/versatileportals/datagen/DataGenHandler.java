@@ -2,6 +2,8 @@ package mrp_v2.versatileportals.datagen;
 
 import mrp_v2.mrplibrary.datagen.DataGeneratorHelper;
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.datagen.language.EN_USTranslationGenerator;
+import mrp_v2.versatileportals.datagen.language.ZH_CNTranslationGenerator;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
@@ -18,5 +20,6 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
         helper.addBlockStateProvider(BlockStateGenerator::new);
         helper.addItemModelProvider(ItemModelGenerator::new);
         helper.addLanguageProvider(EN_USTranslationGenerator::new);
+        helper.addLanguageProvider(ZH_CNTranslationGenerator::new);
     }
 }

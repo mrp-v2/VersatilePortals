@@ -53,11 +53,10 @@ public class Util
         return (r << 16) | (g << 8) | b;
     }
 
-    public static IPortalDataCapability getPortalData(Entity entity)
+    @Nullable public static IPortalDataCapability getPortalData(Entity entity)
     {
         //noinspection ConstantConditions
-        return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY)
-                .orElseThrow(() -> new RuntimeException("Could not get an IPortalDataCapability!"));
+        return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY).orElse(null);
     }
 
     @Nullable public static RegistryKey<World> createWorldKey(String worldID)

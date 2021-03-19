@@ -4,7 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
-import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalControllerScreenClosedPacket;
@@ -24,24 +23,14 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 {
     public static final ResourceLocation GUI_TEXTURE =
             new ResourceLocation(VersatilePortals.ID, "textures/gui/container/portal_controller.png");
-    public static final TranslationTextComponent colorRLabel, colorGLabel, colorBLabel, controlItemLabel;
-
-    static
-    {
-        controlItemLabel = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
-                PortalControllerBlock.ID + ".gui.slotLabel.controlItem", "en_us", "Control Item");
-        String nameStem = "Portal Color ";
-        colorRLabel = EN_USTranslationGenerator
-                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.r", "en_us",
-                        nameStem + "R: ");
-        colorGLabel = EN_USTranslationGenerator
-                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.g", "en_us",
-                        nameStem + "G: ");
-        colorBLabel = EN_USTranslationGenerator
-                .makeTextTranslation("block.", VersatilePortals.ID, PortalControllerBlock.ID + ".gui.color.b", "en_us",
-                        nameStem + "B: ");
-    }
-
+    public static final TranslationTextComponent colorRLabel = new TranslationTextComponent(
+            "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.r"), colorGLabel =
+            new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.g"), colorBLabel =
+            new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.b"),
+            controlItemLabel = new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.slotLabel.controlItem");
     private Slider colorR;
     private Slider colorG;
     private Slider colorB;
@@ -52,13 +41,6 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
         super(screenContainer, inv, titleIn);
         this.ySize = PortalControllerContainer.Y_SIZE;
         this.playerInventoryTitleY = this.ySize - 94;
-    }
-
-    /**
-     * For static initialization
-     */
-    public static void staticInit()
-    {
     }
 
     @Override protected void init()

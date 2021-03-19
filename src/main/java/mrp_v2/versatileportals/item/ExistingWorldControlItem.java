@@ -2,7 +2,6 @@ package mrp_v2.versatileportals.item;
 
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.util.PortalSize;
-import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.BasicWorldTeleporter;
@@ -24,18 +23,10 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
     public static final String ID = "existing_world_control";
     public static final String COLOR_NBT_ID = "Color";
     public static final String WORLD_ID_NBT_ID = "WorldID";
-    public static final TranslationTextComponent worldDoesNotExist;
-    public static final TranslationTextComponent noTeleportSelf;
-
-    static
-    {
-        worldDoesNotExist = EN_USTranslationGenerator
-                .makeTextTranslation("item.", VersatilePortals.ID, "." + ID + ".message.worldDoesNotExist", "en_us",
-                        "There is no world matching the control item");
-        noTeleportSelf = EN_USTranslationGenerator
-                .makeTextTranslation("item.", VersatilePortals.ID, "." + ID + ".message.noTeleportSelf", "en_us",
-                        "The control item must be for a different dimension");
-    }
+    public static final TranslationTextComponent worldDoesNotExist =
+            new TranslationTextComponent("item." + VersatilePortals.ID + "." + ID + ".message.worldDoesNotExist"),
+            noTeleportSelf =
+                    new TranslationTextComponent("item." + VersatilePortals.ID + "." + ID + ".message.noTeleportSelf");
 
     public ExistingWorldControlItem()
     {

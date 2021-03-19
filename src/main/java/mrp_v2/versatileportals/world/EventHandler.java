@@ -5,7 +5,6 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
-import mrp_v2.versatileportals.datagen.EN_USTranslationGenerator;
 import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.Util;
@@ -19,6 +18,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -26,24 +27,16 @@ import java.util.stream.Collectors;
 
 @EventBusSubscriber public class EventHandler
 {
-    public static final TranslationTextComponent noPortalController;
-    public static final TranslationTextComponent noControlItem;
-    public static final TranslationTextComponent teleported;
-    public static final Function<Object[], TranslationTextComponent> teleportingInFunction;
-
-    static
-    {
-        noPortalController = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
-                "." + PortalBlock.ID + ".message.noPortalController", "en_us",
-                "A Portal Controller could not be found for this portal");
-        teleportingInFunction = EN_USTranslationGenerator.makeFormattedTextTranslation("block.", VersatilePortals.ID,
-                "." + PortalControllerBlock.ID + ".message.teleportingIn", "en_us", "Teleporting in %s...");
-        teleported = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
-                "." + PortalControllerBlock.ID + ".message.teleported", "en_us", "Teleported");
-        noControlItem = EN_USTranslationGenerator.makeTextTranslation("block.", VersatilePortals.ID,
-                "." + PortalControllerBlock.ID + ".message.noControlItem", "en_us",
-                "There is no control item or it is invalid");
-    }
+    public static final Logger LOGGER = LogManager.getLogger();
+    public static final TranslationTextComponent noPortalController = new TranslationTextComponent(
+            "block." + VersatilePortals.ID + "." + PortalBlock.ID + ".message.noPortalController"), noControlItem =
+            new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.noControlItem"),
+            teleported = new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleported");
+    public static final Function<Object[], TranslationTextComponent> teleportingInFunction =
+            (args) -> new TranslationTextComponent(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleportingIn", args);
 
     @SubscribeEvent public static void worldTick(final WorldTickEvent event)
     {
@@ -59,6 +52,11 @@ import java.util.stream.Collectors;
             for (Entity entity : relevantEntities)
             {
                 IPortalDataCapability portalData = Util.getPortalData(entity);
+                if (portalData == null)
+                {
+                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity.toString());
+                    continue;
+                }
                 if (portalData.getInPortal())
                 {
                     portalData.setInPortal(false);
