@@ -1,0 +1,19 @@
+{
+  "block.versatileportals.portal": "传送门",
+  "block.versatileportals.portal.message.noPortalController": "找不到此门的传送门控制器",
+  "block.versatileportals.portal_controller": "传送门控制器",
+  "block.versatileportals.portal_controller.message.noControlItem": "没有维度标识器，传送门无法工作",
+  "block.versatileportals.portal_controller.message.teleported": "传送成功",
+  "block.versatileportals.portal_controller.message.teleportingIn": "正在传送%s……",
+  "block.versatileportals.portal_frame": "传送门框架",
+  "block.versatileportalsportal_controller.gui.color.b": "传送门色彩 B：",
+  "block.versatileportalsportal_controller.gui.color.g": "传送门色彩 G：",
+  "block.versatileportalsportal_controller.gui.color.r": "传送门色彩 R：",
+  "block.versatileportalsportal_controller.gui.slotLabel.controlItem": "维度标识器放置位置",
+  "item.versatileportals.empty_existing_world_control": "空白的维度标识器",
+  "item.versatileportals.existing_world_control": "维度标识器",
+  "item.versatileportals.existing_world_control.message.noTeleportSelf": "标识控制器必须标识与现有维度不同的维度世界",
+  "item.versatileportals.existing_world_control.message.worldDoesNotExist": "我们失去了与标识控制器匹配的维度",
+  "item.versatileportals.portal_lighter": "维度打火石",
+  "itemGroup.versatileportals": "通用传送门"
+}
