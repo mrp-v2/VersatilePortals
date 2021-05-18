@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
                 IPortalDataCapability portalData = Util.getPortalData(entity);
                 if (portalData == null)
                 {
-                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity.toString());
+                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity);
                     continue;
                 }
                 if (portalData.getInPortal())
@@ -79,8 +79,7 @@ import java.util.stream.Collectors;
                     } else
                     {
                         PortalSize portalSize = new PortalSize(world, portalData.getPortalPos(),
-                                world.getBlockState(portalData.getPortalPos())
-                                        .get(BlockStateProperties.HORIZONTAL_AXIS));
+                                world.getBlockState(portalData.getPortalPos()).get(BlockStateProperties.AXIS));
                         PortalControllerTileEntity controller = portalSize.getPortalController(world).getLeft();
                         if (controller == null)
                         {

@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
         {
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
+        // we can't use the passed in IBlockDisplayReader, because it is a ChunkRenderCache, and will error if trying access blocks not in the chunk
         ClientWorld world = null;
         if (iBlockDisplayReader instanceof ChunkRenderCache)
         {
@@ -40,6 +41,7 @@ import java.lang.reflect.Field;
                     try
                     {
                         world = (ClientWorld) field.get(iBlockDisplayReader);
+                        break;
                     } catch (IllegalAccessException e)
                     {
                         e.printStackTrace();

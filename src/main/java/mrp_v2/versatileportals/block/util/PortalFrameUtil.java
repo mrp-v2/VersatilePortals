@@ -10,19 +10,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PortalFrameUtil
 {
-    public static int getColor(IWorld iWorld, BlockPos pos)
+    public static int getColor(IBlockReader world, BlockPos pos)
     {
-        PortalControllerTileEntity controller = getPortalController(iWorld, pos);
+        PortalControllerTileEntity controller = getPortalController(world, pos);
         if (controller != null)
         {
             return controller.getPortalColor();
@@ -30,7 +31,7 @@ public class PortalFrameUtil
         return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
     }
 
-    @Nullable public static PortalControllerTileEntity getPortalController(IWorld world, BlockPos pos)
+    @Nullable public static PortalControllerTileEntity getPortalController(IBlockReader world, BlockPos pos)
     {
         PortalControllerTileEntity testController = null;
         for (PortalSize size : getPortalSizes(pos, world, false))
@@ -48,12 +49,12 @@ public class PortalFrameUtil
         return testController;
     }
 
-    public static List<PortalSize> getPortalSizes(BlockPos pos, IWorld iWorld, boolean includeSelf)
+    public static List<PortalSize> getPortalSizes(BlockPos pos, IBlockReader world, boolean includeSelf)
     {
         List<PortalSize> portals = Lists.newArrayList();
         for (Pair<BlockPos, Direction.Axis> test : getPossiblePortalLocations(pos))
         {
-            PortalSize size = new PortalSize(iWorld, test.getLeft(), test.getRight());
+            PortalSize size = new PortalSize(world, test.getLeft(), test.getRight());
             if (size.isValid())
             {
                 portals.add(size);
@@ -61,12 +62,17 @@ public class PortalFrameUtil
         }
         if (includeSelf)
         {
-            PortalSize size = new PortalSize(iWorld, pos, Direction.Axis.X);
+            PortalSize size = new PortalSize(world, pos, Direction.Axis.X);
             if (size.isValid())
             {
                 portals.add(size);
             }
-            size = new PortalSize(iWorld, pos, Direction.Axis.Z);
+            size = new PortalSize(world, pos, Direction.Axis.Z);
+            if (size.isValid())
+            {
+                portals.add(size);
+            }
+            size = new PortalSize(world, pos, Direction.Axis.Y);
             if (size.isValid())
             {
                 portals.add(size);
@@ -82,18 +88,46 @@ public class PortalFrameUtil
 
     public static Pair<BlockPos, Direction.Axis>[] getNeighbors(BlockPos pos)
     {
-        return Util.makeArray(Pair.of(pos.up(), Direction.Axis.Z), Pair.of(pos.down(), Direction.Axis.Z),
-                Pair.of(pos.up(), Direction.Axis.X), Pair.of(pos.down(), Direction.Axis.X),
-                Pair.of(pos.north(), Direction.Axis.Z), Pair.of(pos.south(), Direction.Axis.Z),
-                Pair.of(pos.east(), Direction.Axis.X), Pair.of(pos.west(), Direction.Axis.X));
+        List<Pair<BlockPos, Direction.Axis>> tests = new ArrayList<>();
+        for (Direction.Axis axis : Direction.Axis.values())
+        {
+            Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
+            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE)), axis));
+            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE)), axis));
+            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)), axis));
+            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)), axis));
+        }
+        return tests.toArray(Util.makeArray());
     }
 
     public static Pair<BlockPos, Direction.Axis>[] getVerticalDiagonals(BlockPos pos)
     {
-        return Util.makeArray(Pair.of(pos.up().north(), Direction.Axis.Z), Pair.of(pos.up().south(), Direction.Axis.Z),
-                Pair.of(pos.up().east(), Direction.Axis.X), Pair.of(pos.up().west(), Direction.Axis.X),
-                Pair.of(pos.down().north(), Direction.Axis.Z), Pair.of(pos.down().south(), Direction.Axis.Z),
-                Pair.of(pos.down().east(), Direction.Axis.X), Pair.of(pos.down().west(), Direction.Axis.X));
+        List<Pair<BlockPos, Direction.Axis>> tests = new ArrayList<>();
+        for (Direction.Axis axis : Direction.Axis.values())
+        {
+            Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
+            tests.add(Pair.of(pos
+                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
+                            .offset(Direction
+                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
+                            .offset(Direction
+                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
+                            .offset(Direction
+                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
+                            .offset(Direction
+                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
+                    axis));
+        }
+        return tests.toArray(Util.makeArray());
     }
 
     public static void sendUpdatePacket(BlockState oldState, BlockPos pos, World world)

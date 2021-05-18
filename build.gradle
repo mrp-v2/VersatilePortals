@@ -379,9 +379,38 @@ if (usesMixins)
     }
 }
 
+task ensureCleanWorkingTree {
+    doFirst {
+        Tuple2<String, String> statusResult = doCommand("git", "status")
+        if (!statusResult.first.contains("working tree clean"))
+        {
+            throw new IllegalStateException("The working tree isn't clean")
+        }
+    }
+    mustRunAfter ':regenerateUpdateJson'
+}
+
+task ensureTagExists {
+    doFirst {
+        Tuple2<String, String> tagResult = doCommand("git", "tag", "$version")
+        if (!tagResult.second.empty)
+        {
+            if (tagResult.second.contains("already exists")) {
+                return
+            }
+            throw new IllegalStateException("Error creating new tag")
+        }
+        throw new IllegalStateException("Tag created, rerun the task please")
+    }
+    mustRunAfter ':ensureCleanWorkingTree'
+}
+
 task publishToGithubAndCurseforge {
+    dependsOn ':regenerateUpdateJson'
+    dependsOn ':ensureCleanWorkingTree'
+    dependsOn ':ensureTagExists'
     dependsOn ':publishGprPublicationToGitHubPackagesRepository'
-    dependsOn ":curseforge${projectId}"
+    dependsOn ':curseforge'
 }
 
 curseforge {
@@ -391,32 +420,28 @@ curseforge {
     }
     project {
         id = projectId
-        StringBuilder out = new StringBuilder(), error = new StringBuilder()
-        Process previousVersionProcess = ['git', 'describe', '--tags', '--abbrev=0', "${version}^"].execute()
-        previousVersionProcess.consumeProcessOutput(out, error)
-        previousVersionProcess.waitFor()
-        String previousVersion = out.toString().trim()
-        out = new StringBuilder()
-        println('Previous Version: ' + previousVersion)
-        println('Error?: ' + error.toString().trim())
-        error = new StringBuilder()
-        Process gitLogProcess = ['git', 'log', '--pretty=format:"%s"', "${previousVersion}..${version}"].execute()
-        gitLogProcess.consumeProcessOutput(out, error)
-        gitLogProcess.waitFor()
-        String changelogStr = out.toString().trim()
-        println('Changelog: ' + changelogStr)
-        println('Error?: ' + error.toString().trim())
-        changelog = changelogStr
+        Tuple2<String, String> previousVersionResult =
+                doCommand('git', 'describe', '--tags', '--abbrev=0', "${version}^")
+        println('Previous Version: ' + previousVersionResult.first)
+        println('Error?: ' + previousVersionResult.second.trim())
+        Tuple2<String, String> changelogResult =
+                doCommand('git', 'log', '--pretty=format:"%s"', "${previousVersionResult.first}..${version}")
+        println('Changelog: ' + changelogResult.first)
+        println('Error?: ' + changelogResult.second.trim())
+        changelog = changelogResult.first
         releaseType = 'release'
         addGameVersion mcVersion
-        relations {
-            for (GithubDependency dependency : githubDependencyList)
-            {
-                requiredDependency dependency.curseforgeSlug
-            }
-            for (CurseforgeDependency dependency : curseforgeDependencyList)
-            {
-                requiredDependency dependency.curseforgeSlug
+        if (githubDependencyList.size() > 0 || curseforgeDependencyList.size() > 0)
+        {
+            relations {
+                for (GithubDependency dependency : githubDependencyList)
+                {
+                    requiredDependency dependency.curseforgeSlug
+                }
+                for (CurseforgeDependency dependency : curseforgeDependencyList)
+                {
+                    requiredDependency dependency.curseforgeSlug
+                }
             }
         }
     }
@@ -426,4 +451,20 @@ curseforge {
         javaIntegration = true
         forgeGradleIntegration = true
     }
+}
+
+static Tuple2<String, String> doCommand(String... command)
+{
+    Process commandProcess = command.execute()
+    StringBuilder out = new StringBuilder(), error = new StringBuilder()
+    commandProcess.consumeProcessOutput(out, error)
+    commandProcess.waitFor()
+    return new Tuple2<>(out.toString().trim(), error.toString().trim())
+}
+
+tasks.getByName('publishGprPublicationToGitHubPackagesRepository').configure {
+    mustRunAfter ':ensureTagExists'
+}
+tasks.getByName('curseforge').configure {
+    mustRunAfter ':publishGprPublicationToGitHubPackagesRepository'
 }

@@ -20,6 +20,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
         this.particleBlue = Util.fGetColorB(color);
     }
 
+    @Override public void tick()
+    {
+        super.tick();
+        this.posY -= 1 - (float) this.age / this.maxAge;
+    }
+
     @OnlyIn(Dist.CLIENT) public static class Factory implements IParticleFactory<PortalParticleData>
     {
         private final IAnimatedSprite spriteSet;

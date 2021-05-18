@@ -32,15 +32,14 @@ import javax.annotation.Nullable;
 public class PortalControllerBlock extends PortalFrameBlock implements IPortalFrame
 {
     public static final String ID = "portal_controller";
-    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
-    private static final VoxelShape BASE_SHAPE = VoxelShapes.or(makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D),
-            makeCuboidShape(0.0D, 13.0D, 0.0D, 16.0D, 16.0D, 16.0D));
-    private static final VoxelShape SHAPE_NS = VoxelShapes
-            .or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 3.0D, 13.0, 16.0D),
-                    makeCuboidShape(13.0D, 3.0D, 0.0D, 16.0D, 13.0D, 16.0D)).simplify();
-    private static final VoxelShape SHAPE_EW = VoxelShapes
-            .or(BASE_SHAPE, makeCuboidShape(0.0D, 3.0D, 0.0D, 16.0D, 13.0D, 3.0D),
-                    makeCuboidShape(0.0D, 3.0D, 13.0D, 16.0D, 13.0D, 16.0D)).simplify();
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+    public static final VoxelShape TOP_SIDE = makeCuboidShape(0, 13, 0, 16, 16, 16), BOTTOM_SIDE =
+            makeCuboidShape(0, 0, 0, 16, 3, 16), EAST_SIDE = makeCuboidShape(13, 0, 0, 16, 16, 16), WEST_SIDE =
+            makeCuboidShape(0, 0, 0, 3, 16, 16), SOUTH_SIDE = makeCuboidShape(0, 0, 13, 16, 16, 16), NORTH_SIDE =
+            makeCuboidShape(0, 0, 0, 16, 16, 3);
+    public static final VoxelShape SHAPE_NS = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, EAST_SIDE, WEST_SIDE).simplify(),
+            SHAPE_EW = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, SOUTH_SIDE, NORTH_SIDE).simplify(), SHAPE_UD =
+            VoxelShapes.or(EAST_SIDE, WEST_SIDE, SOUTH_SIDE, NORTH_SIDE);
 
     public PortalControllerBlock()
     {
@@ -54,24 +53,24 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         double x = pos.getX() + 0.5D;
         double y = pos.getY() + 0.5D;
         double z = pos.getZ() + 0.5D;
-        double motion = 0.0625D * 6.0D;
+        double motion = 0.375D;
         double noMotion = 0.0D;
-        worldIn.addParticle(data, x, y, z, noMotion, motion, noMotion);
-        worldIn.addParticle(data, x, y, z, noMotion, -motion, noMotion);
-        if (stateIn.get(AXIS) == Direction.Axis.Z)
+        Direction.Axis axis = stateIn.get(AXIS);
+        if (axis != Direction.Axis.X)
         {
             worldIn.addParticle(data, x, y, z, motion, noMotion, noMotion);
             worldIn.addParticle(data, x, y, z, -motion, noMotion, noMotion);
-        } else
+        }
+        if (axis != Direction.Axis.Y)
+        {
+            worldIn.addParticle(data, x, y, z, noMotion, motion, noMotion);
+            worldIn.addParticle(data, x, y, z, noMotion, -motion, noMotion);
+        }
+        if (axis != Direction.Axis.Z)
         {
             worldIn.addParticle(data, x, y, z, noMotion, noMotion, motion);
             worldIn.addParticle(data, x, y, z, noMotion, noMotion, -motion);
         }
-    }
-
-    public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
-    {
-        return state.isSolidSide(reader, pos, side);
     }
 
     @Override
@@ -89,6 +88,11 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
                     });
         }
         super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
+
+    public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
+    {
+        return state.isSolidSide(reader, pos, side);
     }
 
     @Override public boolean hasTileEntity(BlockState state)
@@ -129,12 +133,22 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
 
     private VoxelShape getShape(BlockState state)
     {
-        return state.get(AXIS) == Direction.Axis.X ? SHAPE_EW : SHAPE_NS;
+        switch (state.get(AXIS))
+        {
+            case X:
+                return SHAPE_EW;
+            case Y:
+                return SHAPE_UD;
+            case Z:
+                return SHAPE_NS;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        return this.getDefaultState().with(AXIS, context.getPlacementHorizontalFacing().getAxis());
+        return this.getDefaultState().with(AXIS, context.getNearestLookingDirection().getAxis());
     }
 
     @Override public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,

@@ -1,9 +1,11 @@
 package mrp_v2.versatileportals.util;
 
+import com.google.common.collect.ImmutableMap;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -18,6 +20,25 @@ import javax.annotation.Nullable;
 
 public class Util
 {
+    public static final ImmutableMap<Direction.Axis, Pair<Direction.Axis, Direction.Axis>> OTHER_AXES_MAP = ImmutableMap
+            .of(Direction.Axis.X, getOtherOxes(Direction.Axis.X), Direction.Axis.Y, getOtherOxes(Direction.Axis.Y),
+                    Direction.Axis.Z, getOtherOxes(Direction.Axis.Z));
+
+    private static Pair<Direction.Axis, Direction.Axis> getOtherOxes(Direction.Axis axis)
+    {
+        switch (axis)
+        {
+            case X:
+                return Pair.of(Direction.Axis.Y, Direction.Axis.Z);
+            case Y:
+                return Pair.of(Direction.Axis.X, Direction.Axis.Z);
+            case Z:
+                return Pair.of(Direction.Axis.X, Direction.Axis.Y);
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public static int iGetColorR(int color)
     {
         return (color & 0xFF0000) >> 16;

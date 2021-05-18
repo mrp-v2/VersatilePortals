@@ -1,4 +1,4 @@
-package mrp_v2.versatileportals.datagen.language;
+package mrp_v2.versatileportals.datagen;
 
 import mrp_v2.mrplibrary.datagen.providers.LanguageProvider;
 import mrp_v2.versatileportals.VersatilePortals;

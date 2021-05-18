@@ -11,7 +11,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
@@ -31,6 +31,9 @@ import java.util.function.Function;
 public class PortalBlock extends Block
 {
     public static final String ID = "portal";
+    public static final VoxelShape Y_AABB = makeCuboidShape(0, 6, 0, 16, 10, 16);
+    public static final VoxelShape Z_AABB = makeCuboidShape(0, 0, 6, 16, 16, 10);
+    public static final VoxelShape X_AABB = makeCuboidShape(6, 0, 0, 10, 16, 16);
 
     public PortalBlock()
     {
@@ -42,8 +45,7 @@ public class PortalBlock extends Block
         super(propertiesModifier
                 .apply(Properties.create(Material.PORTAL).doesNotBlockMovement().hardnessAndResistance(-1.0F)
                         .sound(SoundType.GLASS).setLightLevel((state) -> 11)));
-        this.setDefaultState(
-                this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X));
+        this.setDefaultState(this.stateContainer.getBaseState().with(BlockStateProperties.AXIS, Direction.Axis.X));
     }
 
     @SuppressWarnings("deprecation") @Override
@@ -51,10 +53,11 @@ public class PortalBlock extends Block
             BlockPos currentPos, BlockPos facingPos)
     {
         Direction.Axis updateAxis = facing.getAxis();
-        Direction.Axis thisAxis = stateIn.get(BlockStateProperties.HORIZONTAL_AXIS);
-        boolean isUpdateFromOtherAxis = thisAxis != updateAxis && updateAxis.isHorizontal();
+        Direction.Axis thisAxis = stateIn.get(BlockStateProperties.AXIS);
+        boolean isUpdateFromOtherAxis = thisAxis == updateAxis;
         return !isUpdateFromOtherAxis && !facingState.isIn(this) &&
-                !(new PortalSize(worldIn, currentPos, thisAxis)).validate() ? Blocks.AIR.getDefaultState() :
+                !(new PortalSize(worldIn, currentPos, thisAxis)).isValidAndHasCorrectPortalBlockCount() ?
+                Blocks.AIR.getDefaultState() :
                 super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
 
@@ -64,12 +67,12 @@ public class PortalBlock extends Block
         {
             case COUNTERCLOCKWISE_90:
             case CLOCKWISE_90:
-                switch (state.get(BlockStateProperties.HORIZONTAL_AXIS))
+                switch (state.get(BlockStateProperties.AXIS))
                 {
                     case Z:
-                        return state.with(BlockStateProperties.HORIZONTAL_AXIS, Axis.X);
+                        return state.with(BlockStateProperties.AXIS, Axis.X);
                     case X:
-                        return state.with(BlockStateProperties.HORIZONTAL_AXIS, Axis.Z);
+                        return state.with(BlockStateProperties.AXIS, Axis.Z);
                     default:
                         return state;
                 }
@@ -81,7 +84,17 @@ public class PortalBlock extends Block
     @SuppressWarnings("deprecation") @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
     {
-        return Blocks.NETHER_PORTAL.getShape(state, worldIn, pos, context);
+        switch (state.get(BlockStateProperties.AXIS))
+        {
+            case X:
+                return X_AABB;
+            case Y:
+                return Y_AABB;
+            case Z:
+                return Z_AABB;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn)
@@ -96,30 +109,37 @@ public class PortalBlock extends Block
     {
         for (int i = 0; i < 4; ++i)
         {
-            double d0 = pos.getX() + rand.nextDouble();
-            double d1 = pos.getY() + rand.nextDouble();
-            double d2 = pos.getZ() + rand.nextDouble();
-            double d3 = (rand.nextFloat() - 0.5D) * 0.5D;
-            double d4 = (rand.nextFloat() - 0.5D) * 0.5D;
-            double d5 = (rand.nextFloat() - 0.5D) * 0.5D;
+            double x = pos.getX() + rand.nextDouble();
+            double y = pos.getY() + rand.nextDouble();
+            double z = pos.getZ() + rand.nextDouble();
+            double xSpeed = (rand.nextFloat() - 0.5D) * 0.5D;
+            double ySpeed = (rand.nextFloat() - 0.5D) * 0.5D;
+            double zSpeed = (rand.nextFloat() - 0.5D) * 0.5D;
+            // Either 1 or -1
             int j = rand.nextInt(2) * 2 - 1;
-            if (stateIn.get(BlockStateProperties.HORIZONTAL_AXIS) == Axis.Z)
+            switch (stateIn.get(BlockStateProperties.AXIS))
             {
-                d0 = pos.getX() + 0.5D + 0.25D * j;
-                d3 = rand.nextFloat() * 2.0F * j;
-            } else
-            {
-                d2 = pos.getZ() + 0.5D + 0.25D * j;
-                d5 = rand.nextFloat() * 2.0F * j;
+                case X:
+                    x = pos.getX() + 0.5D + 0.25D * j;
+                    xSpeed = rand.nextFloat() * 2.0F * j;
+                    break;
+                case Y:
+                    y = pos.getY() + 0.5D + 0.25D * j;
+                    ySpeed = rand.nextFloat() * 2.0F * j;
+                    break;
+                case Z:
+                    z = pos.getZ() + 0.5D + 0.25D * j;
+                    zSpeed = rand.nextFloat() * 2.0F * j;
+                    break;
             }
-            worldIn.addParticle(new PortalParticleData(PortalBlock.getColor(stateIn, worldIn, pos)), d0, d1, d2, d3, d4,
-                    d5);
+            worldIn.addParticle(new PortalParticleData(PortalBlock.getColor(stateIn, worldIn, pos)), x, y, z, xSpeed,
+                    ySpeed, zSpeed);
         }
     }
 
-    public static int getColor(BlockState blockState, World world, BlockPos pos)
+    public static int getColor(BlockState blockState, IBlockReader world, BlockPos pos)
     {
-        PortalSize size = new PortalSize(world, pos, blockState.get(BlockStateProperties.HORIZONTAL_AXIS));
+        PortalSize size = new PortalSize(world, pos, blockState.get(BlockStateProperties.AXIS));
         PortalControllerTileEntity portalControllerTE = size.getPortalController(world).getLeft();
         if (portalControllerTE != null)
         {
@@ -133,8 +153,8 @@ public class PortalBlock extends Block
         return ItemStack.EMPTY;
     }
 
-    @Override protected void fillStateContainer(Builder<Block, BlockState> builder)
+    @Override protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
     {
-        builder.add(BlockStateProperties.HORIZONTAL_AXIS);
+        builder.add(BlockStateProperties.AXIS);
     }
 }

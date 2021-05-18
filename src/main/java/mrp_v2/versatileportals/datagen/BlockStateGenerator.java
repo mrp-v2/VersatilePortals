@@ -30,15 +30,28 @@ public class BlockStateGenerator extends BlockStateProvider
 
     private void registerPortal()
     {
-        ModelBuilder<BlockModelBuilder> modelBuilder = models().getBuilder("block/" + PortalBlock.ID)
-                .texture("portal", "block/" + PortalBlock.ID)
-                .texture("particle", "block/" + PortalBlock.ID);
+        ModelBuilder<BlockModelBuilder> modelBuilder =
+                models().getBuilder("block/" + PortalBlock.ID).texture("portal", "block/" + PortalBlock.ID)
+                        .texture("particle", "block/" + PortalBlock.ID);
         ModelBuilder<BlockModelBuilder>.ElementBuilder elementBuilder =
                 modelBuilder.element().from(6, 0, 0).to(10, 16, 16);
+        ModelBuilder<BlockModelBuilder> flatModelBuilder =
+                models().getBuilder("block/" + PortalBlock.ID + "_flat").texture("portal", "block/" + PortalBlock.ID)
+                        .texture("particle", "block/" + PortalBlock.ID);
+        ModelBuilder<BlockModelBuilder>.ElementBuilder flatElementBuilder =
+                flatModelBuilder.element().from(0, 6, 0).to(16, 10, 16);
         noCullTintedFace(elementBuilder, Direction.EAST);
         noCullTintedFace(elementBuilder, Direction.WEST);
+        noCullTintedFace(flatElementBuilder, Direction.UP);
+        noCullTintedFace(flatElementBuilder, Direction.DOWN);
         elementBuilder.texture("#portal");
-        horizontalAxisBlock(ObjectHolder.PORTAL_BLOCK.get(), modelBuilder);
+        flatElementBuilder.texture("#portal");
+        getVariantBuilder(ObjectHolder.PORTAL_BLOCK.get()).partialState()
+                .with(BlockStateProperties.AXIS, Direction.Axis.X).modelForState().modelFile(modelBuilder).addModel()
+                .partialState().with(BlockStateProperties.AXIS, Direction.Axis.Z).modelForState()
+                .modelFile(modelBuilder).rotationY(90).addModel().partialState()
+                .with(BlockStateProperties.AXIS, Direction.Axis.Y).modelForState().modelFile(flatModelBuilder)
+                .addModel();
     }
 
     private void registerPortalFrame()
@@ -46,11 +59,8 @@ public class BlockStateGenerator extends BlockStateProvider
         simpleBlock(ObjectHolder.PORTAL_FRAME_BLOCK.get(),
                 models().withExistingParent("block/" + PortalFrameBlock.ID, "block")
                         .texture("frame", "block/" + PortalFrameBlock.ID)
-                        .texture("particle", "block/" + PortalFrameBlock.ID)
-                        .element()
-                        .cube("#frame")
-                        .allFaces((dir, face) -> face.tintindex(0))
-                        .end());
+                        .texture("particle", "block/" + PortalFrameBlock.ID).element().cube("#frame")
+                        .allFaces((dir, face) -> face.tintindex(0)).end());
     }
 
     private void registerPortalController()
@@ -96,13 +106,23 @@ public class BlockStateGenerator extends BlockStateProvider
         sameCullTintedFace(elementBuilder, Direction.NORTH);
         sameCullTintedFace(elementBuilder, Direction.SOUTH);
         elementBuilder.texture("#end").end();
-        horizontalAxisBlock(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get(), modelBuilder);
+        axisBlock(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get(), modelBuilder, false);
     }
 
     private <T extends ModelBuilder<T>> ModelBuilder<T>.ElementBuilder noCullTintedFace(
             ModelBuilder<T>.ElementBuilder builder, Direction face)
     {
         return builder.face(face).tintindex(0).end();
+    }
+
+    private void axisBlock(Block block, ModelFile model, boolean defaultStateIsX)
+    {
+        getVariantBuilder(block).partialState().with(BlockStateProperties.AXIS, Direction.Axis.X).modelForState()
+                .modelFile(model).rotationY(defaultStateIsX ? 0 : 90).addModel().partialState()
+                .with(BlockStateProperties.AXIS, Direction.Axis.Z).modelForState().modelFile(model)
+                .rotationY(defaultStateIsX ? 90 : 0).addModel().partialState()
+                .with(BlockStateProperties.AXIS, Direction.Axis.Y).modelForState().modelFile(model).rotationX(90)
+                .addModel();
     }
 
     private <T extends ModelBuilder<T>> ModelBuilder<T>.ElementBuilder sameCullTintedFace(
@@ -115,21 +135,6 @@ public class BlockStateGenerator extends BlockStateProvider
             ModelBuilder<T>.ElementBuilder builder, Direction face, Direction cullface)
     {
         return builder.face(face).cullface(cullface).tintindex(0).end();
-    }
-
-    private void horizontalAxisBlock(Block block, ModelFile model)
-    {
-        getVariantBuilder(block).partialState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X)
-                .modelForState()
-                .modelFile(model)
-                .rotationY(90)
-                .addModel()
-                .partialState()
-                .with(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.Z)
-                .modelForState()
-                .modelFile(model)
-                .addModel();
     }
 }
 

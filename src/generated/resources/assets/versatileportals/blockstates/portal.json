@@ -1,11 +1,14 @@
 {
   "variants": {
     "axis=x": {
-      "model": "versatileportals:block/portal",
-      "y": 90
+      "model": "versatileportals:block/portal"
+    },
+    "axis=y": {
+      "model": "versatileportals:block/portal_flat"
     },
     "axis=z": {
-      "model": "versatileportals:block/portal"
+      "model": "versatileportals:block/portal",
+      "y": 90
     }
   }
 }
