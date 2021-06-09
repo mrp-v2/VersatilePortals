@@ -132,8 +132,8 @@ public class PortalBlock extends Block
                     zSpeed = rand.nextFloat() * 2.0F * j;
                     break;
             }
-            worldIn.addParticle(new PortalParticleData(PortalBlock.getColor(stateIn, worldIn, pos)), x, y, z, xSpeed,
-                    ySpeed, zSpeed);
+            worldIn.addParticle(new PortalParticleData(PortalBlock.getColor(stateIn, worldIn, pos),
+                    stateIn.getValue(BlockStateProperties.AXIS) == Axis.Y), x, y, z, xSpeed, ySpeed, zSpeed);
         }
     }
 

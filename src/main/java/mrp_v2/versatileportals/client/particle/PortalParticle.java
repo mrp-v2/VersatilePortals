@@ -11,19 +11,25 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT) public class PortalParticle extends net.minecraft.client.particle.PortalParticle
 {
+    private final boolean isOnYAxis;
+
     protected PortalParticle(ClientWorld clientWorld, double x, double y, double z, double xSpeed, double ySpeed,
-            double zSpeed, int color)
+            double zSpeed, int color, boolean isOnYAxis)
     {
         super(clientWorld, x, y, z, xSpeed, ySpeed, zSpeed);
         this.rCol = Util.fGetColorR(color);
         this.gCol = Util.fGetColorG(color);
         this.bCol = Util.fGetColorB(color);
+        this.isOnYAxis = isOnYAxis;
     }
 
     @Override public void tick()
     {
         super.tick();
-        this.y -= 1 - (float) this.age / this.lifetime;
+        if (isOnYAxis)
+        {
+            this.y -= 1 - (float) this.age / this.lifetime;
+        }
     }
 
     @OnlyIn(Dist.CLIENT) public static class Factory implements IParticleFactory<PortalParticleData>
@@ -40,7 +46,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
                 double z, double xSpeed, double ySpeed, double zSpeed)
         {
             PortalParticle portalParticle =
-                    new PortalParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, particleData.getColor());
+                    new PortalParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, particleData.getColor(),
+                            particleData.isOnYAxis());
             portalParticle.pickSprite(this.spriteSet);
             return portalParticle;
         }
