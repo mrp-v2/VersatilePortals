@@ -31,7 +31,7 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
     public ExistingWorldControlItem()
     {
         //noinspection ConstantConditions
-        super(properties -> properties.group(null));
+        super(properties -> properties.tab(null));
     }
 
     public static int getColorDataFromItem(ItemStack stack)
@@ -57,7 +57,7 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
 
     private static int getColorFromWorld(World world)
     {
-        return world.getDimensionKey().toString().hashCode() & 0xFFFFFF;
+        return world.dimension().toString().hashCode() & 0xFFFFFF;
     }
 
     public static void addTeleportDataToItem(ItemStack stack, ResourceLocation worldID)
@@ -65,13 +65,13 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
         CompoundNBT compound = stack.getOrCreateTag();
         compound.putString(WORLD_ID_NBT_ID, worldID.toString());
         stack.setTag(compound);
-        stack.setDisplayName(new StringTextComponent(worldID.getPath()));
+        stack.setHoverName(new StringTextComponent(worldID.getPath()));
     }
 
     @Nullable @Override
     public Entity teleportEntity(Entity entity, ServerWorld currentWorld, PortalSize portalSize, ItemStack itemStack)
     {
-        ServerWorld destinationWorld = currentWorld.getServer().getWorld(getTeleportDestination(itemStack));
+        ServerWorld destinationWorld = currentWorld.getServer().getLevel(getTeleportDestination(itemStack));
         if (destinationWorld == null)
         {
             if (entity instanceof ServerPlayerEntity)

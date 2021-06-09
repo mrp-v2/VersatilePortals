@@ -27,16 +27,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
         ItemStack itemStack = tileEntityIn.getInventory().getStackInSlot(0);
         if (itemStack != ItemStack.EMPTY)
         {
-            matrixStackIn.push();
+            matrixStackIn.pushPose();
             matrixStackIn.translate(0.5D, 0.5D, 0.5D);
-            matrixStackIn.rotate(Vector3f.YP.rotationDegrees(360.0F * (tileEntityIn.ticks + partialTicks) /
+            matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(360.0F * (tileEntityIn.ticks + partialTicks) /
                     PortalControllerTileEntity.TICKS_PER_RENDER_REVOLUTION));
             matrixStackIn.scale(0.5F, 0.5F, 0.5F);
-            Minecraft.getInstance()
-                     .getItemRenderer()
-                     .renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, combinedLightIn,
-                             combinedOverlayIn, matrixStackIn, bufferIn);
-            matrixStackIn.pop();
+            Minecraft.getInstance().getItemRenderer()
+                    .renderStatic(itemStack, ItemCameraTransforms.TransformType.FIXED, combinedLightIn,
+                            combinedOverlayIn, matrixStackIn, bufferIn);
+            matrixStackIn.popPose();
         }
     }
 }

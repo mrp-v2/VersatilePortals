@@ -10,6 +10,6 @@ public class PortalPointOfInterestType extends PointOfInterestType
 
     public PortalPointOfInterestType()
     {
-        super(ID, getAllStates(ObjectHolder.PORTAL_BLOCK.get()), 0, 1);
+        super(ID, getBlockStates(ObjectHolder.PORTAL_BLOCK.get()), 0, 1);
     }
 }

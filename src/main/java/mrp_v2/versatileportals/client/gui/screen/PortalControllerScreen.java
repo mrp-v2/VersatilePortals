@@ -39,15 +39,15 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
             ITextComponent titleIn)
     {
         super(screenContainer, inv, titleIn);
-        this.ySize = PortalControllerContainer.Y_SIZE;
-        this.playerInventoryTitleY = this.ySize - 94;
+        this.imageHeight = PortalControllerContainer.Y_SIZE;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override protected void init()
     {
         super.init();
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
         addElements(i, j);
     }
 
@@ -55,30 +55,30 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
     {
         this.renderBackground(stack);
         super.render(stack, i1, i2, f1);
-        this.renderHoveredTooltip(stack, i1, i2);
+        this.renderTooltip(stack, i1, i2);
     }
 
-    @Override protected void drawGuiContainerForegroundLayer(MatrixStack stack, int x, int y)
+    @Override protected void renderLabels(MatrixStack stack, int x, int y)
     {
-        super.drawGuiContainerForegroundLayer(stack, x, y);
-        this.font.func_243248_b(stack, controlItemLabel, 8, 92, 4210752);
+        super.renderLabels(stack, x, y);
+        this.font.draw(stack, controlItemLabel, 8, 92, 4210752);
     }
 
-    @Override protected void drawGuiContainerBackgroundLayer(MatrixStack stack, float f1, int i1, int i2)
+    @Override protected void renderBg(MatrixStack stack, float f1, int i1, int i2)
     {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.blit(stack, i, j, 0, 0, this.xSize, this.ySize);
+        this.minecraft.getTextureManager().bind(GUI_TEXTURE);
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
+        this.blit(stack, i, j, 0, 0, this.imageWidth, this.imageHeight);
     }
 
-    @Override public void onClose()
+    @Override public void removed()
     {
         PacketHandler.INSTANCE
-                .sendToServer(new PortalControllerScreenClosedPacket(this.getCurrentColor(), this.container.getPos()));
-        super.onClose();
-        this.minecraft.keyboardListener.enableRepeatEvents(false);
+                .sendToServer(new PortalControllerScreenClosedPacket(this.getCurrentColor(), this.menu.getPos()));
+        super.removed();
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     public int getCurrentColor()
@@ -88,11 +88,11 @@ import net.minecraftforge.fml.client.gui.widget.Slider;
 
     protected void addElements(int xStart, int yStart)
     {
-        this.minecraft.keyboardListener.enableRepeatEvents(true);
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int sliderYSpacing = 4;
         int sliderYOffset = 19;
         int sliderXOffset = 28;
-        int color = this.container.getColor();
+        int color = this.menu.getColor();
         Button.IPressable buttonAction = (button) ->
         {
         };

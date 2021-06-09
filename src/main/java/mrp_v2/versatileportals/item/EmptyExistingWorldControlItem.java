@@ -15,10 +15,10 @@ public class EmptyExistingWorldControlItem extends BasicSingleItem
         super();
     }
 
-    @Override public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
+    @Override public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand)
     {
         ItemStack itemStack = ExistingWorldControlItem.getItemForWorld(world);
-        player.setHeldItem(hand, itemStack);
-        return ActionResult.func_233538_a_(itemStack, world.isRemote);
+        player.setItemInHand(hand, itemStack);
+        return ActionResult.sidedSuccess(itemStack, world.isClientSide);
     }
 }

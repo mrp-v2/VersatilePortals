@@ -14,6 +14,6 @@ public class BasicSingleItem extends Item
 
     public BasicSingleItem(Function<Properties, Properties> propertiesModifier)
     {
-        super(propertiesModifier.apply(new Properties().maxStackSize(1).group(ObjectHolder.MAIN_ITEM_GROUP)));
+        super(propertiesModifier.apply(new Properties().stacksTo(1).tab(ObjectHolder.MAIN_ITEM_GROUP)));
     }
 }

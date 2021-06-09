@@ -50,7 +50,7 @@ import net.minecraftforge.registries.ForgeRegistries;
     public static final RegistryObject<BlockItem> PORTAL_CONTROLLER_BLOCK_ITEM;
     public static final ItemGroup MAIN_ITEM_GROUP = new ItemGroup(VersatilePortals.ID)
     {
-        @Override @OnlyIn(Dist.CLIENT) public ItemStack createIcon()
+        @Override @OnlyIn(Dist.CLIENT) public ItemStack makeIcon()
         {
             return new ItemStack(PORTAL_CONTROLLER_BLOCK_ITEM.get());
         }
@@ -101,6 +101,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
     public static BlockItem createBlockItem(Block block)
     {
-        return new BlockItem(block, new Item.Properties().group(MAIN_ITEM_GROUP));
+        return new BlockItem(block, new Item.Properties().tab(MAIN_ITEM_GROUP));
     }
 }

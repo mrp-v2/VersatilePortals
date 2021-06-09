@@ -1,8 +1,8 @@
 package mrp_v2.versatileportals.network;
 
 import mrp_v2.versatileportals.VersatilePortals;
-import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
+import mrp_v2.versatileportals.block.util.PortalSize;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -41,7 +41,7 @@ public class PortalFrameUpdatePacket
             World world = VersatilePortals.WORLD_SUPPLIER.get();
             if (world != null)
             {
-                if (world.isBlockLoaded(this.pos))
+                if (world.hasChunkAt(this.pos))
                 {
                     PortalFrameUtil.updatePortals(this.sizes);
                 }

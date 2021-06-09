@@ -86,17 +86,17 @@ public class Util
         {
             return null;
         }
-        return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(worldID));
+        return RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(worldID));
     }
 
     public static String getWorldID(World world)
     {
-        return getWorldID(world.getDimensionKey());
+        return getWorldID(world.dimension());
     }
 
     public static String getWorldID(RegistryKey<World> world)
     {
-        return world.getLocation().toString();
+        return world.location().toString();
     }
 
     public static BlockPos[] getCollidingBlocks(AxisAlignedBB box)
@@ -154,6 +154,6 @@ public class Util
 
     public static void sendMessage(ServerPlayerEntity player, ITextComponent message)
     {
-        player.func_241151_a_(message, ChatType.GAME_INFO, net.minecraft.util.Util.DUMMY_UUID);
+        player.sendMessage(message, ChatType.GAME_INFO, net.minecraft.util.Util.NIL_UUID);
     }
 }

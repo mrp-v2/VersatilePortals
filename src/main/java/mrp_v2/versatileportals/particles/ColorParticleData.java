@@ -26,7 +26,7 @@ public abstract class ColorParticleData implements IParticleData
     {
         ParticleType<T> particleType = new ParticleType<T>(false, deserializerSupplier)
         {
-            @Override public Codec<T> func_230522_e_()
+            @Override public Codec<T> codec()
             {
                 return codecSupplier.get();
             }
@@ -51,26 +51,26 @@ public abstract class ColorParticleData implements IParticleData
     {
         return new IParticleData.IDeserializer<T>()
         {
-            @Override public T deserialize(ParticleType<T> particleTypeIn, StringReader reader)
+            @Override public T fromCommand(ParticleType<T> particleTypeIn, StringReader reader)
                     throws CommandSyntaxException
             {
                 reader.expect(' ');
                 return constructor.apply(reader.readInt());
             }
 
-            @Override public T read(ParticleType<T> particleTypeIn, PacketBuffer buffer)
+            @Override public T fromNetwork(ParticleType<T> particleTypeIn, PacketBuffer buffer)
             {
                 return constructor.apply(buffer.readInt());
             }
         };
     }
 
-    @Override public void write(PacketBuffer buffer)
+    @Override public void writeToNetwork(PacketBuffer buffer)
     {
         buffer.writeInt(this.color);
     }
 
-    @Override public String getParameters()
+    @Override public String writeToString()
     {
         return String.format(Locale.ROOT, "%s, %d", getID(), this.color);
     }

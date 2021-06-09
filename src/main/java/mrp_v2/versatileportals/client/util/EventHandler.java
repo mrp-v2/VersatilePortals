@@ -26,11 +26,11 @@ public class EventHandler
 {
     @SubscribeEvent public static void clientSetup(final FMLClientSetupEvent event)
     {
-        RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK.get(), RenderType.getTranslucent());
-        VersatilePortals.WORLD_SUPPLIER = () -> Minecraft.getInstance().world;
+        RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK.get(), RenderType.translucent());
+        VersatilePortals.WORLD_SUPPLIER = () -> Minecraft.getInstance().level;
         ClientRegistry.bindTileEntityRenderer(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE.get(),
                 PortalControllerTileEntityRenderer::new);
-        ScreenManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), PortalControllerScreen::new);
+        ScreenManager.register(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), PortalControllerScreen::new);
     }
 
     @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)
@@ -49,9 +49,9 @@ public class EventHandler
     @SuppressWarnings("resource") @SubscribeEvent
     public static void registerParticles(final ParticleFactoryRegisterEvent event)
     {
-        ParticleManager particleManager = Minecraft.getInstance().particles;
-        particleManager.registerFactory(ObjectHolder.PORTAL_PARTICLE_TYPE.get(), PortalParticle.Factory::new);
-        particleManager.registerFactory(ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE.get(),
-                PortalControllerParticle.Factory::new);
+        ParticleManager particleManager = Minecraft.getInstance().particleEngine;
+        particleManager.register(ObjectHolder.PORTAL_PARTICLE_TYPE.get(), PortalParticle.Factory::new);
+        particleManager
+                .register(ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE.get(), PortalControllerParticle.Factory::new);
     }
 }

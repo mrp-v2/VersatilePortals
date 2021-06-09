@@ -24,28 +24,26 @@ public class PortalFrameBlock extends Block implements IPortalFrame
 
     protected PortalFrameBlock(Function<Properties, Properties> propertiesModifier)
     {
-        super(propertiesModifier
-                .apply(AbstractBlock.Properties.create(Material.IRON, MaterialColor.LIGHT_GRAY).setRequiresTool()
-                        .hardnessAndResistance(3.0F, 3.0F)));
+        super(propertiesModifier.apply(AbstractBlock.Properties.of(Material.METAL, MaterialColor.COLOR_LIGHT_GRAY)
+                .requiresCorrectToolForDrops().strength(3.0F, 3.0F)));
     }
 
     /**
      * Post-placement, only server-side
      */
-    @Override public void onBlockAdded(BlockState newState, World world, BlockPos pos, BlockState oldState,
-            boolean isMoving)
+    @Override public void onPlace(BlockState newState, World world, BlockPos pos, BlockState oldState, boolean isMoving)
     {
-        super.onBlockAdded(newState, world, pos, oldState, isMoving);
+        super.onPlace(newState, world, pos, oldState, isMoving);
         PortalFrameUtil.sendUpdatePacket(oldState, pos, world);
     }
 
     /**
      * Post-removal, only server-side
      */
-    @Override public void onReplaced(BlockState oldState, World world, BlockPos pos, BlockState newState,
+    @Override public void onRemove(BlockState oldState, World world, BlockPos pos, BlockState newState,
             boolean isMoving)
     {
-        super.onReplaced(oldState, world, pos, newState, isMoving);
+        super.onRemove(oldState, world, pos, newState, isMoving);
         PortalFrameUtil.sendUpdatePacket(oldState, pos, world);
     }
 

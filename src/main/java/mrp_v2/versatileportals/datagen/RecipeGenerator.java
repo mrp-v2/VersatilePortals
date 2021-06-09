@@ -22,7 +22,7 @@ public class RecipeGenerator extends RecipeProvider
         super(dataGeneratorIn, modId);
     }
 
-    @Override protected void registerRecipes(Consumer<IFinishedRecipe> consumer)
+    @Override protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer)
     {
         makePortalFrameRecipe(consumer);
         makePortalControllerRecipe(consumer);
@@ -32,58 +32,56 @@ public class RecipeGenerator extends RecipeProvider
 
     private void makePortalFrameRecipe(Consumer<IFinishedRecipe> consumer)
     {
-        ShapedRecipeBuilder recipeBuilder = ShapedRecipeBuilder.shapedRecipe(ObjectHolder.PORTAL_FRAME_BLOCK.get());
-        recipeBuilder.patternLine("LLL");
-        recipeBuilder.patternLine("LOL");
-        recipeBuilder.patternLine("LLL");
-        recipeBuilder.key('L', Tags.Items.GEMS_LAPIS);
-        recipeBuilder.key('O', Tags.Items.OBSIDIAN);
-        recipeBuilder.addCriterion("has_obsidian", hasItem(Tags.Items.OBSIDIAN));
-        recipeBuilder.addCriterion("has_lapis", hasItem(Tags.Items.GEMS_LAPIS));
-        recipeBuilder.build(consumer);
+        ShapedRecipeBuilder recipeBuilder = ShapedRecipeBuilder.shaped(ObjectHolder.PORTAL_FRAME_BLOCK.get());
+        recipeBuilder.pattern("LLL");
+        recipeBuilder.pattern("LOL");
+        recipeBuilder.pattern("LLL");
+        recipeBuilder.define('L', Tags.Items.GEMS_LAPIS);
+        recipeBuilder.define('O', Tags.Items.OBSIDIAN);
+        recipeBuilder.unlockedBy("has_obsidian", has(Tags.Items.OBSIDIAN));
+        recipeBuilder.unlockedBy("has_lapis", has(Tags.Items.GEMS_LAPIS));
+        recipeBuilder.save(consumer);
     }
 
     private void makePortalControllerRecipe(Consumer<IFinishedRecipe> consumer)
     {
-        ShapedRecipeBuilder recipeBuilder =
-                ShapedRecipeBuilder.shapedRecipe(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
-        recipeBuilder.patternLine("FBF");
-        recipeBuilder.patternLine("BRB");
-        recipeBuilder.patternLine("FEF");
-        recipeBuilder.key('F', ObjectHolder.PORTAL_FRAME_BLOCK.get());
-        recipeBuilder.key('B', Tags.Items.BOOKSHELVES);
-        recipeBuilder.key('R', Tags.Items.DUSTS_REDSTONE);
-        recipeBuilder.key('E', Blocks.ENCHANTING_TABLE);
-        recipeBuilder.addCriterion("has_portal_frame", hasItem(ObjectHolder.PORTAL_FRAME_BLOCK.get()));
-        recipeBuilder.build(consumer);
+        ShapedRecipeBuilder recipeBuilder = ShapedRecipeBuilder.shaped(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
+        recipeBuilder.pattern("FBF");
+        recipeBuilder.pattern("BRB");
+        recipeBuilder.pattern("FEF");
+        recipeBuilder.define('F', ObjectHolder.PORTAL_FRAME_BLOCK.get());
+        recipeBuilder.define('B', Tags.Items.BOOKSHELVES);
+        recipeBuilder.define('R', Tags.Items.DUSTS_REDSTONE);
+        recipeBuilder.define('E', Blocks.ENCHANTING_TABLE);
+        recipeBuilder.unlockedBy("has_portal_frame", has(ObjectHolder.PORTAL_FRAME_BLOCK.get()));
+        recipeBuilder.save(consumer);
     }
 
     private void makeEmptyExistingWorldControlRecipe(Consumer<IFinishedRecipe> consumer)
     {
         // normal recipe
         ShapelessRecipeBuilder recipeBuilder =
-                ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
-        recipeBuilder.addIngredient(Ingredient.fromTag(Tags.Items.GEMS_LAPIS));
-        recipeBuilder.addIngredient(Items.CLOCK);
-        recipeBuilder.addIngredient(Items.MAP);
-        recipeBuilder.addIngredient(Items.COMPASS);
-        recipeBuilder.addIngredient(Tags.Items.DUSTS_REDSTONE);
-        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
-        recipeBuilder.build(consumer);
+                ShapelessRecipeBuilder.shapeless(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.requires(Ingredient.of(Tags.Items.GEMS_LAPIS));
+        recipeBuilder.requires(Items.CLOCK);
+        recipeBuilder.requires(Items.MAP);
+        recipeBuilder.requires(Items.COMPASS);
+        recipeBuilder.requires(Tags.Items.DUSTS_REDSTONE);
+        recipeBuilder.unlockedBy("has_portal_controller", has(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
+        recipeBuilder.save(consumer);
         // recipe from existing world control
-        recipeBuilder = ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
-        recipeBuilder.addIngredient(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get());
-        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
-        recipeBuilder.build(consumer, new ResourceLocation(VersatilePortals.ID, "empty_control_from_existing"));
+        recipeBuilder = ShapelessRecipeBuilder.shapeless(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.requires(ObjectHolder.EXISTING_WORLD_TELEPORT_ITEM.get());
+        recipeBuilder.unlockedBy("has_portal_controller", has(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
+        recipeBuilder.save(consumer, new ResourceLocation(VersatilePortals.ID, "empty_control_from_existing"));
     }
 
     private void makePortalLighterRecipe(Consumer<IFinishedRecipe> consumer)
     {
-        ShapelessRecipeBuilder recipeBuilder =
-                ShapelessRecipeBuilder.shapelessRecipe(ObjectHolder.PORTAL_LIGHTER_ITEM.get());
-        recipeBuilder.addIngredient(Items.FLINT_AND_STEEL);
-        recipeBuilder.addIngredient(Tags.Items.GEMS_LAPIS);
-        recipeBuilder.addCriterion("has_portal_controller", hasItem(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
-        recipeBuilder.build(consumer);
+        ShapelessRecipeBuilder recipeBuilder = ShapelessRecipeBuilder.shapeless(ObjectHolder.PORTAL_LIGHTER_ITEM.get());
+        recipeBuilder.requires(Items.FLINT_AND_STEEL);
+        recipeBuilder.requires(Tags.Items.GEMS_LAPIS);
+        recipeBuilder.unlockedBy("has_portal_controller", has(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()));
+        recipeBuilder.save(consumer);
     }
 }

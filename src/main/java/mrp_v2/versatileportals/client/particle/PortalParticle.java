@@ -15,15 +15,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
             double zSpeed, int color)
     {
         super(clientWorld, x, y, z, xSpeed, ySpeed, zSpeed);
-        this.particleRed = Util.fGetColorR(color);
-        this.particleGreen = Util.fGetColorG(color);
-        this.particleBlue = Util.fGetColorB(color);
+        this.rCol = Util.fGetColorR(color);
+        this.gCol = Util.fGetColorG(color);
+        this.bCol = Util.fGetColorB(color);
     }
 
     @Override public void tick()
     {
         super.tick();
-        this.posY -= 1 - (float) this.age / this.maxAge;
+        this.y -= 1 - (float) this.age / this.lifetime;
     }
 
     @OnlyIn(Dist.CLIENT) public static class Factory implements IParticleFactory<PortalParticleData>
@@ -36,12 +36,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
         }
 
         @Override
-        public Particle makeParticle(PortalParticleData particleData, ClientWorld worldIn, double x, double y, double z,
-                double xSpeed, double ySpeed, double zSpeed)
+        public Particle createParticle(PortalParticleData particleData, ClientWorld worldIn, double x, double y,
+                double z, double xSpeed, double ySpeed, double zSpeed)
         {
             PortalParticle portalParticle =
                     new PortalParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, particleData.getColor());
-            portalParticle.selectSpriteRandomly(this.spriteSet);
+            portalParticle.pickSprite(this.spriteSet);
             return portalParticle;
         }
     }

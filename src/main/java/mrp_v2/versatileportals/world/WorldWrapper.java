@@ -14,7 +14,11 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.*;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.ITickList;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.border.WorldBorder;
@@ -44,29 +48,29 @@ public class WorldWrapper implements IWorld
         this.overrideState = overrideState;
     }
 
-    @Override public ITickList<Block> getPendingBlockTicks()
+    @Override public ITickList<Block> getBlockTicks()
     {
-        return this.world.getPendingBlockTicks();
+        return this.world.getBlockTicks();
     }
 
-    @Override public ITickList<Fluid> getPendingFluidTicks()
+    @Override public ITickList<Fluid> getLiquidTicks()
     {
-        return this.world.getPendingFluidTicks();
+        return this.world.getLiquidTicks();
     }
 
-    @Override public IWorldInfo getWorldInfo()
+    @Override public IWorldInfo getLevelData()
     {
-        return this.world.getWorldInfo();
+        return this.world.getLevelData();
     }
 
-    @Override public DifficultyInstance getDifficultyForLocation(BlockPos pos)
+    @Override public DifficultyInstance getCurrentDifficultyAt(BlockPos pos)
     {
-        return this.world.getDifficultyForLocation(pos);
+        return this.world.getCurrentDifficultyAt(pos);
     }
 
-    @Override public AbstractChunkProvider getChunkProvider()
+    @Override public AbstractChunkProvider getChunkSource()
     {
-        return this.world.getChunkProvider();
+        return this.world.getChunkSource();
     }
 
     @Override public Random getRandom()
@@ -88,9 +92,9 @@ public class WorldWrapper implements IWorld
         this.world.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
     }
 
-    @Override public void playEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data)
+    @Override public void levelEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data)
     {
-        this.world.playEvent(player, type, pos, data);
+        this.world.levelEvent(player, type, pos, data);
     }
 
     public World getWorld()
@@ -98,14 +102,14 @@ public class WorldWrapper implements IWorld
         return this.world;
     }
 
-    @Override public float func_230487_a_(Direction direction, boolean b)
+    @Override public float getShade(Direction direction, boolean b)
     {
-        return this.world.func_230487_a_(direction, b);
+        return this.world.getShade(direction, b);
     }
 
-    @Override public WorldLightManager getLightManager()
+    @Override public WorldLightManager getLightEngine()
     {
-        return this.world.getLightManager();
+        return this.world.getLightEngine();
     }
 
     @Nullable @Override public IChunk getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull)
@@ -118,9 +122,9 @@ public class WorldWrapper implements IWorld
         return this.world.getHeight(heightmapType, x, z);
     }
 
-    @Override public int getSkylightSubtracted()
+    @Override public int getSkyDarken()
     {
-        return this.world.getSkylightSubtracted();
+        return this.world.getSkyDarken();
     }
 
     @Override public BiomeManager getBiomeManager()
@@ -128,19 +132,19 @@ public class WorldWrapper implements IWorld
         return this.world.getBiomeManager();
     }
 
-    @Override public int getBlockColor(BlockPos blockPosIn, ColorResolver colorResolverIn)
+    @Override public int getBlockTint(BlockPos blockPosIn, ColorResolver colorResolverIn)
     {
-        return this.world.getBlockColor(blockPosIn, colorResolverIn);
+        return this.world.getBlockTint(blockPosIn, colorResolverIn);
     }
 
-    @Override public Biome getNoiseBiomeRaw(int x, int y, int z)
+    @Override public Biome getUncachedNoiseBiome(int x, int y, int z)
     {
-        return this.world.getNoiseBiomeRaw(x, y, z);
+        return this.world.getUncachedNoiseBiome(x, y, z);
     }
 
-    @Override public boolean isRemote()
+    @Override public boolean isClientSide()
     {
-        return this.world.isRemote;
+        return this.world.isClientSide;
     }
 
     @Override public int getSeaLevel()
@@ -148,14 +152,14 @@ public class WorldWrapper implements IWorld
         return this.world.getSeaLevel();
     }
 
-    @Override public DimensionType getDimensionType()
+    @Override public DimensionType dimensionType()
     {
-        return this.world.getDimensionType();
+        return this.world.dimensionType();
     }
 
-    @Nullable @Override public TileEntity getTileEntity(BlockPos pos)
+    @Nullable @Override public TileEntity getBlockEntity(BlockPos pos)
     {
-        return this.world.getTileEntity(pos);
+        return this.world.getBlockEntity(pos);
     }
 
     @Override public BlockState getBlockState(BlockPos pos)
@@ -177,28 +181,26 @@ public class WorldWrapper implements IWorld
         return this.world.getWorldBorder();
     }
 
-    @Override
-    public List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entityIn, AxisAlignedBB boundingBox,
+    @Override public List<Entity> getEntities(@Nullable Entity entityIn, AxisAlignedBB boundingBox,
             @Nullable Predicate<? super Entity> predicate)
     {
-        return this.world.getEntitiesInAABBexcluding(entityIn, boundingBox, predicate);
+        return this.world.getEntities(entityIn, boundingBox, predicate);
     }
 
-    @Override
-    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> clazz, AxisAlignedBB aabb,
+    @Override public <T extends Entity> List<T> getEntitiesOfClass(Class<? extends T> clazz, AxisAlignedBB aabb,
             @Nullable Predicate<? super T> filter)
     {
-        return this.world.getEntitiesWithinAABB(clazz, aabb, filter);
+        return this.world.getEntitiesOfClass(clazz, aabb, filter);
     }
 
-    @Override public List<? extends PlayerEntity> getPlayers()
+    @Override public List<? extends PlayerEntity> players()
     {
-        return this.world.getPlayers();
+        return this.world.players();
     }
 
-    @Override public boolean setBlockState(BlockPos pos, BlockState state, int flags, int recursionLeft)
+    @Override public boolean setBlock(BlockPos pos, BlockState state, int flags, int recursionLeft)
     {
-        return this.world.setBlockState(pos, state, flags, recursionLeft);
+        return this.world.setBlock(pos, state, flags, recursionLeft);
     }
 
     @Override public boolean removeBlock(BlockPos pos, boolean isMoving)
@@ -211,13 +213,13 @@ public class WorldWrapper implements IWorld
         return this.world.destroyBlock(pos, dropBlock, entity, recursionLeft);
     }
 
-    @Override public boolean hasBlockState(BlockPos pos, Predicate<BlockState> state)
+    @Override public boolean isStateAtPosition(BlockPos pos, Predicate<BlockState> state)
     {
-        return this.world.hasBlockState(pos, state);
+        return this.world.isStateAtPosition(pos, state);
     }
 
-    @Override public DynamicRegistries func_241828_r()
+    @Override public DynamicRegistries registryAccess()
     {
-        return this.world.func_241828_r();
+        return this.world.registryAccess();
     }
 }

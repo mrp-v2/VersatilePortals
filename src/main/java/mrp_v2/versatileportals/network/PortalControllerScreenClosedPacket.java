@@ -36,10 +36,10 @@ public class PortalControllerScreenClosedPacket
         context.get().enqueueWork(() ->
         {
             ServerPlayerEntity player = context.get().getSender();
-            if (player.world.isBlockLoaded(this.pos))
+            if (player.level.hasChunkAt(this.pos))
             {
                 PortalControllerTileEntity portalController =
-                        (PortalControllerTileEntity) player.world.getTileEntity(this.pos);
+                        (PortalControllerTileEntity) player.level.getBlockEntity(this.pos);
                 if (portalController != null)
                 {
                     portalController.setPortalColor(this.portalColor);

@@ -78,6 +78,6 @@ public class PortalDataHandler implements IPortalDataCapability
 
     @Override public void setPortalPos(BlockPos portalPos)
     {
-        this.portalPos = portalPos.toImmutable();
+        this.portalPos = portalPos.immutable();
     }
 }

@@ -52,8 +52,8 @@ public class PortalControllerTileEntity extends TileEntity
     public static TileEntityType<PortalControllerTileEntity> createTileEntity()
     {
         //noinspection ConstantConditions
-        return TileEntityType.Builder.create(PortalControllerTileEntity::new,
-                ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()).build(null);
+        return TileEntityType.Builder.of(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())
+                .build(null);
     }
 
     public PortalControllerTileEntity()
@@ -100,12 +100,13 @@ public class PortalControllerTileEntity extends TileEntity
 
     public ITextComponent getDefaultName()
     {
-        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getTranslationKey());
+        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId());
     }
 
     @Override public Container createMenu(int id, PlayerInventory playerInventoryIn, PlayerEntity playerIn)
     {
-        return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor, this.getPos());
+        return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor,
+                this.getBlockPos());
     }
 
     @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
@@ -119,16 +120,16 @@ public class PortalControllerTileEntity extends TileEntity
 
     @Override public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
     {
-        this.read(this.getBlockState(), pkt.getNbtCompound());
-        if (this.world.isBlockLoaded(this.pos))
+        this.load(this.getBlockState(), pkt.getTag());
+        if (this.level.hasChunkAt(this.worldPosition))
         {
-            PortalFrameUtil.updatePortals(PortalFrameUtil.getPortalSizes(this.pos, this.world, false));
+            PortalFrameUtil.updatePortals(PortalFrameUtil.getPortalSizes(this.worldPosition, this.level, false));
         }
     }
 
-    @Override public void read(BlockState state, CompoundNBT compound)
+    @Override public void load(BlockState state, CompoundNBT compound)
     {
-        super.read(state, compound);
+        super.load(state, compound);
         if (compound.contains(DATA_NBT_ID, 10))
         {
             CompoundNBT dataNBT = compound.getCompound(DATA_NBT_ID);
@@ -143,29 +144,28 @@ public class PortalControllerTileEntity extends TileEntity
         }
     }
 
-    @Override public CompoundNBT write(CompoundNBT compound)
+    @Override public CompoundNBT save(CompoundNBT compound)
     {
-        super.write(compound);
+        super.save(compound);
         PortalControllerData.CODEC.encodeStart(NBTDynamicOps.INSTANCE, new PortalControllerData(this))
-                .resultOrPartial(VersatilePortals.LOGGER::error)
-                .ifPresent((data) -> compound.put(DATA_NBT_ID, data));
+                .resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) -> compound.put(DATA_NBT_ID, data));
         return compound;
     }
 
     @Override public SUpdateTileEntityPacket getUpdatePacket()
     {
-        return new SUpdateTileEntityPacket(this.getPos(), -1, this.write(new CompoundNBT()));
+        return new SUpdateTileEntityPacket(this.getBlockPos(), -1, this.save(new CompoundNBT()));
     }
 
     @Override public CompoundNBT getUpdateTag()
     {
-        return this.write(super.getUpdateTag());
+        return this.save(super.getUpdateTag());
     }
 
-    @Override public void remove()
+    @Override public void setRemoved()
     {
         this.inventoryLazyOptional.invalidate();
-        super.remove();
+        super.setRemoved();
     }
 
     public int getPortalColor()
@@ -178,7 +178,7 @@ public class PortalControllerTileEntity extends TileEntity
         if (this.portalColor != newPortalColor)
         {
             this.portalColor = newPortalColor;
-            this.markDirty();
+            this.setChanged();
             this.sendUpdateToClient();
         }
     }
@@ -186,18 +186,18 @@ public class PortalControllerTileEntity extends TileEntity
     private void sendUpdateToClient()
     {
         BlockState state = this.getBlockState();
-        this.world.notifyBlockUpdate(this.getPos(), state, state, 2);
+        this.level.sendBlockUpdated(this.getBlockPos(), state, state, 2);
     }
 
     public void onInventorySlotChanged()
     {
-        this.markDirty();
+        this.setChanged();
         this.sendUpdateToClient();
     }
 
     @Override public void tick()
     {
-        if (!this.world.isRemote)
+        if (!this.level.isClientSide)
         {
             return;
         }
@@ -211,7 +211,7 @@ public class PortalControllerTileEntity extends TileEntity
             {
                 return;
             }
-            PortalControllerBlock.animateTick(this.getBlockState(), this.world, this.pos);
+            PortalControllerBlock.animateTick(this.getBlockState(), this.level, this.worldPosition);
         }
     }
 

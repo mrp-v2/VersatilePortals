@@ -62,16 +62,16 @@ import java.util.stream.Collectors;
                     portalData.setInPortal(false);
                     if (portalData.getRemainingPortalCooldown() > 0)
                     {
-                        portalData.setRemainingPortalCooldown(entity.getPortalCooldown());
+                        portalData.setRemainingPortalCooldown(entity.getDimensionChangingDelay());
                         return;
                     }
-                    if (portalData.incrementInPortalTime() < entity.getMaxInPortalTime())
+                    if (portalData.incrementInPortalTime() < entity.getPortalWaitTime())
                     {
-                        if (entity.getMaxInPortalTime() > 1)
+                        if (entity.getPortalWaitTime() > 1)
                         {
                             if (entity instanceof ServerPlayerEntity)
                             {
-                                int remainingInPortalTime = entity.getMaxInPortalTime() - portalData.getInPortalTime();
+                                int remainingInPortalTime = entity.getPortalWaitTime() - portalData.getInPortalTime();
                                 Util.sendMessage((ServerPlayerEntity) entity, teleportingInFunction
                                         .apply(new Object[]{Math.ceil(remainingInPortalTime / 2.0F) / 10.0F}));
                             }
@@ -79,7 +79,7 @@ import java.util.stream.Collectors;
                     } else
                     {
                         PortalSize portalSize = new PortalSize(world, portalData.getPortalPos(),
-                                world.getBlockState(portalData.getPortalPos()).get(BlockStateProperties.AXIS));
+                                world.getBlockState(portalData.getPortalPos()).getValue(BlockStateProperties.AXIS));
                         PortalControllerTileEntity controller = portalSize.getPortalController(world).getLeft();
                         if (controller == null)
                         {

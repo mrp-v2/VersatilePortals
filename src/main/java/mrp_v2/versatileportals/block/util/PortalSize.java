@@ -1,6 +1,8 @@
 package mrp_v2.versatileportals.block.util;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mrp_v2.versatileportals.block.IPortalFrame;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
@@ -27,6 +29,14 @@ import java.util.function.Predicate;
 public class PortalSize
 {
     public static final int MAX_SIZE = 21, MIN_SIZE = 1;
+    public static final Codec<PortalSize> CODEC = RecordCodecBuilder.create((builder) -> builder
+            .group(Direction.Axis.CODEC.fieldOf("Axis").forGetter((size) -> size.axis),
+                    BlockPos.CODEC.fieldOf("FarthestDownNorthWestPortalLoc")
+                            .forGetter((size) -> size.farthestDownNorthWestPortalLoc),
+                    Codec.INT.fieldOf("SizeA").forGetter((size) -> size.sizeA),
+                    Codec.INT.fieldOf("SizeB").forGetter((size) -> size.sizeB),
+                    Codec.INT.fieldOf("PortalBlockCount").forGetter((size) -> size.portalBlockCount))
+            .apply(builder, PortalSize::new));
     private final Direction.Axis axis;
     private final Direction dirA, dirB, oppositeDirA, oppositeDirB;
     private int sizeA, sizeB, portalBlockCount;
@@ -39,13 +49,28 @@ public class PortalSize
      */
     @Nullable private BlockPos portalControllerRelativePos;
 
+    private PortalSize(Direction.Axis axis, BlockPos farthestDownNorthWestPortalLoc, int sizeA, int sizeB,
+            int portalBlockCount)
+    {
+        this.axis = axis;
+        Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
+        this.dirA = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getLeft());
+        this.oppositeDirA = this.dirA.getOpposite();
+        this.dirB = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getRight());
+        this.oppositeDirB = this.dirB.getOpposite();
+        this.farthestDownNorthWestPortalLoc = farthestDownNorthWestPortalLoc;
+        this.sizeA = sizeA;
+        this.sizeB = sizeB;
+        this.portalBlockCount = portalBlockCount;
+    }
+
     public PortalSize(IBlockReader world, BlockPos pos, Direction.Axis axis)
     {
         this.axis = axis;
         Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
-        this.dirA = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, otherAxes.getLeft());
+        this.dirA = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getLeft());
         this.oppositeDirA = this.dirA.getOpposite();
-        this.dirB = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, otherAxes.getRight());
+        this.dirB = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getRight());
         this.oppositeDirB = this.dirB.getOpposite();
         this.farthestDownNorthWestPortalLoc = this.getFarthestDownNorthWestPortalLoc(pos, world);
         if (this.farthestDownNorthWestPortalLoc == null)
@@ -72,56 +97,96 @@ public class PortalSize
             if (portalControllerResult.getLeft() != null)
             {
                 this.portalControllerRelativePos =
-                        portalControllerResult.getLeft().getPos().subtract(this.farthestDownNorthWestPortalLoc);
+                        portalControllerResult.getLeft().getBlockPos().subtract(this.farthestDownNorthWestPortalLoc);
             }
         }
     }
 
-    protected PortalSize(PacketBuffer buffer)
+    public Pair<PortalControllerTileEntity, Boolean> getPortalController(IBlockReader world)
     {
-        this.farthestDownNorthWestPortalLoc = buffer.readBlockPos();
-        this.sizeA = buffer.readInt();
-        this.sizeB = buffer.readInt();
-        this.portalBlockCount = buffer.readInt();
-        this.axis = buffer.readEnumValue(Direction.Axis.class);
-        Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
-        this.dirA = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, otherAxes.getLeft());
-        this.oppositeDirA = this.dirA.getOpposite();
-        this.dirB = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, otherAxes.getRight());
-        this.oppositeDirB = this.dirB.getOpposite();
+        PortalControllerTileEntity portalControllerTileEntity = null;
+        boolean found = false;
+        if (this.isValid())
+        {
+            for (Pair<BlockPos, Optional<Direction>> frame : this.getFrameBlocks())
+            {
+                BlockState state = world.getBlockState(frame.getLeft());
+                if (isPortalController(state))
+                {
+                    if (found)
+                    {
+                        return Pair.of(null, false);
+                    }
+                    TileEntity temp = world.getBlockEntity(frame.getLeft());
+                    portalControllerTileEntity =
+                            temp instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) temp : null;
+                    found = true;
+                }
+            }
+        }
+        return Pair.of(portalControllerTileEntity, found);
     }
 
     public static boolean isPortalController(BlockState state)
     {
-        return state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
+        return state.is(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
     }
 
-    public static boolean isPortal(BlockState state)
+    public List<Pair<BlockPos, Optional<Direction>>> getFrameBlocks()
     {
-        return state.isIn(ObjectHolder.PORTAL_BLOCK.get());
-    }
-
-    public static boolean isPortalFrame(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
-    {
-        Block block = state.getBlock();
-        if (state.isIn(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
+        List<Pair<BlockPos, Optional<Direction>>> frame =
+                Lists.newArrayListWithCapacity(this.sizeA * 2 + this.sizeB * 2 + 4);
+        //corners
+        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(oppositeDirB).relative(oppositeDirA),
+                Optional.empty()));
+        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(oppositeDirB).relative(this.dirA, this.sizeA),
+                Optional.empty()));
+        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.dirB, this.sizeB).relative(oppositeDirA),
+                Optional.empty()));
+        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.dirB, this.sizeB)
+                .relative(this.dirA, this.sizeA), Optional.empty()));
+        for (int i = 0; i < this.sizeB; i++)
         {
-            return ((PortalControllerBlock) block).isSideValidForPortal(state, reader, pos, side);
-        } else if (state.isIn(ObjectHolder.PORTAL_FRAME_BLOCK.get()))
-        {
-            return true;
-        } else if (state.getBlock() instanceof IPortalFrame)
-        {
-            return ((IPortalFrame) state.getBlock()).isSideValidForPortal(state, reader, pos, side);
-        } else
-        {
-            return false;
+            // -A side
+            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.oppositeDirA).relative(dirB, i),
+                    Optional.of(this.dirA)));
+            // +A side
+            frame.add(
+                    Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.dirA, this.sizeA).relative(this.dirB, i),
+                            Optional.of(this.oppositeDirA)));
         }
+        for (int i = 0; i < this.sizeA; i++)
+        {
+            // -B side
+            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.oppositeDirB).relative(this.dirA, i),
+                    Optional.of(this.dirB)));
+            // +B side
+            frame.add(
+                    Pair.of(this.farthestDownNorthWestPortalLoc.relative(this.dirB, this.sizeB).relative(this.dirA, i),
+                            Optional.of(this.oppositeDirB)));
+        }
+        return frame;
+    }
+
+    @Nullable private BlockPos getFarthestDownNorthWestPortalLoc(BlockPos pos, IBlockReader world)
+    {
+        if (!canConnect(world.getBlockState(pos)))
+        {
+            return null;
+        }
+        for (int i = Math.max(this.dirB.getAxis() == Direction.Axis.Y ? 0 : Integer.MIN_VALUE,
+                getOnAxis(pos, this.dirB.getAxis()) - MAX_SIZE); getOnAxis(pos, this.dirB.getAxis()) > i &&
+                     canConnect(world.getBlockState(pos.relative(this.oppositeDirB)));
+             pos = pos.relative(this.oppositeDirB))
+        {
+        }
+        int j = this.getDistanceFromEdge(pos, this.oppositeDirA, this.dirA, this.oppositeDirB, this.dirB, world) - 1;
+        return j < 0 ? null : pos.relative(this.oppositeDirA, j);
     }
 
     private static boolean canConnect(BlockState state)
     {
-        return state.isAir() || state.isIn(BlockTags.FIRE) || isPortal(state);
+        return state.isAir() || state.is(BlockTags.FIRE) || isPortal(state);
     }
 
     public static List<PortalSize> readListFromBuffer(PacketBuffer buffer)
@@ -141,13 +206,9 @@ public class PortalSize
         sizes.forEach((size) -> size.writeToBuffer(buffer));
     }
 
-    public void writeToBuffer(PacketBuffer buffer)
+    public static boolean isPortal(BlockState state)
     {
-        buffer.writeBlockPos(this.farthestDownNorthWestPortalLoc);
-        buffer.writeInt(this.sizeA);
-        buffer.writeInt(this.sizeB);
-        buffer.writeInt(this.portalBlockCount);
-        buffer.writeEnumValue(this.axis);
+        return state.is(ObjectHolder.PORTAL_BLOCK.get());
     }
 
     public static Optional<PortalSize> tryGetEmptyPortalSize(IWorld world, BlockPos pos)
@@ -262,163 +323,6 @@ public class PortalSize
         return portalControllerRelativePos;
     }
 
-    public void placePortalBlocks(IWorld world)
-    {
-        BlockState state = ObjectHolder.PORTAL_BLOCK.get().getDefaultState().with(BlockStateProperties.AXIS, this.axis);
-        BlockPos.getAllInBoxMutable(this.farthestDownNorthWestPortalLoc,
-                this.farthestDownNorthWestPortalLoc.offset(dirA, this.sizeA - 1).offset(this.dirB, this.sizeB - 1))
-                .forEach((pos) -> world.setBlockState(pos, state, 18));
-    }
-
-    public Pair<PortalControllerTileEntity, Boolean> getPortalController(IBlockReader world)
-    {
-        PortalControllerTileEntity portalControllerTileEntity = null;
-        boolean found = false;
-        if (this.isValid())
-        {
-            for (Pair<BlockPos, Optional<Direction>> frame : this.getFrameBlocks())
-            {
-                BlockState state = world.getBlockState(frame.getLeft());
-                if (isPortalController(state))
-                {
-                    if (found)
-                    {
-                        return Pair.of(null, false);
-                    }
-                    TileEntity temp = world.getTileEntity(frame.getLeft());
-                    portalControllerTileEntity =
-                            temp instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) temp : null;
-                    found = true;
-                }
-            }
-        }
-        return Pair.of(portalControllerTileEntity, found);
-    }
-
-    public List<Pair<BlockPos, Optional<Direction>>> getFrameBlocks()
-    {
-        List<Pair<BlockPos, Optional<Direction>>> frame =
-                Lists.newArrayListWithCapacity(this.sizeA * 2 + this.sizeB * 2 + 4);
-        //corners
-        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(oppositeDirB).offset(oppositeDirA),
-                Optional.empty()));
-        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(oppositeDirB).offset(this.dirA, this.sizeA),
-                Optional.empty()));
-        frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.dirB, this.sizeB).offset(oppositeDirA),
-                Optional.empty()));
-        frame.add(
-                Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.dirB, this.sizeB).offset(this.dirA, this.sizeA),
-                        Optional.empty()));
-        for (int i = 0; i < this.sizeB; i++)
-        {
-            // -A side
-            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.oppositeDirA).offset(dirB, i),
-                    Optional.of(this.dirA)));
-            // +A side
-            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.dirA, this.sizeA).offset(this.dirB, i),
-                    Optional.of(this.oppositeDirA)));
-        }
-        for (int i = 0; i < this.sizeA; i++)
-        {
-            // -B side
-            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.oppositeDirB).offset(this.dirA, i),
-                    Optional.of(this.dirB)));
-            // +B side
-            frame.add(Pair.of(this.farthestDownNorthWestPortalLoc.offset(this.dirB, this.sizeB).offset(this.dirA, i),
-                    Optional.of(this.oppositeDirB)));
-        }
-        return frame;
-    }
-
-    public boolean isValidAndHasCorrectPortalBlockCount()
-    {
-        return this.isValid() && this.portalBlockCount == this.sizeB * this.sizeA;
-    }
-
-    private int getSizeB(IBlockReader world)
-    {
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-        int i = this.getDistanceFromPositiveBSide(mutable, world);
-        return i >= MIN_SIZE && i <= MAX_SIZE && this.isPositiveBFrameSideValid(mutable, i, world) ? i : 0;
-    }
-
-    // Also verifies the A sides of the frame
-    private int getDistanceFromPositiveBSide(BlockPos.Mutable pos, IBlockReader world)
-    {
-        for (int i = 0; i < MAX_SIZE; i++)
-        {
-            pos.setPos(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.oppositeDirA);
-            if (!isPortalFrame(world.getBlockState(pos), world, pos, this.dirA))
-            {
-                return i;
-            }
-            pos.setPos(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.dirA, this.sizeA);
-            if (!isPortalFrame(world.getBlockState(pos), world, pos, this.oppositeDirA))
-            {
-                return i;
-            }
-            for (int j = 0; j < this.sizeA; j++)
-            {
-                pos.setPos(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.dirA, j);
-                BlockState state = world.getBlockState(pos);
-                if (!canConnect(state))
-                {
-                    return i;
-                }
-                if (state.isIn(ObjectHolder.PORTAL_BLOCK.get()))
-                {
-                    this.portalBlockCount++;
-                }
-            }
-        }
-        return MAX_SIZE;
-    }
-
-    private boolean isPositiveBFrameSideValid(BlockPos.Mutable pos, int distanceFromSide, IBlockReader world)
-    {
-        for (int i = 0; i < this.sizeA; i++)
-        {
-            BlockPos.Mutable mutable = pos.setPos(this.farthestDownNorthWestPortalLoc).move(this.dirB, distanceFromSide)
-                    .move(this.dirA, i);
-            if (!isPortalFrame(world.getBlockState(mutable), world, mutable, this.oppositeDirB))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Nullable private BlockPos getFarthestDownNorthWestPortalLoc(BlockPos pos, IBlockReader world)
-    {
-        if (!canConnect(world.getBlockState(pos)))
-        {
-            return null;
-        }
-        for (int i = Math.max(this.dirB.getAxis() == Direction.Axis.Y ? 0 : Integer.MIN_VALUE,
-                getOnAxis(pos, this.dirB.getAxis()) - MAX_SIZE);
-             getOnAxis(pos, this.dirB.getAxis()) > i && canConnect(world.getBlockState(pos.offset(this.oppositeDirB)));
-             pos = pos.offset(this.oppositeDirB))
-        {
-        }
-        int j = this.getDistanceFromEdge(pos, this.oppositeDirA, this.dirA, this.oppositeDirB, this.dirB, world) - 1;
-        return j < 0 ? null : pos.offset(this.oppositeDirA, j);
-    }
-
-    private int getOnAxis(BlockPos pos, Direction.Axis axis)
-    {
-        switch (axis)
-        {
-            case X:
-                return pos.getX();
-            case Y:
-                return pos.getY();
-            case Z:
-                return pos.getZ();
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     // Also verifies the testingDir side of the frame
     private int getDistanceFromEdge(BlockPos start, Direction movingDir, Direction oppositeMovingDir,
             Direction testingDir, Direction oppositeTestingDir, IBlockReader world)
@@ -426,7 +330,7 @@ public class PortalSize
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (int i = 0; i <= MAX_SIZE; i++)
         {
-            mutable.setPos(start).move(movingDir, i);
+            mutable.set(start).move(movingDir, i);
             BlockState nextBlockState = world.getBlockState(mutable);
             if (!canConnect(nextBlockState))
             {
@@ -445,6 +349,129 @@ public class PortalSize
         return 0;
     }
 
+    public static boolean isPortalFrame(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
+    {
+        Block block = state.getBlock();
+        if (state.is(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
+        {
+            return ((PortalControllerBlock) block).isSideValidForPortal(state, reader, pos, side);
+        } else if (state.is(ObjectHolder.PORTAL_FRAME_BLOCK.get()))
+        {
+            return true;
+        } else if (state.getBlock() instanceof IPortalFrame)
+        {
+            return ((IPortalFrame) state.getBlock()).isSideValidForPortal(state, reader, pos, side);
+        } else
+        {
+            return false;
+        }
+    }
+
+    protected PortalSize(PacketBuffer buffer)
+    {
+        this.farthestDownNorthWestPortalLoc = buffer.readBlockPos();
+        this.sizeA = buffer.readInt();
+        this.sizeB = buffer.readInt();
+        this.portalBlockCount = buffer.readInt();
+        this.axis = buffer.readEnum(Direction.Axis.class);
+        Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
+        this.dirA = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getLeft());
+        this.oppositeDirA = this.dirA.getOpposite();
+        this.dirB = Direction.get(Direction.AxisDirection.POSITIVE, otherAxes.getRight());
+        this.oppositeDirB = this.dirB.getOpposite();
+    }
+
+    public boolean isValidAndHasCorrectPortalBlockCount()
+    {
+        return this.isValid() && this.portalBlockCount == this.sizeB * this.sizeA;
+    }
+
+    private int getSizeB(IBlockReader world)
+    {
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        int i = this.getDistanceFromPositiveBSide(mutable, world);
+        return i >= MIN_SIZE && i <= MAX_SIZE && this.isPositiveBFrameSideValid(mutable, i, world) ? i : 0;
+    }
+
+    public void writeToBuffer(PacketBuffer buffer)
+    {
+        buffer.writeBlockPos(this.farthestDownNorthWestPortalLoc);
+        buffer.writeInt(this.sizeA);
+        buffer.writeInt(this.sizeB);
+        buffer.writeInt(this.portalBlockCount);
+        buffer.writeEnum(this.axis);
+    }
+
+    public void placePortalBlocks(IWorld world)
+    {
+        BlockState state =
+                ObjectHolder.PORTAL_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.AXIS, this.axis);
+        BlockPos.betweenClosed(this.farthestDownNorthWestPortalLoc,
+                this.farthestDownNorthWestPortalLoc.relative(dirA, this.sizeA - 1).relative(this.dirB, this.sizeB - 1))
+                .forEach((pos) -> world.setBlock(pos, state, 18));
+    }
+
+    // Also verifies the A sides of the frame
+    private int getDistanceFromPositiveBSide(BlockPos.Mutable pos, IBlockReader world)
+    {
+        for (int i = 0; i < MAX_SIZE; i++)
+        {
+            pos.set(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.oppositeDirA);
+            if (!isPortalFrame(world.getBlockState(pos), world, pos, this.dirA))
+            {
+                return i;
+            }
+            pos.set(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.dirA, this.sizeA);
+            if (!isPortalFrame(world.getBlockState(pos), world, pos, this.oppositeDirA))
+            {
+                return i;
+            }
+            for (int j = 0; j < this.sizeA; j++)
+            {
+                pos.set(this.farthestDownNorthWestPortalLoc).move(this.dirB, i).move(this.dirA, j);
+                BlockState state = world.getBlockState(pos);
+                if (!canConnect(state))
+                {
+                    return i;
+                }
+                if (state.is(ObjectHolder.PORTAL_BLOCK.get()))
+                {
+                    this.portalBlockCount++;
+                }
+            }
+        }
+        return MAX_SIZE;
+    }
+
+    private int getOnAxis(BlockPos pos, Direction.Axis axis)
+    {
+        switch (axis)
+        {
+            case X:
+                return pos.getX();
+            case Y:
+                return pos.getY();
+            case Z:
+                return pos.getZ();
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean isPositiveBFrameSideValid(BlockPos.Mutable pos, int distanceFromSide, IBlockReader world)
+    {
+        for (int i = 0; i < this.sizeA; i++)
+        {
+            BlockPos.Mutable mutable =
+                    pos.set(this.farthestDownNorthWestPortalLoc).move(this.dirB, distanceFromSide).move(this.dirA, i);
+            if (!isPortalFrame(world.getBlockState(mutable), world, mutable, this.oppositeDirB))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private int getSizeA(IBlockReader world)
     {
         int i = this.getDistanceFromEdge(this.farthestDownNorthWestPortalLoc, this.dirA, this.oppositeDirA,
@@ -454,8 +481,9 @@ public class PortalSize
 
     public Pair<BlockPos, BlockPos> getBlockRange()
     {
-        BlockPos a = this.farthestDownNorthWestPortalLoc.offset(this.dirB, -1).offset(this.dirA, -1);
-        BlockPos b = this.farthestDownNorthWestPortalLoc.offset(this.dirB, this.sizeB).offset(this.dirA, this.sizeA);
+        BlockPos a = this.farthestDownNorthWestPortalLoc.relative(this.dirB, -1).relative(this.dirA, -1);
+        BlockPos b =
+                this.farthestDownNorthWestPortalLoc.relative(this.dirB, this.sizeB).relative(this.dirA, this.sizeA);
         return Pair.of(a, b);
     }
 

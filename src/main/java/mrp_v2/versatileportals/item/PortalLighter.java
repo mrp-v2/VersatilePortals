@@ -14,22 +14,21 @@ public class PortalLighter extends BasicSingleItem
 
     public PortalLighter()
     {
-        super(properties -> properties.maxDamage(64));
+        super(properties -> properties.durability(64));
     }
 
-    @SuppressWarnings("resource") @Override public ActionResultType onItemUse(ItemUseContext context)
+    @SuppressWarnings("resource") @Override public ActionResultType useOn(ItemUseContext context)
     {
-        Optional<PortalSize> optionalSize =
-                PortalSize.tryGetEmptyPortalSize(context.getWorld(), context.getPos().offset(context.getFace()));
+        Optional<PortalSize> optionalSize = PortalSize
+                .tryGetEmptyPortalSize(context.getLevel(), context.getClickedPos().relative(context.getClickedFace()));
         if (optionalSize.isPresent())
         {
-            context.getWorld()
-                    .playSound(context.getPlayer(), context.getPos(), SoundEvents.ITEM_FLINTANDSTEEL_USE,
-                            SoundCategory.BLOCKS, 1.0F, random.nextFloat() * 0.4F + 0.8F);
-            optionalSize.get().placePortalBlocks(context.getWorld());
-            context.getItem()
-                    .damageItem(1, context.getPlayer(), (player) -> player.sendBreakAnimation(context.getHand()));
-            return ActionResultType.func_233537_a_(context.getWorld().isRemote);
+            context.getLevel().playSound(context.getPlayer(), context.getClickedPos(), SoundEvents.FLINTANDSTEEL_USE,
+                    SoundCategory.BLOCKS, 1.0F, random.nextFloat() * 0.4F + 0.8F);
+            optionalSize.get().placePortalBlocks(context.getLevel());
+            context.getItemInHand()
+                    .hurtAndBreak(1, context.getPlayer(), (player) -> player.broadcastBreakEvent(context.getHand()));
+            return ActionResultType.sidedSuccess(context.getLevel().isClientSide);
         }
         return ActionResultType.FAIL;
     }

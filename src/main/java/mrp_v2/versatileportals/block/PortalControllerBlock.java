@@ -33,18 +33,17 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
 {
     public static final String ID = "portal_controller";
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-    public static final VoxelShape TOP_SIDE = makeCuboidShape(0, 13, 0, 16, 16, 16), BOTTOM_SIDE =
-            makeCuboidShape(0, 0, 0, 16, 3, 16), EAST_SIDE = makeCuboidShape(13, 0, 0, 16, 16, 16), WEST_SIDE =
-            makeCuboidShape(0, 0, 0, 3, 16, 16), SOUTH_SIDE = makeCuboidShape(0, 0, 13, 16, 16, 16), NORTH_SIDE =
-            makeCuboidShape(0, 0, 0, 16, 16, 3);
-    public static final VoxelShape SHAPE_NS = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, EAST_SIDE, WEST_SIDE).simplify(),
-            SHAPE_EW = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, SOUTH_SIDE, NORTH_SIDE).simplify(), SHAPE_UD =
+    public static final VoxelShape TOP_SIDE = box(0, 13, 0, 16, 16, 16), BOTTOM_SIDE = box(0, 0, 0, 16, 3, 16),
+            EAST_SIDE = box(13, 0, 0, 16, 16, 16), WEST_SIDE = box(0, 0, 0, 3, 16, 16), SOUTH_SIDE =
+            box(0, 0, 13, 16, 16, 16), NORTH_SIDE = box(0, 0, 0, 16, 16, 3);
+    public static final VoxelShape SHAPE_NS = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, EAST_SIDE, WEST_SIDE).optimize(),
+            SHAPE_EW = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, SOUTH_SIDE, NORTH_SIDE).optimize(), SHAPE_UD =
             VoxelShapes.or(EAST_SIDE, WEST_SIDE, SOUTH_SIDE, NORTH_SIDE);
 
     public PortalControllerBlock()
     {
-        super(Properties::notSolid);
-        this.setDefaultState(this.stateContainer.getBaseState().with(AXIS, Direction.Axis.X));
+        super(Properties::noOcclusion);
+        this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.X));
     }
 
     public static void animateTick(BlockState stateIn, World worldIn, BlockPos pos)
@@ -55,7 +54,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         double z = pos.getZ() + 0.5D;
         double motion = 0.375D;
         double noMotion = 0.0D;
-        Direction.Axis axis = stateIn.get(AXIS);
+        Direction.Axis axis = stateIn.getValue(AXIS);
         if (axis != Direction.Axis.X)
         {
             worldIn.addParticle(data, x, y, z, motion, noMotion, noMotion);
@@ -73,26 +72,25 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         }
     }
 
-    @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    @Override public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
         if (state.hasTileEntity() && (state.getBlock() != newState.getBlock() || !newState.hasTileEntity()))
         {
-            worldIn.getTileEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            worldIn.getBlockEntity(pos).getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                     .ifPresent(itemHandler ->
                     {
                         for (int i = 0; i < itemHandler.getSlots(); i++)
                         {
-                            Block.spawnAsEntity(worldIn, pos, itemHandler.getStackInSlot(i));
+                            Block.popResource(worldIn, pos, itemHandler.getStackInSlot(i));
                         }
                     });
         }
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
     public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
     {
-        return state.isSolidSide(reader, pos, side);
+        return state.isFaceSturdy(reader, pos, side);
     }
 
     @Override public boolean hasTileEntity(BlockState state)
@@ -106,10 +104,10 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
-            Hand handIn, BlockRayTraceResult hit)
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn,
+            BlockRayTraceResult hit)
     {
-        PortalControllerTileEntity portalController = (PortalControllerTileEntity) worldIn.getTileEntity(pos);
+        PortalControllerTileEntity portalController = (PortalControllerTileEntity) worldIn.getBlockEntity(pos);
         if (portalController != null)
         {
             if (player instanceof ServerPlayerEntity)
@@ -120,7 +118,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
                     buffer.writeBlockPos(pos);
                 });
             }
-            return ActionResultType.func_233537_a_(worldIn.isRemote);
+            return ActionResultType.sidedSuccess(worldIn.isClientSide);
         }
         return ActionResultType.PASS;
     }
@@ -133,7 +131,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
 
     private VoxelShape getShape(BlockState state)
     {
-        switch (state.get(AXIS))
+        switch (state.getValue(AXIS))
         {
             case X:
                 return SHAPE_EW;
@@ -148,24 +146,24 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
 
     @Override public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        return this.getDefaultState().with(AXIS, context.getNearestLookingDirection().getAxis());
+        return this.defaultBlockState().setValue(AXIS, context.getNearestLookingDirection().getAxis());
     }
 
-    @Override public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+    @Override public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
             ItemStack stack)
     {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-        if (stack.hasDisplayName())
+        super.setPlacedBy(worldIn, pos, state, placer, stack);
+        if (stack.hasCustomHoverName())
         {
-            TileEntity tileEntity = worldIn.getTileEntity(pos);
+            TileEntity tileEntity = worldIn.getBlockEntity(pos);
             if (tileEntity instanceof PortalControllerTileEntity)
             {
-                ((PortalControllerTileEntity) tileEntity).setCustomName(stack.getDisplayName());
+                ((PortalControllerTileEntity) tileEntity).setCustomName(stack.getHoverName());
             }
         }
     }
 
-    @Override protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
+    @Override protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
     {
         builder.add(AXIS);
     }

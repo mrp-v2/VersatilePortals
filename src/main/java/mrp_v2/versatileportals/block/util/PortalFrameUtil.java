@@ -92,10 +92,18 @@ public class PortalFrameUtil
         for (Direction.Axis axis : Direction.Axis.values())
         {
             Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
-            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE)), axis));
-            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE)), axis));
-            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)), axis));
-            tests.add(Pair.of(pos.offset(Direction.getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)), axis));
+            tests.add(Pair.of(pos
+                            .relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .relative(Direction.fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
+                    axis));
+            tests.add(Pair.of(pos
+                            .relative(Direction.fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
+                    axis));
         }
         return tests.toArray(Util.makeArray());
     }
@@ -106,25 +114,25 @@ public class PortalFrameUtil
         for (Direction.Axis axis : Direction.Axis.values())
         {
             Pair<Direction.Axis, Direction.Axis> otherAxes = Util.OTHER_AXES_MAP.get(axis);
-            tests.add(Pair.of(pos
-                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
-                            .offset(Direction
-                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
+            tests.add(Pair.of(
+                    pos.relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
+                            .relative(Direction
+                                    .fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
                     axis));
-            tests.add(Pair.of(pos
-                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
-                            .offset(Direction
-                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
+            tests.add(Pair.of(
+                    pos.relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.POSITIVE))
+                            .relative(Direction
+                                    .fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
                     axis));
-            tests.add(Pair.of(pos
-                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
-                            .offset(Direction
-                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
+            tests.add(Pair.of(
+                    pos.relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
+                            .relative(Direction
+                                    .fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.POSITIVE)),
                     axis));
-            tests.add(Pair.of(pos
-                            .offset(Direction.getFacingFromAxisDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
-                            .offset(Direction
-                                    .getFacingFromAxisDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
+            tests.add(Pair.of(
+                    pos.relative(Direction.fromAxisAndDirection(otherAxes.getLeft(), Direction.AxisDirection.NEGATIVE))
+                            .relative(Direction
+                                    .fromAxisAndDirection(otherAxes.getRight(), Direction.AxisDirection.NEGATIVE)),
                     axis));
         }
         return tests.toArray(Util.makeArray());
@@ -173,7 +181,7 @@ public class PortalFrameUtil
                 z1 = z2;
                 z2 = zt;
             }
-            Minecraft.getInstance().worldRenderer.markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
+            Minecraft.getInstance().levelRenderer.setBlocksDirty(x1, y1, z1, x2, y2, z2);
         }
     }
 }

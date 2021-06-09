@@ -71,36 +71,36 @@ public class PortalControllerContainer extends Container
         return this.color;
     }
 
-    @Override public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
+    @Override public ItemStack quickMoveStack(PlayerEntity playerIn, int index)
     {
         ItemStack itemStack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-        if (slot != null && slot.getHasStack())
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem())
         {
-            ItemStack itemStack1 = slot.getStack();
+            ItemStack itemStack1 = slot.getItem();
             itemStack = itemStack1.copy();
             if (index < this.inventory.getSlots())
             {
-                if (!this.mergeItemStack(itemStack1, this.inventory.getSlots(), this.inventorySlots.size(), true))
+                if (!this.moveItemStackTo(itemStack1, this.inventory.getSlots(), this.slots.size(), true))
                 {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemStack1, 0, this.inventory.getSlots(), false))
+            } else if (!this.moveItemStackTo(itemStack1, 0, this.inventory.getSlots(), false))
             {
                 return ItemStack.EMPTY;
             }
             if (itemStack1.isEmpty())
             {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else
             {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
         return itemStack;
     }
 
-    @Override public boolean canInteractWith(PlayerEntity playerIn)
+    @Override public boolean stillValid(PlayerEntity playerIn)
     {
         return true;
     }

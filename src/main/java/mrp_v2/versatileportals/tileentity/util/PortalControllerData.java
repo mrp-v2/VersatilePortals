@@ -40,7 +40,7 @@ public class PortalControllerData
 
     @Nullable private static ITextComponent makeITextComponent(String str)
     {
-        return str.equals(NULL_STRING) ? null : ITextComponent.Serializer.getComponentFromJson(str);
+        return str.equals(NULL_STRING) ? null : ITextComponent.Serializer.fromJson(str);
     }
 
     public CompoundNBT getInventoryData()
