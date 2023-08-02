@@ -19,8 +19,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
     }
 }
@@ -125,16 +124,8 @@ class CurseforgeDependency
     }
 }
 
-List<CurseforgeDependency> curseforgeDependencyList =
-        CurseforgeDependency.makeCurseforgeDependencyList(curseforgeDependencies)
-for (CurseforgeDependency dependency : curseforgeDependencyList)
-{
-    println('Added Curseforge dependency: ' + dependency.curseforgeSlug)
-}
-
 archivesBaseName = modId
 group = "${author}.${archivesBaseName}"
-boolean usesMixins = file("src/main/resources/${modId}.mixins.json").exists()
 File secretFile = file '../secrets.json'
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' +
@@ -156,11 +147,6 @@ minecraft {
     }
     runs {
         client {
-            if (usesMixins)
-            {
-                property 'mixin.env.disableRefMap', 'true'
-                arg "-mixin.config=" + archivesBaseName + ".mixins.json"
-            }
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
@@ -171,11 +157,6 @@ minecraft {
             }
         }
         server {
-            if (usesMixins)
-            {
-                property 'mixin.env.disableRefMap', 'true'
-                arg "-mixin.config=" + archivesBaseName + ".mixins.json"
-            }
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
@@ -186,11 +167,6 @@ minecraft {
             }
         }
         data {
-            if (usesMixins)
-            {
-                property 'mixin.env.disableRefMap', 'true'
-                arg "-mixin.config=" + archivesBaseName + ".mixins.json"
-            }
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
@@ -237,12 +213,8 @@ dependencies {
     minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
     for (GithubDependency dependency : githubDependencyList)
     {
-        compile fg.deobf(dependency.modNamespace + '.' + dependency.modId + ':' + dependency.modId + ':' +
+        implementation fg.deobf(dependency.modNamespace + '.' + dependency.modId + ':' + dependency.modId + ':' +
                 dependency.apiVersion + dependency.patchVersion)
-    }
-    for (CurseforgeDependency dependency : curseforgeDependencyList)
-    {
-        compile fg.deobf("curse.maven:${dependency.curseforgeSlug}-${dependency.projectId}:${dependency.fileId}")
     }
 }
 
@@ -256,10 +228,6 @@ jar {
                 'Implementation-Version': "${version}",
                 'Implementation-Vendor': author,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"))
-        if (usesMixins)
-        {
-            map.putAll('MixinConfigs': "${modId}.mixins.json")
-        }
         attributes(map)
     }
 }
@@ -370,15 +338,6 @@ task regenerateUpdateJson {
     }
 }
 
-if (usesMixins)
-{
-    apply plugin: 'org.spongepowered.mixin'
-
-    mixin {
-        add sourceSets.main, "${modId}.refmap.json"
-    }
-}
-
 task ensureCleanWorkingTree {
     doFirst {
         Tuple2<String, String> statusResult = doCommand("git", "status")
@@ -431,14 +390,10 @@ curseforge {
         changelog = changelogResult.first
         releaseType = 'release'
         addGameVersion mcVersion
-        if (githubDependencyList.size() > 0 || curseforgeDependencyList.size() > 0)
+        if (githubDependencyList.size() > 0)
         {
             relations {
                 for (GithubDependency dependency : githubDependencyList)
-                {
-                    requiredDependency dependency.curseforgeSlug
-                }
-                for (CurseforgeDependency dependency : curseforgeDependencyList)
                 {
                     requiredDependency dependency.curseforgeSlug
                 }
