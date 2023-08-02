@@ -2,9 +2,9 @@ package mrp_v2.versatileportals.village;
 
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 
-public class PortalPointOfInterestType extends PointOfInterestType
+public class PortalPointOfInterestType extends PoiType
 {
     public static final String ID = PortalBlock.ID;
 

@@ -1,9 +1,9 @@
 package mrp_v2.versatileportals.network;
 
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -19,13 +19,13 @@ public class PortalControllerScreenClosedPacket
         this.pos = pos;
     }
 
-    public PortalControllerScreenClosedPacket(PacketBuffer buffer)
+    public PortalControllerScreenClosedPacket(FriendlyByteBuf buffer)
     {
         this.portalColor = buffer.readInt();
         this.pos = buffer.readBlockPos();
     }
 
-    public void encode(PacketBuffer buffer)
+    public void encode(FriendlyByteBuf buffer)
     {
         buffer.writeInt(this.portalColor);
         buffer.writeBlockPos(this.pos);
@@ -35,7 +35,7 @@ public class PortalControllerScreenClosedPacket
     {
         context.get().enqueueWork(() ->
         {
-            ServerPlayerEntity player = context.get().getSender();
+            ServerPlayer player = context.get().getSender();
             if (player.level.hasChunkAt(this.pos))
             {
                 PortalControllerTileEntity portalController =

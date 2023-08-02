@@ -6,11 +6,14 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.data.ExistingFileHelper;
+
+import mrp_v2.mrplibrary.datagen.providers.TextureProvider.FinishedTextureConsumer;
+import mrp_v2.mrplibrary.datagen.providers.TextureProvider.Texture;
 
 public class TextureGenerator extends TextureProvider
 {

@@ -4,15 +4,17 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class ColorParticleData implements IParticleData
+import net.minecraft.core.particles.ParticleOptions.Deserializer;
+
+public abstract class ColorParticleData implements ParticleOptions
 {
     protected final int color;
 
@@ -22,7 +24,7 @@ public abstract class ColorParticleData implements IParticleData
     }
 
     protected static <T extends ColorParticleData> ParticleType<T> createParticleType(Supplier<Codec<T>> codecSupplier,
-            IDeserializer<T> deserializerSupplier)
+                                                                                      Deserializer<T> deserializerSupplier)
     {
         ParticleType<T> particleType = new ParticleType<T>(false, deserializerSupplier)
         {
@@ -46,10 +48,10 @@ public abstract class ColorParticleData implements IParticleData
         return this.color;
     }
 
-    protected static <T extends ColorParticleData> IParticleData.IDeserializer<T> makeDeserializer(
+    protected static <T extends ColorParticleData> ParticleOptions.Deserializer<T> makeDeserializer(
             Function<Integer, T> constructor)
     {
-        return new IParticleData.IDeserializer<T>()
+        return new ParticleOptions.Deserializer<T>()
         {
             @Override public T fromCommand(ParticleType<T> particleTypeIn, StringReader reader)
                     throws CommandSyntaxException
@@ -58,14 +60,16 @@ public abstract class ColorParticleData implements IParticleData
                 return constructor.apply(reader.readInt());
             }
 
-            @Override public T fromNetwork(ParticleType<T> particleTypeIn, PacketBuffer buffer)
+            @Override
+            public T fromNetwork(ParticleType<T> particleTypeIn, FriendlyByteBuf buffer)
             {
                 return constructor.apply(buffer.readInt());
             }
         };
     }
 
-    @Override public void writeToNetwork(PacketBuffer buffer)
+    @Override
+    public void writeToNetwork(FriendlyByteBuf buffer)
     {
         buffer.writeInt(this.color);
     }

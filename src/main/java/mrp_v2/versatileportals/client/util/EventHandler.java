@@ -9,10 +9,10 @@ import mrp_v2.versatileportals.client.renderer.color.PortalColorer;
 import mrp_v2.versatileportals.client.renderer.tileentity.PortalControllerTileEntityRenderer;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
@@ -26,11 +26,11 @@ public class EventHandler
 {
     @SubscribeEvent public static void clientSetup(final FMLClientSetupEvent event)
     {
-        RenderTypeLookup.setRenderLayer(ObjectHolder.PORTAL_BLOCK.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(ObjectHolder.PORTAL_BLOCK.get(), RenderType.translucent());
         VersatilePortals.WORLD_SUPPLIER = () -> Minecraft.getInstance().level;
         ClientRegistry.bindTileEntityRenderer(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE.get(),
                 PortalControllerTileEntityRenderer::new);
-        ScreenManager.register(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), PortalControllerScreen::new);
+        MenuScreens.register(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), PortalControllerScreen::new);
     }
 
     @SubscribeEvent public static void registerBlockColors(final ColorHandlerEvent.Block event)
@@ -49,7 +49,7 @@ public class EventHandler
     @SuppressWarnings("resource") @SubscribeEvent
     public static void registerParticles(final ParticleFactoryRegisterEvent event)
     {
-        ParticleManager particleManager = Minecraft.getInstance().particleEngine;
+        ParticleEngine particleManager = Minecraft.getInstance().particleEngine;
         particleManager.register(ObjectHolder.PORTAL_PARTICLE_TYPE.get(), PortalParticle.Factory::new);
         particleManager
                 .register(ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE.get(), PortalControllerParticle.Factory::new);

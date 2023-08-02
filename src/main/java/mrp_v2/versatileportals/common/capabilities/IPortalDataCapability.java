@@ -2,7 +2,7 @@ package mrp_v2.versatileportals.common.capabilities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface IPortalDataCapability
 {

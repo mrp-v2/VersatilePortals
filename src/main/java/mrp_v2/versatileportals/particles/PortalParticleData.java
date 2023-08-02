@@ -6,9 +6,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+
+import net.minecraft.core.particles.ParticleOptions.Deserializer;
 
 public class PortalParticleData extends ColorParticleData
 {
@@ -16,8 +18,8 @@ public class PortalParticleData extends ColorParticleData
             .group(Codec.INT.fieldOf("color").forGetter(ColorParticleData::getColor),
                     Codec.BOOL.fieldOf("isOnYAxis").forGetter(PortalParticleData::isOnYAxis))
             .apply(builder, PortalParticleData::new));
-    public static final IDeserializer<PortalParticleData> DESERIALIZER =
-            new IParticleData.IDeserializer<PortalParticleData>()
+    public static final Deserializer<PortalParticleData> DESERIALIZER =
+            new ParticleOptions.Deserializer<PortalParticleData>()
             {
                 @Override public PortalParticleData fromCommand(ParticleType<PortalParticleData> particleTypeIn,
                         StringReader reader) throws CommandSyntaxException
@@ -27,7 +29,7 @@ public class PortalParticleData extends ColorParticleData
                 }
 
                 @Override public PortalParticleData fromNetwork(ParticleType<PortalParticleData> particleTypeIn,
-                        PacketBuffer buffer)
+                                                                FriendlyByteBuf buffer)
                 {
                     return new PortalParticleData(buffer.readInt(), buffer.readBoolean());
                 }

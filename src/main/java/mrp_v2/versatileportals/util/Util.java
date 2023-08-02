@@ -3,17 +3,17 @@ package mrp_v2.versatileportals.util;
 import com.google.common.collect.ImmutableMap;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -80,26 +80,27 @@ public class Util
         return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY).orElse(null);
     }
 
-    @Nullable public static RegistryKey<World> createWorldKey(String worldID)
+    @Nullable
+    public static ResourceKey<Level> createWorldKey(String worldID)
     {
         if (worldID.isEmpty())
         {
             return null;
         }
-        return RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(worldID));
+        return ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(worldID));
     }
 
-    public static String getWorldID(World world)
+    public static String getWorldID(Level world)
     {
         return getWorldID(world.dimension());
     }
 
-    public static String getWorldID(RegistryKey<World> world)
+    public static String getWorldID(ResourceKey<Level> world)
     {
         return world.location().toString();
     }
 
-    public static BlockPos[] getCollidingBlocks(AxisAlignedBB box)
+    public static BlockPos[] getCollidingBlocks(AABB box)
     {
         int minX = (int) Math.floor(box.minX);
         int minY = (int) Math.floor(box.minY);
@@ -152,8 +153,8 @@ public class Util
         return mergedArray;
     }
 
-    public static void sendMessage(ServerPlayerEntity player, ITextComponent message)
+    public static void sendMessage(ServerPlayer player, Component message)
     {
-        player.sendMessage(message, ChatType.GAME_INFO, net.minecraft.util.Util.NIL_UUID);
+        player.sendMessage(message, ChatType.GAME_INFO, net.minecraft.Util.NIL_UUID);
     }
 }

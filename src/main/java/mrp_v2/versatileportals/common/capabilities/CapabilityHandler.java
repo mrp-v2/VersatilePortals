@@ -2,8 +2,8 @@ package mrp_v2.versatileportals.common.capabilities;
 
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;

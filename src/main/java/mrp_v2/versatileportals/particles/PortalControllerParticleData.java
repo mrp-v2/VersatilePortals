@@ -3,12 +3,14 @@ package mrp_v2.versatileportals.particles;
 import com.mojang.serialization.Codec;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.particles.ParticleType;
+import net.minecraft.core.particles.ParticleType;
+
+import net.minecraft.core.particles.ParticleOptions.Deserializer;
 
 public class PortalControllerParticleData extends ColorParticleData
 {
     public static final Codec<PortalControllerParticleData> CODEC = makeCodec(PortalControllerParticleData::new);
-    public static final IDeserializer<PortalControllerParticleData> DESERIALIZER =
+    public static final Deserializer<PortalControllerParticleData> DESERIALIZER =
             makeDeserializer(PortalControllerParticleData::new);
     public static final String ID = PortalControllerBlock.ID;
 

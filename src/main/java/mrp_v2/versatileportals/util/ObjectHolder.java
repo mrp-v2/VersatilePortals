@@ -13,15 +13,15 @@ import mrp_v2.versatileportals.particles.PortalControllerParticleData;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.village.PortalPointOfInterestType;
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -36,19 +36,19 @@ import net.minecraftforge.registries.ForgeRegistries;
             DeferredRegister.create(ForgeRegistries.BLOCKS, VersatilePortals.ID);
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, VersatilePortals.ID);
-    public static final DeferredRegister<ContainerType<?>> CONTAINERS =
+    public static final DeferredRegister<MenuType<?>> CONTAINERS =
             DeferredRegister.create(ForgeRegistries.CONTAINERS, VersatilePortals.ID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES =
             DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, VersatilePortals.ID);
-    public static final DeferredRegister<PointOfInterestType> POIS =
+    public static final DeferredRegister<PoiType> POIS =
             DeferredRegister.create(ForgeRegistries.POI_TYPES, VersatilePortals.ID);
-    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES =
+    public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES =
             DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, VersatilePortals.ID);
     public static final RegistryObject<PortalBlock> PORTAL_BLOCK;
     public static final RegistryObject<PortalControllerBlock> PORTAL_CONTROLLER_BLOCK;
     public static final RegistryObject<PortalFrameBlock> PORTAL_FRAME_BLOCK;
     public static final RegistryObject<BlockItem> PORTAL_CONTROLLER_BLOCK_ITEM;
-    public static final ItemGroup MAIN_ITEM_GROUP = new ItemGroup(VersatilePortals.ID)
+    public static final CreativeModeTab MAIN_ITEM_GROUP = new CreativeModeTab(VersatilePortals.ID)
     {
         @Override @OnlyIn(Dist.CLIENT) public ItemStack makeIcon()
         {
@@ -59,12 +59,12 @@ import net.minecraftforge.registries.ForgeRegistries;
     public static final RegistryObject<PortalLighter> PORTAL_LIGHTER_ITEM;
     public static final RegistryObject<EmptyExistingWorldControlItem> EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
     public static final RegistryObject<ExistingWorldControlItem> EXISTING_WORLD_TELEPORT_ITEM;
-    public static final RegistryObject<ContainerType<PortalControllerContainer>> PORTAL_CONTROLLER_CONTAINER_TYPE;
+    public static final RegistryObject<MenuType<PortalControllerContainer>> PORTAL_CONTROLLER_CONTAINER_TYPE;
     public static final RegistryObject<ParticleType<PortalParticleData>> PORTAL_PARTICLE_TYPE;
     public static final RegistryObject<ParticleType<PortalControllerParticleData>> PORTAL_CONTROLLER_PARTICLE_TYPE;
     public static final PortalDataStorage PORTAL_DATA_STORAGE;
     public static final RegistryObject<PortalPointOfInterestType> PORTAL_POINT_OF_INTEREST_TYPE;
-    public static final RegistryObject<TileEntityType<PortalControllerTileEntity>> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
+    public static final RegistryObject<BlockEntityType<PortalControllerTileEntity>> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
 
     static
     {

@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.common.capabilities;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class PortalDataHandler implements IPortalDataCapability
 {

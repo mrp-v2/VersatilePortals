@@ -2,22 +2,22 @@ package mrp_v2.versatileportals.client.particle;
 
 import mrp_v2.versatileportals.particles.PortalControllerParticleData;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.IParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class PortalControllerParticle extends SpriteTexturedParticle
+public class PortalControllerParticle extends TextureSheetParticle
 {
     private final double originX;
     private final double originY;
     private final double originZ;
 
-    protected PortalControllerParticle(ClientWorld clientWorld, double x, double y, double z, double motionX,
+    protected PortalControllerParticle(ClientLevel clientWorld, double x, double y, double z, double motionX,
             double motionY, double motionZ, int color)
     {
         super(clientWorld, x, y, z);
@@ -56,9 +56,10 @@ public class PortalControllerParticle extends SpriteTexturedParticle
         }
     }
 
-    @Override public IParticleRenderType getRenderType()
+    @Override
+    public ParticleRenderType getRenderType()
     {
-        return IParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
     @Override protected int getLightColor(float partialTick)
@@ -73,17 +74,18 @@ public class PortalControllerParticle extends SpriteTexturedParticle
         return superBrightness & 255 | sBLeft16And255 << 16;
     }
 
-    @OnlyIn(Dist.CLIENT) public static class Factory implements IParticleFactory<PortalControllerParticleData>
+    @OnlyIn(Dist.CLIENT)
+    public static class Factory implements ParticleProvider<PortalControllerParticleData>
     {
-        private final IAnimatedSprite spriteSet;
+        private final SpriteSet spriteSet;
 
-        public Factory(IAnimatedSprite spriteSet)
+        public Factory(SpriteSet spriteSet)
         {
             this.spriteSet = spriteSet;
         }
 
         @Override
-        public Particle createParticle(PortalControllerParticleData particleData, ClientWorld worldIn, double x,
+        public Particle createParticle(PortalControllerParticleData particleData, ClientLevel worldIn, double x,
                 double y, double z, double xSpeed, double ySpeed, double zSpeed)
         {
             PortalControllerParticle portalControllerParticle =

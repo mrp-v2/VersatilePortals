@@ -1,9 +1,11 @@
 package mrp_v2.versatileportals.item;
 
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 import java.util.function.Function;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class BasicSingleItem extends Item
 {

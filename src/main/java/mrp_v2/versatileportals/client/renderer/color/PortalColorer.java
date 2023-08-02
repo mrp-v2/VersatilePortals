@@ -4,25 +4,26 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.chunk.ChunkRenderCache;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
-@OnlyIn(Dist.CLIENT) public class PortalColorer implements IBlockColor
+@OnlyIn(Dist.CLIENT)
+public class PortalColorer implements BlockColor
 {
     public static final PortalColorer INSTANCE = new PortalColorer();
 
     @Override
-    public int getColor(BlockState blockState, @Nullable IBlockDisplayReader iBlockDisplayReader,
+    public int getColor(BlockState blockState, @Nullable BlockAndTintGetter iBlockDisplayReader,
             @Nullable BlockPos pos, int tint)
     {
         if (iBlockDisplayReader == null || pos == null)
@@ -30,17 +31,17 @@ import java.lang.reflect.Field;
             return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
         }
         // we can't use the passed in IBlockDisplayReader, because it is a ChunkRenderCache, and will error if trying access blocks not in the chunk
-        ClientWorld world = null;
-        if (iBlockDisplayReader instanceof ChunkRenderCache)
+        ClientLevel world = null;
+        if (iBlockDisplayReader instanceof RenderChunkRegion)
         {
-            for (Field field : ChunkRenderCache.class.getDeclaredFields())
+            for (Field field : RenderChunkRegion.class.getDeclaredFields())
             {
-                if (field.getType() == World.class)
+                if (field.getType() == Level.class)
                 {
                     field.setAccessible(true);
                     try
                     {
-                        world = (ClientWorld) field.get(iBlockDisplayReader);
+                        world = (ClientLevel) field.get(iBlockDisplayReader);
                         break;
                     } catch (IllegalAccessException e)
                     {

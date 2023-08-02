@@ -3,38 +3,38 @@ package mrp_v2.versatileportals.inventory.container;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class PortalControllerContainer extends Container
+public class PortalControllerContainer extends AbstractContainerMenu
 {
     public static final int Y_SIZE = 218;
     private final PortalControllerItemStackHandler inventory;
     private final int color;
     private final BlockPos pos;
 
-    public PortalControllerContainer(int id, PlayerInventory playerInventoryIn)
+    public PortalControllerContainer(int id, Inventory playerInventoryIn)
     {
         //noinspection ConstantConditions
         this(id, playerInventoryIn, PortalControllerTileEntity.DEFAULT_PORTAL_COLOR, null);
     }
 
-    public PortalControllerContainer(int id, PlayerInventory playerInventoryIn, int color, BlockPos pos)
+    public PortalControllerContainer(int id, Inventory playerInventoryIn, int color, BlockPos pos)
     {
         this(id, playerInventoryIn, new PortalControllerItemStackHandler(null), color, pos);
     }
 
-    public PortalControllerContainer(int id, PlayerInventory playerInventoryIn,
+    public PortalControllerContainer(int id, Inventory playerInventoryIn,
             PortalControllerItemStackHandler inventoryIn, int color, BlockPos pos)
     {
         super(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), id);
@@ -44,7 +44,7 @@ public class PortalControllerContainer extends Container
         this.addSlots(playerInventoryIn);
     }
 
-    private void addSlots(PlayerInventory playerInventory)
+    private void addSlots(Inventory playerInventory)
     {
         this.addSlot(new SlotItemHandler(this.inventory, 0, 80, 104));
         // player inventory slots
@@ -71,7 +71,8 @@ public class PortalControllerContainer extends Container
         return this.color;
     }
 
-    @Override public ItemStack quickMoveStack(PlayerEntity playerIn, int index)
+    @Override
+    public ItemStack quickMoveStack(Player playerIn, int index)
     {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
@@ -100,12 +101,13 @@ public class PortalControllerContainer extends Container
         return itemStack;
     }
 
-    @Override public boolean stillValid(PlayerEntity playerIn)
+    @Override
+    public boolean stillValid(Player playerIn)
     {
         return true;
     }
 
-    public static class Type extends ContainerType<PortalControllerContainer>
+    public static class Type extends MenuType<PortalControllerContainer>
             implements IContainerFactory<PortalControllerContainer>
     {
         public Type()
@@ -113,13 +115,13 @@ public class PortalControllerContainer extends Container
             super(Type::factory);
         }
 
-        private static PortalControllerContainer factory(int windowId, PlayerInventory playerInv)
+        private static PortalControllerContainer factory(int windowId, Inventory playerInv)
         {
             return new PortalControllerContainer(windowId, playerInv);
         }
 
         @Override
-        public PortalControllerContainer create(int windowId, PlayerInventory playerInv, PacketBuffer extraData)
+        public PortalControllerContainer create(int windowId, Inventory playerInv, FriendlyByteBuf extraData)
         {
             int color = extraData.readInt();
             BlockPos pos = extraData.readBlockPos();

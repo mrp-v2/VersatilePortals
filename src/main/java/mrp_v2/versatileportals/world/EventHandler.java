@@ -8,12 +8,12 @@ import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,14 +28,14 @@ import java.util.stream.Collectors;
 @EventBusSubscriber public class EventHandler
 {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final TranslationTextComponent noPortalController = new TranslationTextComponent(
+    public static final TranslatableComponent noPortalController = new TranslatableComponent(
             "block." + VersatilePortals.ID + "." + PortalBlock.ID + ".message.noPortalController"), noControlItem =
-            new TranslationTextComponent(
+            new TranslatableComponent(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.noControlItem"),
-            teleported = new TranslationTextComponent(
+            teleported = new TranslatableComponent(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleported");
-    public static final Function<Object[], TranslationTextComponent> teleportingInFunction =
-            (args) -> new TranslationTextComponent(
+    public static final Function<Object[], TranslatableComponent> teleportingInFunction =
+            (args) -> new TranslatableComponent(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleportingIn", args);
 
     @SubscribeEvent public static void worldTick(final WorldTickEvent event)
@@ -44,9 +44,9 @@ import java.util.stream.Collectors;
         {
             return;
         }
-        if (event.world instanceof ServerWorld)
+        if (event.world instanceof ServerLevel)
         {
-            ServerWorld world = (ServerWorld) event.world;
+            ServerLevel world = (ServerLevel) event.world;
             Set<Entity> relevantEntities = world.getEntities().filter(entity -> entity != null && entity.isAlive())
                     .collect(Collectors.toSet());
             for (Entity entity : relevantEntities)
@@ -69,10 +69,10 @@ import java.util.stream.Collectors;
                     {
                         if (entity.getPortalWaitTime() > 1)
                         {
-                            if (entity instanceof ServerPlayerEntity)
+                            if (entity instanceof ServerPlayer)
                             {
                                 int remainingInPortalTime = entity.getPortalWaitTime() - portalData.getInPortalTime();
-                                Util.sendMessage((ServerPlayerEntity) entity, teleportingInFunction
+                                Util.sendMessage((ServerPlayer) entity, teleportingInFunction
                                         .apply(new Object[]{Math.ceil(remainingInPortalTime / 2.0F) / 10.0F}));
                             }
                         }
@@ -83,9 +83,9 @@ import java.util.stream.Collectors;
                         PortalControllerTileEntity controller = portalSize.getPortalController(world).getLeft();
                         if (controller == null)
                         {
-                            if (entity instanceof ServerPlayerEntity)
+                            if (entity instanceof ServerPlayer)
                             {
-                                Util.sendMessage((ServerPlayerEntity) entity, noPortalController);
+                                Util.sendMessage((ServerPlayer) entity, noPortalController);
                             }
                             return;
                         }
@@ -100,17 +100,17 @@ import java.util.stream.Collectors;
                         }
                         if (portalControlItem == null)
                         {
-                            if (entity instanceof ServerPlayerEntity)
+                            if (entity instanceof ServerPlayer)
                             {
-                                Util.sendMessage((ServerPlayerEntity) entity, noControlItem);
+                                Util.sendMessage((ServerPlayer) entity, noControlItem);
                             }
                             return;
                         }
                         Entity teleportedEntity =
                                 portalControlItem.teleportEntity(entity, world, portalSize, portalControlItemStack);
-                        if (teleportedEntity instanceof ServerPlayerEntity)
+                        if (teleportedEntity instanceof ServerPlayer)
                         {
-                            Util.sendMessage((ServerPlayerEntity) teleportedEntity, teleported);
+                            Util.sendMessage((ServerPlayer) teleportedEntity, teleported);
                         }
                     }
                 } else

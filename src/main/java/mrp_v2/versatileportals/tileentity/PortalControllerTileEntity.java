@@ -9,25 +9,25 @@ import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTDynamicOps;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.INameable;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Nameable;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -35,8 +35,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class PortalControllerTileEntity extends TileEntity
-        implements ICapabilityProvider, INamedContainerProvider, ITickableTileEntity, INameable
+public class PortalControllerTileEntity extends BlockEntity
+        implements ICapabilityProvider, MenuProvider, TickableBlockEntity, Nameable
 {
     public static final String ID = PortalControllerBlock.ID;
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
@@ -46,13 +46,13 @@ public class PortalControllerTileEntity extends TileEntity
     private final PortalControllerItemStackHandler inventory;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
     public int ticks;
-    private ITextComponent customName;
+    private Component customName;
     private int portalColor;
 
-    public static TileEntityType<PortalControllerTileEntity> createTileEntity()
+    public static BlockEntityType<PortalControllerTileEntity> createTileEntity()
     {
         //noinspection ConstantConditions
-        return TileEntityType.Builder.of(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())
+        return BlockEntityType.Builder.of(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())
                 .build(null);
     }
 
@@ -74,7 +74,8 @@ public class PortalControllerTileEntity extends TileEntity
         return this.inventory.getStackInSlot(0);
     }
 
-    @Nullable public RegistryKey<World> getTeleportDestination()
+    @Nullable
+    public ResourceKey<Level> getTeleportDestination()
     {
         if (this.inventory.getStackInSlot(0).isEmpty())
         {
@@ -83,27 +84,31 @@ public class PortalControllerTileEntity extends TileEntity
         return ExistingWorldControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
     }
 
-    @Override public ITextComponent getName()
+    @Override
+    public Component getName()
     {
         return this.customName != null ? this.customName : this.getDefaultName();
     }
 
-    @Nullable @Override public ITextComponent getCustomName()
+    @Nullable
+    @Override
+    public Component getCustomName()
     {
         return this.customName;
     }
 
-    public void setCustomName(@Nullable ITextComponent name)
+    public void setCustomName(@Nullable Component name)
     {
         this.customName = name;
     }
 
-    public ITextComponent getDefaultName()
+    public Component getDefaultName()
     {
-        return new TranslationTextComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId());
+        return new TranslatableComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId());
     }
 
-    @Override public Container createMenu(int id, PlayerInventory playerInventoryIn, PlayerEntity playerIn)
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventoryIn, Player playerIn)
     {
         return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor,
                 this.getBlockPos());
@@ -118,7 +123,8 @@ public class PortalControllerTileEntity extends TileEntity
         return super.getCapability(cap, side);
     }
 
-    @Override public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt)
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
     {
         this.load(this.getBlockState(), pkt.getTag());
         if (this.level.hasChunkAt(this.worldPosition))
@@ -127,14 +133,15 @@ public class PortalControllerTileEntity extends TileEntity
         }
     }
 
-    @Override public void load(BlockState state, CompoundNBT compound)
+    @Override
+    public void load(BlockState state, CompoundTag compound)
     {
         super.load(state, compound);
         if (compound.contains(DATA_NBT_ID, 10))
         {
-            CompoundNBT dataNBT = compound.getCompound(DATA_NBT_ID);
+            CompoundTag dataNBT = compound.getCompound(DATA_NBT_ID);
             DataResult<PortalControllerData> dataResult =
-                    PortalControllerData.CODEC.parse(NBTDynamicOps.INSTANCE, dataNBT);
+                    PortalControllerData.CODEC.parse(NbtOps.INSTANCE, dataNBT);
             dataResult.resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) ->
             {
                 this.portalColor = data.getPortalColor();
@@ -144,20 +151,23 @@ public class PortalControllerTileEntity extends TileEntity
         }
     }
 
-    @Override public CompoundNBT save(CompoundNBT compound)
+    @Override
+    public CompoundTag save(CompoundTag compound)
     {
         super.save(compound);
-        PortalControllerData.CODEC.encodeStart(NBTDynamicOps.INSTANCE, new PortalControllerData(this))
+        PortalControllerData.CODEC.encodeStart(NbtOps.INSTANCE, new PortalControllerData(this))
                 .resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) -> compound.put(DATA_NBT_ID, data));
         return compound;
     }
 
-    @Override public SUpdateTileEntityPacket getUpdatePacket()
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket()
     {
-        return new SUpdateTileEntityPacket(this.getBlockPos(), -1, this.save(new CompoundNBT()));
+        return new ClientboundBlockEntityDataPacket(this.getBlockPos(), -1, this.save(new CompoundTag()));
     }
 
-    @Override public CompoundNBT getUpdateTag()
+    @Override
+    public CompoundTag getUpdateTag()
     {
         return this.save(super.getUpdateTag());
     }
@@ -215,8 +225,9 @@ public class PortalControllerTileEntity extends TileEntity
         }
     }
 
-    @Override public ITextComponent getDisplayName()
+    @Override
+    public Component getDisplayName()
     {
-        return INameable.super.getDisplayName();
+        return Nameable.super.getDisplayName();
     }
 }

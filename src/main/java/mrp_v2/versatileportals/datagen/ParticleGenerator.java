@@ -3,9 +3,11 @@ package mrp_v2.versatileportals.datagen;
 import mrp_v2.mrplibrary.datagen.providers.ParticleProvider;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
+
+import mrp_v2.mrplibrary.datagen.providers.ParticleProvider.ParticleBuilder;
 
 public class ParticleGenerator extends ParticleProvider
 {

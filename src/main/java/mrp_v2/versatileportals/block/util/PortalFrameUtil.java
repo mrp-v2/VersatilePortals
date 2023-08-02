@@ -6,12 +6,12 @@ import mrp_v2.versatileportals.network.PortalFrameUpdatePacket;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.WorldWrapper;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class PortalFrameUtil
 {
-    public static int getColor(IBlockReader world, BlockPos pos)
+    public static int getColor(BlockGetter world, BlockPos pos)
     {
         PortalControllerTileEntity controller = getPortalController(world, pos);
         if (controller != null)
@@ -31,7 +31,8 @@ public class PortalFrameUtil
         return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
     }
 
-    @Nullable public static PortalControllerTileEntity getPortalController(IBlockReader world, BlockPos pos)
+    @Nullable
+    public static PortalControllerTileEntity getPortalController(BlockGetter world, BlockPos pos)
     {
         PortalControllerTileEntity testController = null;
         for (PortalSize size : getPortalSizes(pos, world, false))
@@ -49,7 +50,7 @@ public class PortalFrameUtil
         return testController;
     }
 
-    public static List<PortalSize> getPortalSizes(BlockPos pos, IBlockReader world, boolean includeSelf)
+    public static List<PortalSize> getPortalSizes(BlockPos pos, BlockGetter world, boolean includeSelf)
     {
         List<PortalSize> portals = Lists.newArrayList();
         for (Pair<BlockPos, Direction.Axis> test : getPossiblePortalLocations(pos))
@@ -138,13 +139,13 @@ public class PortalFrameUtil
         return tests.toArray(Util.makeArray());
     }
 
-    public static void sendUpdatePacket(BlockState oldState, BlockPos pos, World world)
+    public static void sendUpdatePacket(BlockState oldState, BlockPos pos, Level world)
     {
         PacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> world.getChunkAt(pos)),
                 new PortalFrameUpdatePacket(pos, getUpdateSizes(oldState, pos, world)));
     }
 
-    public static List<PortalSize> getUpdateSizes(BlockState oldState, BlockPos pos, World world)
+    public static List<PortalSize> getUpdateSizes(BlockState oldState, BlockPos pos, Level world)
     {
         List<PortalSize> sizes = Lists.newArrayList();
         sizes.addAll(getPortalSizes(pos, world, false));

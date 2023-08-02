@@ -3,31 +3,33 @@ package mrp_v2.versatileportals.block;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.particles.PortalControllerParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class PortalControllerBlock extends PortalFrameBlock implements IPortalFrame
 {
@@ -36,9 +38,9 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
     public static final VoxelShape TOP_SIDE = box(0, 13, 0, 16, 16, 16), BOTTOM_SIDE = box(0, 0, 0, 16, 3, 16),
             EAST_SIDE = box(13, 0, 0, 16, 16, 16), WEST_SIDE = box(0, 0, 0, 3, 16, 16), SOUTH_SIDE =
             box(0, 0, 13, 16, 16, 16), NORTH_SIDE = box(0, 0, 0, 16, 16, 3);
-    public static final VoxelShape SHAPE_NS = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, EAST_SIDE, WEST_SIDE).optimize(),
-            SHAPE_EW = VoxelShapes.or(TOP_SIDE, BOTTOM_SIDE, SOUTH_SIDE, NORTH_SIDE).optimize(), SHAPE_UD =
-            VoxelShapes.or(EAST_SIDE, WEST_SIDE, SOUTH_SIDE, NORTH_SIDE);
+    public static final VoxelShape SHAPE_NS = Shapes.or(TOP_SIDE, BOTTOM_SIDE, EAST_SIDE, WEST_SIDE).optimize(),
+            SHAPE_EW = Shapes.or(TOP_SIDE, BOTTOM_SIDE, SOUTH_SIDE, NORTH_SIDE).optimize(), SHAPE_UD =
+            Shapes.or(EAST_SIDE, WEST_SIDE, SOUTH_SIDE, NORTH_SIDE);
 
     public PortalControllerBlock()
     {
@@ -46,7 +48,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.X));
     }
 
-    public static void animateTick(BlockState stateIn, World worldIn, BlockPos pos)
+    public static void animateTick(BlockState stateIn, Level worldIn, BlockPos pos)
     {
         PortalControllerParticleData data = new PortalControllerParticleData(PortalFrameUtil.getColor(worldIn, pos));
         double x = pos.getX() + 0.5D;
@@ -72,7 +74,8 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         }
     }
 
-    @Override public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+    @Override
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving)
     {
         if (state.hasTileEntity() && (state.getBlock() != newState.getBlock() || !newState.hasTileEntity()))
         {
@@ -88,7 +91,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
-    public boolean isSideValidForPortal(BlockState state, IBlockReader reader, BlockPos pos, Direction side)
+    public boolean isSideValidForPortal(BlockState state, BlockGetter reader, BlockPos pos, Direction side)
     {
         return state.isFaceSturdy(reader, pos, side);
     }
@@ -98,33 +101,34 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         return true;
     }
 
-    @Override public TileEntity createTileEntity(BlockState state, IBlockReader world)
+    @Override
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world)
     {
         return new PortalControllerTileEntity();
     }
 
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn,
-            BlockRayTraceResult hit)
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn,
+                                 BlockHitResult hit)
     {
         PortalControllerTileEntity portalController = (PortalControllerTileEntity) worldIn.getBlockEntity(pos);
         if (portalController != null)
         {
-            if (player instanceof ServerPlayerEntity)
+            if (player instanceof ServerPlayer)
             {
-                NetworkHooks.openGui((ServerPlayerEntity) player, portalController, (buffer) ->
+                NetworkHooks.openGui((ServerPlayer) player, portalController, (buffer) ->
                 {
                     buffer.writeInt(portalController.getPortalColor());
                     buffer.writeBlockPos(pos);
                 });
             }
-            return ActionResultType.sidedSuccess(worldIn.isClientSide);
+            return InteractionResult.sidedSuccess(worldIn.isClientSide);
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
     {
         return this.getShape(state);
     }
@@ -144,18 +148,20 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         }
     }
 
-    @Override public BlockState getStateForPlacement(BlockItemUseContext context)
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context)
     {
         return this.defaultBlockState().setValue(AXIS, context.getNearestLookingDirection().getAxis());
     }
 
-    @Override public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
+    @Override
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer,
             ItemStack stack)
     {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
         if (stack.hasCustomHoverName())
         {
-            TileEntity tileEntity = worldIn.getBlockEntity(pos);
+            BlockEntity tileEntity = worldIn.getBlockEntity(pos);
             if (tileEntity instanceof PortalControllerTileEntity)
             {
                 ((PortalControllerTileEntity) tileEntity).setCustomName(stack.getHoverName());
@@ -163,7 +169,8 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         }
     }
 
-    @Override protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
     {
         builder.add(AXIS);
     }

@@ -1,64 +1,67 @@
 package mrp_v2.versatileportals.world;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.TickList;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.ColorResolver;
-import net.minecraft.world.lighting.WorldLightManager;
-import net.minecraft.world.storage.IWorldInfo;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.storage.LevelData;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class WorldWrapper implements IWorld
+public class WorldWrapper implements LevelAccessor
 {
-    private final World world;
+    private final Level world;
     private final BlockPos overridePos;
     private final BlockState overrideState;
 
-    public WorldWrapper(World world, @Nullable BlockPos overridePos, @Nullable BlockState overrideState)
+    public WorldWrapper(Level world, @Nullable BlockPos overridePos, @Nullable BlockState overrideState)
     {
         this.world = world;
         this.overridePos = overridePos;
         this.overrideState = overrideState;
     }
 
-    @Override public ITickList<Block> getBlockTicks()
+    @Override
+    public TickList<Block> getBlockTicks()
     {
         return this.world.getBlockTicks();
     }
 
-    @Override public ITickList<Fluid> getLiquidTicks()
+    @Override
+    public TickList<Fluid> getLiquidTicks()
     {
         return this.world.getLiquidTicks();
     }
 
-    @Override public IWorldInfo getLevelData()
+    @Override
+    public LevelData getLevelData()
     {
         return this.world.getLevelData();
     }
@@ -68,7 +71,8 @@ public class WorldWrapper implements IWorld
         return this.world.getCurrentDifficultyAt(pos);
     }
 
-    @Override public AbstractChunkProvider getChunkSource()
+    @Override
+    public ChunkSource getChunkSource()
     {
         return this.world.getChunkSource();
     }
@@ -79,25 +83,26 @@ public class WorldWrapper implements IWorld
     }
 
     @Override
-    public void playSound(@Nullable PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category,
+    public void playSound(@Nullable Player player, BlockPos pos, SoundEvent soundIn, SoundSource category,
             float volume, float pitch)
     {
         this.world.playSound(player, pos, soundIn, category, volume, pitch);
     }
 
     @Override
-    public void addParticle(IParticleData particleData, double x, double y, double z, double xSpeed, double ySpeed,
+    public void addParticle(ParticleOptions particleData, double x, double y, double z, double xSpeed, double ySpeed,
             double zSpeed)
     {
         this.world.addParticle(particleData, x, y, z, xSpeed, ySpeed, zSpeed);
     }
 
-    @Override public void levelEvent(@Nullable PlayerEntity player, int type, BlockPos pos, int data)
+    @Override
+    public void levelEvent(@Nullable Player player, int type, BlockPos pos, int data)
     {
         this.world.levelEvent(player, type, pos, data);
     }
 
-    public World getWorld()
+    public Level getWorld()
     {
         return this.world;
     }
@@ -107,17 +112,21 @@ public class WorldWrapper implements IWorld
         return this.world.getShade(direction, b);
     }
 
-    @Override public WorldLightManager getLightEngine()
+    @Override
+    public LevelLightEngine getLightEngine()
     {
         return this.world.getLightEngine();
     }
 
-    @Nullable @Override public IChunk getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull)
+    @Nullable
+    @Override
+    public ChunkAccess getChunk(int x, int z, ChunkStatus requiredStatus, boolean nonnull)
     {
         return this.world.getChunk(x, z, requiredStatus, nonnull);
     }
 
-    @Override public int getHeight(Heightmap.Type heightmapType, int x, int z)
+    @Override
+    public int getHeight(Heightmap.Types heightmapType, int x, int z)
     {
         return this.world.getHeight(heightmapType, x, z);
     }
@@ -157,7 +166,9 @@ public class WorldWrapper implements IWorld
         return this.world.dimensionType();
     }
 
-    @Nullable @Override public TileEntity getBlockEntity(BlockPos pos)
+    @Nullable
+    @Override
+    public BlockEntity getBlockEntity(BlockPos pos)
     {
         return this.world.getBlockEntity(pos);
     }
@@ -181,19 +192,22 @@ public class WorldWrapper implements IWorld
         return this.world.getWorldBorder();
     }
 
-    @Override public List<Entity> getEntities(@Nullable Entity entityIn, AxisAlignedBB boundingBox,
+    @Override
+    public List<Entity> getEntities(@Nullable Entity entityIn, AABB boundingBox,
             @Nullable Predicate<? super Entity> predicate)
     {
         return this.world.getEntities(entityIn, boundingBox, predicate);
     }
 
-    @Override public <T extends Entity> List<T> getEntitiesOfClass(Class<? extends T> clazz, AxisAlignedBB aabb,
+    @Override
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<? extends T> clazz, AABB aabb,
             @Nullable Predicate<? super T> filter)
     {
         return this.world.getEntitiesOfClass(clazz, aabb, filter);
     }
 
-    @Override public List<? extends PlayerEntity> players()
+    @Override
+    public List<? extends Player> players()
     {
         return this.world.players();
     }
@@ -218,7 +232,8 @@ public class WorldWrapper implements IWorld
         return this.world.isStateAtPosition(pos, state);
     }
 
-    @Override public DynamicRegistries registryAccess()
+    @Override
+    public RegistryAccess registryAccess()
     {
         return this.world.registryAccess();
     }
