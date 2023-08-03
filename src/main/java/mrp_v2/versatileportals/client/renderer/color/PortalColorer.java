@@ -2,15 +2,15 @@ package mrp_v2.versatileportals.client.renderer.color;
 
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -28,7 +28,7 @@ public class PortalColorer implements BlockColor
     {
         if (iBlockDisplayReader == null || pos == null)
         {
-            return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
+            return PortalControllerBlockEntity.ERROR_PORTAL_COLOR;
         }
         // we can't use the passed in IBlockDisplayReader, because it is a ChunkRenderCache, and will error if trying access blocks not in the chunk
         ClientLevel world = null;
@@ -52,7 +52,7 @@ public class PortalColorer implements BlockColor
         }
         if (world == null)
         {
-            return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
+            return PortalControllerBlockEntity.ERROR_PORTAL_COLOR;
         }
         if (blockState.is(ObjectHolder.PORTAL_FRAME_BLOCK.get()) ||
                 blockState.is(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get()))
@@ -63,6 +63,6 @@ public class PortalColorer implements BlockColor
         {
             return PortalBlock.getColor(blockState, world, pos);
         }
-        return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
+        return PortalControllerBlockEntity.ERROR_PORTAL_COLOR;
     }
 }

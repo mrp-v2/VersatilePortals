@@ -4,7 +4,7 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.BlockUtil;
@@ -275,11 +275,11 @@ public class BasicWorldTeleporter implements ITeleporter {
                         this.destinationWorld.setBlock(mutableOriginPos,
                                 ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().defaultBlockState()
                                         .setValue(PortalControllerBlock.AXIS, this.originPortalSize.getAxis()), 3);
-                        PortalControllerTileEntity portalControllerTileEntity =
-                                (PortalControllerTileEntity) this.destinationWorld.getBlockEntity(mutableOriginPos);
-                        portalControllerTileEntity.getInventory()
+                        PortalControllerBlockEntity portalControllerBlockEntity =
+                                (PortalControllerBlockEntity) this.destinationWorld.getBlockEntity(mutableOriginPos);
+                        portalControllerBlockEntity.getInventory()
                                 .insertItem(0, ExistingWorldControlItem.getItemForWorld(this.originWorld), false);
-                        portalControllerTileEntity.setPortalColor(
+                        portalControllerBlockEntity.setPortalColor(
                                 this.originPortalSize.getPortalController(this.originWorld).getLeft().getPortalColor());
                     } else {
                         this.destinationWorld

@@ -3,7 +3,7 @@ package mrp_v2.versatileportals.block.util;
 import com.google.common.collect.Lists;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalFrameUpdatePacket;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.WorldWrapper;
 import net.minecraft.client.Minecraft;
@@ -23,21 +23,21 @@ public class PortalFrameUtil
 {
     public static int getColor(BlockGetter world, BlockPos pos)
     {
-        PortalControllerTileEntity controller = getPortalController(world, pos);
+        PortalControllerBlockEntity controller = getPortalController(world, pos);
         if (controller != null)
         {
             return controller.getPortalColor();
         }
-        return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
+        return PortalControllerBlockEntity.ERROR_PORTAL_COLOR;
     }
 
     @Nullable
-    public static PortalControllerTileEntity getPortalController(BlockGetter world, BlockPos pos)
+    public static PortalControllerBlockEntity getPortalController(BlockGetter world, BlockPos pos)
     {
-        PortalControllerTileEntity testController = null;
+        PortalControllerBlockEntity testController = null;
         for (PortalSize size : getPortalSizes(pos, world, false))
         {
-            PortalControllerTileEntity testTileEntity = size.getPortalController(world).getLeft();
+            PortalControllerBlockEntity testTileEntity = size.getPortalController(world).getLeft();
             if (testTileEntity != null)
             {
                 if (testController != null && testController != testTileEntity)

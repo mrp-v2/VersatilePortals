@@ -1,7 +1,7 @@
 package mrp_v2.versatileportals.inventory.container;
 
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,7 +26,7 @@ public class PortalControllerContainer extends AbstractContainerMenu
     public PortalControllerContainer(int id, Inventory playerInventoryIn)
     {
         //noinspection ConstantConditions
-        this(id, playerInventoryIn, PortalControllerTileEntity.DEFAULT_PORTAL_COLOR, null);
+        this(id, playerInventoryIn, PortalControllerBlockEntity.DEFAULT_PORTAL_COLOR, null);
     }
 
     public PortalControllerContainer(int id, Inventory playerInventoryIn, int color, BlockPos pos)

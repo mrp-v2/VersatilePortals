@@ -5,19 +5,19 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mrp_v2.versatileportals.block.IPortalFrame;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -89,7 +89,7 @@ public class PortalSize
         }
         if (this.isValid())
         {
-            Pair<PortalControllerTileEntity, Boolean> portalControllerResult = this.getPortalController(world);
+            Pair<PortalControllerBlockEntity, Boolean> portalControllerResult = this.getPortalController(world);
             if (!portalControllerResult.getRight())
             {
                 this.invalidate();
@@ -314,9 +314,9 @@ public class PortalSize
         return portalControllerRelativePos;
     }
 
-    public Pair<PortalControllerTileEntity, Boolean> getPortalController(BlockGetter world)
+    public Pair<PortalControllerBlockEntity, Boolean> getPortalController(BlockGetter world)
     {
-        PortalControllerTileEntity portalControllerTileEntity = null;
+        PortalControllerBlockEntity portalControllerBlockEntity = null;
         boolean found = false;
         if (this.isValid())
         {
@@ -330,13 +330,13 @@ public class PortalSize
                         return Pair.of(null, false);
                     }
                     BlockEntity temp = world.getBlockEntity(frame.getLeft());
-                    portalControllerTileEntity =
-                            temp instanceof PortalControllerTileEntity ? (PortalControllerTileEntity) temp : null;
+                    portalControllerBlockEntity =
+                            temp instanceof PortalControllerBlockEntity ? (PortalControllerBlockEntity) temp : null;
                     found = true;
                 }
             }
         }
-        return Pair.of(portalControllerTileEntity, found);
+        return Pair.of(portalControllerBlockEntity, found);
     }
 
     @Nullable
@@ -499,11 +499,10 @@ public class PortalSize
         {
             return true;
         }
-        if (!(o instanceof PortalSize))
+        if (!(o instanceof PortalSize that))
         {
             return false;
         }
-        PortalSize that = (PortalSize) o;
         return sizeA == that.sizeA && sizeB == that.sizeB && axis == that.axis &&
                 Objects.equals(farthestDownNorthWestPortalLoc, that.farthestDownNorthWestPortalLoc);
     }

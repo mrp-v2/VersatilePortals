@@ -2,33 +2,31 @@ package mrp_v2.versatileportals.block;
 
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.particles.PortalParticleData;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
 import java.util.function.Function;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class PortalBlock extends Block
 {
@@ -53,12 +51,12 @@ public class PortalBlock extends Block
     public static int getColor(BlockState blockState, BlockGetter world, BlockPos pos)
     {
         PortalSize size = new PortalSize(world, pos, blockState.getValue(BlockStateProperties.AXIS));
-        PortalControllerTileEntity portalControllerTE = size.getPortalController(world).getLeft();
+        PortalControllerBlockEntity portalControllerTE = size.getPortalController(world).getLeft();
         if (portalControllerTE != null)
         {
             return portalControllerTE.getPortalColor();
         }
-        return PortalControllerTileEntity.ERROR_PORTAL_COLOR;
+        return PortalControllerBlockEntity.ERROR_PORTAL_COLOR;
     }
 
     @Override public BlockState rotate(BlockState state, Rotation rot)

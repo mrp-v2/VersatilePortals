@@ -6,7 +6,7 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.IPortalControlItem;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -72,7 +72,7 @@ public class EventHandler {
                     } else {
                         PortalSize portalSize = new PortalSize(world, portalData.getPortalPos(),
                                 world.getBlockState(portalData.getPortalPos()).getValue(BlockStateProperties.AXIS));
-                        PortalControllerTileEntity controller = portalSize.getPortalController(world).getLeft();
+                        PortalControllerBlockEntity controller = portalSize.getPortalController(world).getLeft();
                         if (controller == null) {
                             if (entity instanceof ServerPlayer) {
                                 Util.sendMessage((ServerPlayer) entity, noPortalController);

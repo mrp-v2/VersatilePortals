@@ -1,7 +1,7 @@
 package mrp_v2.versatileportals.inventory;
 
 import mrp_v2.versatileportals.item.IPortalControlItem;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -10,9 +10,9 @@ import javax.annotation.Nullable;
 
 public class PortalControllerItemStackHandler extends ItemStackHandler
 {
-    private final PortalControllerTileEntity portalController;
+    private final PortalControllerBlockEntity portalController;
 
-    public PortalControllerItemStackHandler(@Nullable PortalControllerTileEntity portalController)
+    public PortalControllerItemStackHandler(@Nullable PortalControllerBlockEntity portalController)
     {
         super(1);
         this.portalController = portalController;

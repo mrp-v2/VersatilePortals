@@ -11,7 +11,7 @@ import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.item.PortalLighter;
 import mrp_v2.versatileportals.particles.PortalControllerParticleData;
 import mrp_v2.versatileportals.particles.PortalParticleData;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.village.PortalPointOfInterestType;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -64,7 +64,7 @@ import net.minecraftforge.registries.RegistryObject;
     public static final RegistryObject<ParticleType<PortalControllerParticleData>> PORTAL_CONTROLLER_PARTICLE_TYPE;
     public static final PortalDataStorage PORTAL_DATA_STORAGE;
     public static final RegistryObject<PortalPointOfInterestType> PORTAL_POINT_OF_INTEREST_TYPE;
-    public static final RegistryObject<BlockEntityType<PortalControllerTileEntity>> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
+    public static final RegistryObject<BlockEntityType<PortalControllerBlockEntity>> PORTAL_CONTROLLER_TILE_ENTITY_TYPE;
 
     static
     {
@@ -86,7 +86,7 @@ import net.minecraftforge.registries.RegistryObject;
         PORTAL_DATA_STORAGE = new PortalDataStorage();
         PORTAL_POINT_OF_INTEREST_TYPE = POIS.register(PortalPointOfInterestType.ID, PortalPointOfInterestType::new);
         PORTAL_CONTROLLER_TILE_ENTITY_TYPE =
-                TILE_ENTITIES.register(PortalControllerTileEntity.ID, PortalControllerTileEntity::createTileEntity);
+                TILE_ENTITIES.register(PortalControllerBlockEntity.ID, PortalControllerBlockEntity::createTileEntity);
     }
 
     public static void registerListeners(IEventBus bus)

@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.network;
 
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,8 +38,8 @@ public class PortalControllerScreenClosedPacket
             ServerPlayer player = context.get().getSender();
             if (player.level.hasChunkAt(this.pos))
             {
-                PortalControllerTileEntity portalController =
-                        (PortalControllerTileEntity) player.level.getBlockEntity(this.pos);
+                PortalControllerBlockEntity portalController =
+                        (PortalControllerBlockEntity) player.level.getBlockEntity(this.pos);
                 if (portalController != null)
                 {
                     portalController.setPortalColor(this.portalColor);

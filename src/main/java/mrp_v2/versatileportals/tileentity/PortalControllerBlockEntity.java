@@ -9,6 +9,7 @@ import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -34,9 +35,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class PortalControllerTileEntity extends BlockEntity
-        implements ICapabilityProvider, MenuProvider, Nameable
-{
+public class PortalControllerBlockEntity extends BlockEntity
+        implements ICapabilityProvider, MenuProvider, Nameable {
     public static final String ID = PortalControllerBlock.ID;
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
@@ -48,97 +48,95 @@ public class PortalControllerTileEntity extends BlockEntity
     private Component customName;
     private int portalColor;
 
-    public static BlockEntityType<PortalControllerTileEntity> createTileEntity()
-    {
-        //noinspection ConstantConditions
-        return BlockEntityType.Builder.of(PortalControllerTileEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())
-                .build(null);
-    }
-
-    public PortalControllerTileEntity()
-    {
-        super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE.get());
+    public PortalControllerBlockEntity(BlockPos pos, BlockState state) {
+        super(ObjectHolder.PORTAL_CONTROLLER_TILE_ENTITY_TYPE.get(), pos, state);
         this.inventory = new PortalControllerItemStackHandler(this);
         this.inventoryLazyOptional = LazyOptional.of(() -> this.inventory);
         this.portalColor = DEFAULT_PORTAL_COLOR;
     }
 
-    public PortalControllerItemStackHandler getInventory()
-    {
+    public static BlockEntityType<PortalControllerBlockEntity> createTileEntity() {
+        return BlockEntityType.Builder.of(PortalControllerBlockEntity::new, ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())
+                .build(null);
+    }
+
+    public static void tick(Level level, BlockPos pos, BlockState state, PortalControllerBlockEntity controller) {
+        if (!controller.level.isClientSide) {
+            return;
+        }
+        if (++controller.ticks >= TICKS_PER_RENDER_REVOLUTION) {
+            controller.ticks = 0;
+        }
+        if (controller.ticks % 4 == 0) {
+            if (controller.inventory.getStackInSlot(0).isEmpty()) {
+                return;
+            }
+            PortalControllerBlock.animateTick(controller.getBlockState(), controller.level, controller.worldPosition);
+        }
+    }
+
+    public PortalControllerItemStackHandler getInventory() {
         return inventory;
     }
 
-    public ItemStack getControlItemStack()
-    {
+    public ItemStack getControlItemStack() {
         return this.inventory.getStackInSlot(0);
     }
 
     @Nullable
-    public ResourceKey<Level> getTeleportDestination()
-    {
-        if (this.inventory.getStackInSlot(0).isEmpty())
-        {
+    public ResourceKey<Level> getTeleportDestination() {
+        if (this.inventory.getStackInSlot(0).isEmpty()) {
             return null;
         }
         return ExistingWorldControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
     }
 
     @Override
-    public Component getName()
-    {
+    public Component getName() {
         return this.customName != null ? this.customName : this.getDefaultName();
     }
 
     @Nullable
     @Override
-    public Component getCustomName()
-    {
+    public Component getCustomName() {
         return this.customName;
     }
 
-    public void setCustomName(@Nullable Component name)
-    {
+    public void setCustomName(@Nullable Component name) {
         this.customName = name;
     }
 
-    public Component getDefaultName()
-    {
+    public Component getDefaultName() {
         return new TranslatableComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId());
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int id, Inventory playerInventoryIn, Player playerIn)
-    {
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventoryIn, Player playerIn) {
         return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor,
                 this.getBlockPos());
     }
 
-    @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
-    {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-        {
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return this.inventoryLazyOptional.cast();
         }
         return super.getCapability(cap, side);
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt)
-    {
-        this.load(this.getBlockState(), pkt.getTag());
-        if (this.level.hasChunkAt(this.worldPosition))
-        {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        this.load(pkt.getTag());
+        if (this.level.hasChunkAt(this.worldPosition)) {
             PortalFrameUtil.updatePortals(PortalFrameUtil.getPortalSizes(this.worldPosition, this.level, false));
         }
     }
 
     @Override
-    public void load(BlockState state, CompoundTag compound)
-    {
-        super.load(state, compound);
-        if (compound.contains(DATA_NBT_ID, 10))
-        {
-            CompoundTag dataNBT = compound.getCompound(DATA_NBT_ID);
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        if (tag.contains(DATA_NBT_ID, 10)) {
+            CompoundTag dataNBT = tag.getCompound(DATA_NBT_ID);
             DataResult<PortalControllerData> dataResult =
                     PortalControllerData.CODEC.parse(NbtOps.INSTANCE, dataNBT);
             dataResult.resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) ->
@@ -151,82 +149,54 @@ public class PortalControllerTileEntity extends BlockEntity
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) // TODO need to adjust saving method, see discord
-    {
-        super.save(compound);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         PortalControllerData.CODEC.encodeStart(NbtOps.INSTANCE, new PortalControllerData(this))
-                .resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) -> compound.put(DATA_NBT_ID, data));
-        return compound;
+                .resultOrPartial(VersatilePortals.LOGGER::error).ifPresent((data) -> tag.put(DATA_NBT_ID, data));
     }
 
     @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket()
-    {
-        return new ClientboundBlockEntityDataPacket(this.getBlockPos(), -1, this.save(new CompoundTag()));
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public CompoundTag getUpdateTag()
-    {
-        return this.save(super.getUpdateTag());
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag);
+        return tag;
     }
 
-    @Override public void setRemoved()
-    {
+    @Override
+    public void setRemoved() {
         this.inventoryLazyOptional.invalidate();
         super.setRemoved();
     }
 
-    public int getPortalColor()
-    {
+    public int getPortalColor() {
         return this.portalColor;
     }
 
-    public void setPortalColor(int newPortalColor)
-    {
-        if (this.portalColor != newPortalColor)
-        {
+    public void setPortalColor(int newPortalColor) {
+        if (this.portalColor != newPortalColor) {
             this.portalColor = newPortalColor;
             this.setChanged();
             this.sendUpdateToClient();
         }
     }
 
-    private void sendUpdateToClient()
-    {
+    private void sendUpdateToClient() {
         BlockState state = this.getBlockState();
         this.level.sendBlockUpdated(this.getBlockPos(), state, state, 2);
     }
 
-    public void onInventorySlotChanged()
-    {
+    public void onInventorySlotChanged() {
         this.setChanged();
         this.sendUpdateToClient();
     }
 
-    @Override public void tick()
-    {
-        if (!this.level.isClientSide)
-        {
-            return;
-        }
-        if (++this.ticks >= TICKS_PER_RENDER_REVOLUTION)
-        {
-            this.ticks = 0;
-        }
-        if (this.ticks % 4 == 0)
-        {
-            if (this.inventory.getStackInSlot(0).isEmpty())
-            {
-                return;
-            }
-            PortalControllerBlock.animateTick(this.getBlockState(), this.level, this.worldPosition);
-        }
-    }
-
     @Override
-    public Component getDisplayName()
-    {
+    public Component getDisplayName() {
         return Nameable.super.getDisplayName();
     }
 }

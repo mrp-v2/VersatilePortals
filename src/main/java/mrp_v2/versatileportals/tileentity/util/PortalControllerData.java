@@ -2,7 +2,7 @@ package mrp_v2.versatileportals.tileentity.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
+import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 
@@ -21,7 +21,7 @@ public class PortalControllerData
     private final Component customName;
     private final int portalColor;
 
-    public PortalControllerData(PortalControllerTileEntity portalController)
+    public PortalControllerData(PortalControllerBlockEntity portalController)
     {
         this(portalController.getPortalColor(), portalController.getCustomName(),
                 portalController.getInventory().serializeNBT());
