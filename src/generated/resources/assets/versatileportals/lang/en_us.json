@@ -5,6 +5,7 @@
   "block.versatileportals.portal_controller.gui.color.b": "Portal Color B: ",
   "block.versatileportals.portal_controller.gui.color.g": "Portal Color G: ",
   "block.versatileportals.portal_controller.gui.color.r": "Portal Color R: ",
+  "block.versatileportals.portal_controller.gui.matchControlItemLabel": "Set Color from Item",
   "block.versatileportals.portal_controller.gui.slotLabel.controlItem": "Control Item",
   "block.versatileportals.portal_controller.message.noControlItem": "There is no control item or it is invalid",
   "block.versatileportals.portal_controller.message.teleported": "Teleported",

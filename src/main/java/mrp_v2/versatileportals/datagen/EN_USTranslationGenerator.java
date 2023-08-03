@@ -24,6 +24,7 @@ public class EN_USTranslationGenerator extends LanguageProvider
         add(PortalControllerScreen.colorGLabel.getKey(), "Portal Color G: ");
         add(PortalControllerScreen.colorRLabel.getKey(), "Portal Color R: ");
         add(PortalControllerScreen.controlItemLabel.getKey(), "Control Item");
+        add(PortalControllerScreen.matchControlItemLabel.getKey(), "Set Color from Item");
         add(EventHandler.noControlItem.getKey(), "There is no control item or it is invalid");
         add(EventHandler.teleported.getKey(), "Teleported");
         add(EventHandler.teleportingInFunction.apply(new Object[0]).getKey(), "Teleporting in %s...");

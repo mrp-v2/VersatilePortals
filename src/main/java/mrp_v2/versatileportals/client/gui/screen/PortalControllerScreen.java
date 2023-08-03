@@ -4,10 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
+import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalControllerScreenClosedPacket;
 import mrp_v2.versatileportals.util.Util;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -17,12 +19,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.widget.ExtendedButton;
 import net.minecraftforge.client.gui.widget.ForgeSlider;
 
 @OnlyIn(Dist.CLIENT)
 public class PortalControllerScreen extends AbstractContainerScreen<PortalControllerContainer> {
     public static final ResourceLocation GUI_TEXTURE =
             new ResourceLocation(VersatilePortals.ID, "textures/gui/container/portal_controller.png");
+    public static final ResourceLocation PORTAL_FRAME_TEXTURE =
+            new ResourceLocation(VersatilePortals.ID, "textures/block/" + PortalFrameBlock.ID + ".png");
     public static final TranslatableComponent colorRLabel = new TranslatableComponent(
             "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.r"), colorGLabel =
             new TranslatableComponent(
@@ -30,7 +35,8 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
             new TranslatableComponent(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.b"),
             controlItemLabel = new TranslatableComponent(
-                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.slotLabel.controlItem");
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.slotLabel.controlItem"),
+            matchControlItemLabel = new TranslatableComponent("block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.matchControlItemLabel");
     private ForgeSlider colorR;
     private ForgeSlider colorG;
     private ForgeSlider colorB;
@@ -71,6 +77,9 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
         this.blit(stack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        RenderSystem.setShaderColor(this.colorR.getValueInt() / 255F, this.colorG.getValueInt() / 255F, this.colorB.getValueInt() / 255F, 1);
+        RenderSystem.setShaderTexture(0, PORTAL_FRAME_TEXTURE);
+        blit(stack, i + 135, j + 37, 0, 0, 32, 32, 32, 32);
     }
 
     @Override
@@ -89,7 +98,7 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int sliderYSpacing = 4;
         int sliderYOffset = 19;
-        int sliderXOffset = 28;
+        int sliderXOffset = 10;
         int color = this.menu.getColor();
         TextComponent suffix = new TextComponent("");
         this.colorR = this.addRenderableWidget(
@@ -101,5 +110,15 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         this.colorB = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset + 20 * 2 + sliderYSpacing * 2, 120, 20,
                         colorBLabel, suffix, 0, 255, Util.iGetColorB(color), 1, 0, true));
+        this.addRenderableWidget(new ExtendedButton(xStart + 48, yStart + 102, 120, 20, matchControlItemLabel, this::matchControlItemButtonPressed));
+    }
+
+    private void matchControlItemButtonPressed(Button button) {
+        if (menu.hasControlItem()) {
+            int color = menu.getColorFromControlItem();
+            this.colorR.setValue(Util.iGetColorR(color));
+            this.colorG.setValue(Util.iGetColorG(color));
+            this.colorB.setValue(Util.iGetColorB(color));
+        }
     }
 }

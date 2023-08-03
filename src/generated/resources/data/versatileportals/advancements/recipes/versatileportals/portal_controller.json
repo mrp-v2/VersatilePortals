@@ -11,7 +11,9 @@
       "conditions": {
         "items": [
           {
-            "item": "versatileportals:portal_frame"
+            "items": [
+              "versatileportals:portal_frame"
+            ]
           }
         ]
       }
