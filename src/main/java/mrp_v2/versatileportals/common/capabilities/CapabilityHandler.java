@@ -1,6 +1,7 @@
 package mrp_v2.versatileportals.common.capabilities;
 
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.world.EventHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -20,6 +21,9 @@ public class CapabilityHandler {
             PORTAL_DATA_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
             });
         }
+        if (!PORTAL_DATA_CAPABILITY.isRegistered()) {
+            EventHandler.LOGGER.debug("Portal Data Capability was retrieved but it isn't registered!");
+        }
         return PORTAL_DATA_CAPABILITY;
     }
 
@@ -30,8 +34,7 @@ public class CapabilityHandler {
     }
 
     @SubscribeEvent
-    public static void registerCapabilities(RegisterCapabilitiesEvent event) // might need to be registered on other event bus
-    {
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.register(IPortalDataCapability.class);
     }
 }
