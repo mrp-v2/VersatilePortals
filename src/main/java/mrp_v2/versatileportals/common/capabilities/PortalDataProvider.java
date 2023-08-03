@@ -3,6 +3,7 @@ package mrp_v2.versatileportals.common.capabilities;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
@@ -15,6 +16,7 @@ import javax.annotation.Nullable;
 public class PortalDataProvider implements ICapabilitySerializable<CompoundTag> {
     protected final PortalDataHandler portalDataHandler;
     protected final LazyOptional<IPortalDataCapability> portalDataHandlerLazyOptional;
+    protected final boolean isPlayerEntity;
 
     public PortalDataProvider(AttachCapabilitiesEvent<Entity> event) {
         this(event, new PortalDataHandler());
@@ -23,7 +25,15 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundTag> 
     protected PortalDataProvider(AttachCapabilitiesEvent<Entity> event, PortalDataHandler dataHandler) {
         this.portalDataHandler = dataHandler;
         this.portalDataHandlerLazyOptional = LazyOptional.of(() -> this.portalDataHandler);
-        event.addListener(this.portalDataHandlerLazyOptional::invalidate);
+        isPlayerEntity = event.getObject() instanceof ServerPlayer;
+        event.addListener(this::gaurdedInvalidate);
+    }
+
+    private void gaurdedInvalidate() {
+        if (portalDataHandler.isTeleporting() && isPlayerEntity) {
+            return;
+        }
+        portalDataHandlerLazyOptional.invalidate();
     }
 
     @Override

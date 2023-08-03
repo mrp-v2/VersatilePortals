@@ -92,8 +92,10 @@ public class EventHandler {
                             }
                             return;
                         }
+                        portalData.startTeleporting();
                         Entity teleportedEntity =
                                 portalControlItem.teleportEntity(entity, world, portalSize, portalControlItemStack);
+                        portalData.finishTeleporting();
                         if (teleportedEntity instanceof ServerPlayer) {
                             Util.sendMessage((ServerPlayer) teleportedEntity, teleported);
                         }

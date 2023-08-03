@@ -92,13 +92,13 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         int sliderXOffset = 28;
         int color = this.menu.getColor();
         TextComponent suffix = new TextComponent("");
-        this.colorR = this.addWidget(
+        this.colorR = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset, 120, 20, colorRLabel, suffix, 0, 255,
                         Util.iGetColorR(color), 1, 0, true));
-        this.colorG = this.addWidget(
+        this.colorG = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset + 20 + sliderYSpacing, 120, 20, colorGLabel,
                         suffix, 0, 255, Util.iGetColorG(color), 1, 0, true));
-        this.colorB = this.addWidget(
+        this.colorB = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset + 20 * 2 + sliderYSpacing * 2, 120, 20,
                         colorBLabel, suffix, 0, 255, Util.iGetColorB(color), 1, 0, true));
     }
