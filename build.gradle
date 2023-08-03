@@ -238,6 +238,7 @@ jar {
 jar.finalizedBy('reobfJar')
 
 processResources {
+    setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
     String tempMCVersion = mcVersion
     if (mcVersion == "1.16.5")
     {
@@ -319,20 +320,21 @@ task regenerateUpdateJson {
         JsonObject promos = new JsonObject()
         newUpdateJson.add('promos', promos)
         File oldUpdateJsonFile = new File(updateJsonLocation)
-        if (oldUpdateJsonFile.exists())
-        {
+        String latestTargetMCVersion = mcVersion
+        if (oldUpdateJsonFile.exists()) {
             JsonObject oldUpdateJson = new JsonParser().
                     parse(new File(updateJsonLocation).text).getAsJsonObject().
                     getAsJsonObject('promos')
-            for (Map.Entry<String, JsonElement> entry : oldUpdateJson.entrySet())
-            {
+            for (Map.Entry<String, JsonElement> entry : oldUpdateJson.entrySet()) {
                 promos.addProperty(entry.key, entry.value.asString)
+                if (entry.key.equals("latest")) {
+                    latestTargetMCVersion = entry.value.asString.substring(0, entry.value.asString.indexOf("-"))
+                }
             }
         }
         promos.addProperty("${mcVersion}-recommended", (String) version)
         promos.addProperty("${mcVersion}-latest", (String) version)
-        if (mcVersion == new JsonSlurper().parse(secretFile).get('latest-mc-version'))
-        {
+        if (mcVersion >= latestTargetMCVersion) {
             promos.addProperty("recommended", (String) version)
             promos.addProperty("latest", (String) version)
         }
