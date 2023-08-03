@@ -1,9 +1,9 @@
 package mrp_v2.versatileportals.common.capabilities;
 
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -30,7 +30,7 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundTag>
 
     @Override public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side)
     {
-        if (cap == CapabilityHandler.PORTAL_DATA_CAPABILITY)
+        if (cap == CapabilityHandler.GetPortalDataCapability())
         {
             return this.portalDataHandlerLazyOptional.cast();
         }
@@ -41,7 +41,7 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundTag>
     public CompoundTag serializeNBT()
     {
         //noinspection ConstantConditions
-        return (CompoundTag) ObjectHolder.PORTAL_DATA_STORAGE.writeNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY,
+        return (CompoundTag) ObjectHolder.PORTAL_DATA_STORAGE.writeNBT(CapabilityHandler.GetPortalDataCapability(),
                 this.portalDataHandler, null);
     }
 
@@ -49,7 +49,7 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundTag>
     public void deserializeNBT(CompoundTag nbt)
     {
         //noinspection ConstantConditions
-        ObjectHolder.PORTAL_DATA_STORAGE.readNBT(CapabilityHandler.PORTAL_DATA_CAPABILITY, this.portalDataHandler, null,
+        ObjectHolder.PORTAL_DATA_STORAGE.readNBT(CapabilityHandler.GetPortalDataCapability(), this.portalDataHandler, null,
                 nbt);
     }
 }

@@ -1,20 +1,19 @@
 package mrp_v2.versatileportals.client.renderer.tileentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT) public class PortalControllerTileEntityRenderer
-        extends BlockEntityRenderer<PortalControllerTileEntity>
-{
+        implements BlockEntityRenderer<PortalControllerTileEntity> {
     public PortalControllerTileEntityRenderer(BlockEntityRenderDispatcher rendererDispatcherIn)
     {
         super(rendererDispatcherIn);

@@ -12,23 +12,21 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
-@Mod(VersatilePortals.ID) public class VersatilePortals
-{
+@Mod(VersatilePortals.ID)
+public class VersatilePortals {
     public static final String ID = "versatile" + "portals";
     public static final String DISPLAY_NAME = "Versatile Portals";
     public static final Logger LOGGER = LogManager.getLogger();
     public static Supplier<Level> WORLD_SUPPLIER;
 
-    public VersatilePortals()
-    {
+    public VersatilePortals() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(CapabilityHandler::registerCapabilities);
         ObjectHolder.registerListeners(FMLJavaModLoadingContext.get().getModEventBus());
         WORLD_SUPPLIER = () -> null;
     }
 
-    private void commonSetup(FMLCommonSetupEvent event)
-    {
+    private void commonSetup(FMLCommonSetupEvent event) {
         PacketHandler.createChannel();
-        CapabilityHandler.registerCapabilities();
     }
 }

@@ -9,25 +9,24 @@ import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
-import net.minecraft.world.Nameable;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -36,7 +35,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 public class PortalControllerTileEntity extends BlockEntity
-        implements ICapabilityProvider, MenuProvider, TickableBlockEntity, Nameable
+        implements ICapabilityProvider, MenuProvider, Nameable
 {
     public static final String ID = PortalControllerBlock.ID;
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
@@ -152,7 +151,7 @@ public class PortalControllerTileEntity extends BlockEntity
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound)
+    public CompoundTag save(CompoundTag compound) // TODO need to adjust saving method, see discord
     {
         super.save(compound);
         PortalControllerData.CODEC.encodeStart(NbtOps.INSTANCE, new PortalControllerData(this))

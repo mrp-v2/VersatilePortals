@@ -3,36 +3,32 @@ package mrp_v2.versatileportals.datagen;
 import mrp_v2.mrplibrary.datagen.providers.RecipeProvider;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
 
-public class RecipeGenerator extends RecipeProvider
-{
-    protected RecipeGenerator(DataGenerator dataGeneratorIn, String modId)
-    {
+public class RecipeGenerator extends RecipeProvider {
+    protected RecipeGenerator(DataGenerator dataGeneratorIn, String modId) {
         super(dataGeneratorIn, modId);
     }
 
     @Override
-    protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer)
-    {
+    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         makePortalFrameRecipe(consumer);
         makePortalControllerRecipe(consumer);
         makeEmptyExistingWorldControlRecipe(consumer);
         makePortalLighterRecipe(consumer);
     }
 
-    private void makePortalFrameRecipe(Consumer<FinishedRecipe> consumer)
-    {
+    private void makePortalFrameRecipe(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder recipeBuilder = ShapedRecipeBuilder.shaped(ObjectHolder.PORTAL_FRAME_BLOCK.get());
         recipeBuilder.pattern("LLL");
         recipeBuilder.pattern("LOL");
@@ -44,8 +40,7 @@ public class RecipeGenerator extends RecipeProvider
         recipeBuilder.save(consumer);
     }
 
-    private void makePortalControllerRecipe(Consumer<FinishedRecipe> consumer)
-    {
+    private void makePortalControllerRecipe(Consumer<FinishedRecipe> consumer) {
         ShapedRecipeBuilder recipeBuilder = ShapedRecipeBuilder.shaped(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get());
         recipeBuilder.pattern("FBF");
         recipeBuilder.pattern("BRB");
@@ -58,8 +53,7 @@ public class RecipeGenerator extends RecipeProvider
         recipeBuilder.save(consumer);
     }
 
-    private void makeEmptyExistingWorldControlRecipe(Consumer<FinishedRecipe> consumer)
-    {
+    private void makeEmptyExistingWorldControlRecipe(Consumer<FinishedRecipe> consumer) {
         // normal recipe
         ShapelessRecipeBuilder recipeBuilder =
                 ShapelessRecipeBuilder.shapeless(ObjectHolder.EMPTY_EXISTING_WORLD_TELEPORT_ITEM.get());
@@ -77,8 +71,7 @@ public class RecipeGenerator extends RecipeProvider
         recipeBuilder.save(consumer, new ResourceLocation(VersatilePortals.ID, "empty_control_from_existing"));
     }
 
-    private void makePortalLighterRecipe(Consumer<FinishedRecipe> consumer)
-    {
+    private void makePortalLighterRecipe(Consumer<FinishedRecipe> consumer) {
         ShapelessRecipeBuilder recipeBuilder = ShapelessRecipeBuilder.shapeless(ObjectHolder.PORTAL_LIGHTER_ITEM.get());
         recipeBuilder.requires(Items.FLINT_AND_STEEL);
         recipeBuilder.requires(Tags.Items.GEMS_LAPIS);

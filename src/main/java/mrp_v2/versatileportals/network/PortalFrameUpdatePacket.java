@@ -3,10 +3,10 @@ package mrp_v2.versatileportals.network;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.block.util.PortalSize;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
 import java.util.function.Supplier;

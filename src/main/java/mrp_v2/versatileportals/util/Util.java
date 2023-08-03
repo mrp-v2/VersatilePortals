@@ -3,17 +3,17 @@ package mrp_v2.versatileportals.util;
 import com.google.common.collect.ImmutableMap;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -26,17 +26,11 @@ public class Util
 
     private static Pair<Direction.Axis, Direction.Axis> getOtherOxes(Direction.Axis axis)
     {
-        switch (axis)
-        {
-            case X:
-                return Pair.of(Direction.Axis.Y, Direction.Axis.Z);
-            case Y:
-                return Pair.of(Direction.Axis.X, Direction.Axis.Z);
-            case Z:
-                return Pair.of(Direction.Axis.X, Direction.Axis.Y);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (axis) {
+            case X -> Pair.of(Direction.Axis.Y, Direction.Axis.Z);
+            case Y -> Pair.of(Direction.Axis.X, Direction.Axis.Z);
+            case Z -> Pair.of(Direction.Axis.X, Direction.Axis.Y);
+        };
     }
 
     public static int iGetColorR(int color)
@@ -74,7 +68,7 @@ public class Util
         return (r << 16) | (g << 8) | b;
     }
 
-    @Nullable public static IPortalDataCapability getPortalData(Entity entity)
+    public static IPortalDataCapability getPortalData(Entity entity)
     {
         //noinspection ConstantConditions
         return entity.getCapability(CapabilityHandler.PORTAL_DATA_CAPABILITY).orElse(null);

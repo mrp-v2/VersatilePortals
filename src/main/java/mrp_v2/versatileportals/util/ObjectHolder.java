@@ -13,22 +13,22 @@ import mrp_v2.versatileportals.particles.PortalControllerParticleData;
 import mrp_v2.versatileportals.particles.PortalParticleData;
 import mrp_v2.versatileportals.tileentity.PortalControllerTileEntity;
 import mrp_v2.versatileportals.village.PortalPointOfInterestType;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.particles.ParticleType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = VersatilePortals.ID) public class ObjectHolder
 {
@@ -43,7 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
     public static final DeferredRegister<PoiType> POIS =
             DeferredRegister.create(ForgeRegistries.POI_TYPES, VersatilePortals.ID);
     public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES =
-            DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, VersatilePortals.ID);
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, VersatilePortals.ID);
     public static final RegistryObject<PortalBlock> PORTAL_BLOCK;
     public static final RegistryObject<PortalControllerBlock> PORTAL_CONTROLLER_BLOCK;
     public static final RegistryObject<PortalFrameBlock> PORTAL_FRAME_BLOCK;
