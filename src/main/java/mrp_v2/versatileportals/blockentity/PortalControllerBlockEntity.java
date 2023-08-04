@@ -1,13 +1,12 @@
-package mrp_v2.versatileportals.tileentity;
+package mrp_v2.versatileportals.blockentity;
 
 import com.mojang.serialization.DataResult;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
+import mrp_v2.versatileportals.blockentity.util.PortalControllerData;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.inventory.container.PortalControllerMenu;
-import mrp_v2.versatileportals.item.ExistingWorldControlItem;
-import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,7 +16,6 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
@@ -81,14 +79,6 @@ public class PortalControllerBlockEntity extends BlockEntity
 
     public ItemStack getControlItemStack() {
         return this.inventory.getStackInSlot(0);
-    }
-
-    @Nullable
-    public ResourceKey<Level> getTeleportDestination() {
-        if (this.inventory.getStackInSlot(0).isEmpty()) {
-            return null;
-        }
-        return ExistingWorldControlItem.getTeleportDestination(this.inventory.getStackInSlot(0));
     }
 
     @Override

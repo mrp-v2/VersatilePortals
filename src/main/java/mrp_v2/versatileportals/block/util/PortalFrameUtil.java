@@ -1,9 +1,9 @@
 package mrp_v2.versatileportals.block.util;
 
 import com.google.common.collect.Lists;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalFrameUpdatePacket;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.WorldWrapper;
 import net.minecraft.client.Minecraft;

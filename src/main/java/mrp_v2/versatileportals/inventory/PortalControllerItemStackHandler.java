@@ -1,7 +1,7 @@
 package mrp_v2.versatileportals.inventory;
 
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.item.IPortalControlItem;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 

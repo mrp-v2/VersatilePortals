@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mrp_v2.versatileportals.block.IPortalFrame;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.core.BlockPos;

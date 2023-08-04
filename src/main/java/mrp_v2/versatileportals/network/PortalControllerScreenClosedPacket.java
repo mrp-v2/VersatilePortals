@@ -1,6 +1,6 @@
 package mrp_v2.versatileportals.network;
 
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

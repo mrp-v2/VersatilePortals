@@ -2,7 +2,7 @@ package mrp_v2.versatileportals.client.renderer.tileentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;

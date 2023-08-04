@@ -1,8 +1,8 @@
 package mrp_v2.versatileportals.inventory.container;
 
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

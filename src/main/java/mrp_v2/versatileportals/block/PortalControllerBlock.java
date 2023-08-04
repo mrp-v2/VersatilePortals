@@ -1,8 +1,8 @@
 package mrp_v2.versatileportals.block;
 
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.particles.PortalControllerParticleData;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

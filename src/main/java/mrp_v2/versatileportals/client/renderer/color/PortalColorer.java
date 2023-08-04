@@ -2,7 +2,7 @@ package mrp_v2.versatileportals.client.renderer.color;
 
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.multiplayer.ClientLevel;

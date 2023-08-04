@@ -1,8 +1,8 @@
-package mrp_v2.versatileportals.tileentity.util;
+package mrp_v2.versatileportals.blockentity.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mrp_v2.versatileportals.tileentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 
