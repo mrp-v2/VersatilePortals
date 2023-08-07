@@ -5,7 +5,7 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.common.capabilities.PortalDataStorage;
-import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
+import mrp_v2.versatileportals.inventory.container.PortalControllerMenu;
 import mrp_v2.versatileportals.item.EmptyExistingWorldControlItem;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.item.PortalLighter;
@@ -59,7 +59,7 @@ import net.minecraftforge.registries.RegistryObject;
     public static final RegistryObject<PortalLighter> PORTAL_LIGHTER_ITEM;
     public static final RegistryObject<EmptyExistingWorldControlItem> EMPTY_EXISTING_WORLD_TELEPORT_ITEM;
     public static final RegistryObject<ExistingWorldControlItem> EXISTING_WORLD_TELEPORT_ITEM;
-    public static final RegistryObject<MenuType<PortalControllerContainer>> PORTAL_CONTROLLER_CONTAINER_TYPE;
+    public static final RegistryObject<MenuType<PortalControllerMenu>> PORTAL_CONTROLLER_CONTAINER_TYPE;
     public static final RegistryObject<ParticleType<PortalParticleData>> PORTAL_PARTICLE_TYPE;
     public static final RegistryObject<ParticleType<PortalControllerParticleData>> PORTAL_CONTROLLER_PARTICLE_TYPE;
     public static final PortalDataStorage PORTAL_DATA_STORAGE;
@@ -79,7 +79,7 @@ import net.minecraftforge.registries.RegistryObject;
                 ITEMS.register(EmptyExistingWorldControlItem.ID, EmptyExistingWorldControlItem::new);
         EXISTING_WORLD_TELEPORT_ITEM = ITEMS.register(ExistingWorldControlItem.ID, ExistingWorldControlItem::new);
         PORTAL_CONTROLLER_CONTAINER_TYPE =
-                CONTAINERS.register(PortalControllerBlock.ID, PortalControllerContainer.Type::new);
+                CONTAINERS.register(PortalControllerBlock.ID, PortalControllerMenu.Type::new);
         PORTAL_PARTICLE_TYPE = PARTICLES.register(PortalParticleData.ID, PortalParticleData::createParticleType);
         PORTAL_CONTROLLER_PARTICLE_TYPE =
                 PARTICLES.register(PortalControllerParticleData.ID, PortalControllerParticleData::createParticleType);

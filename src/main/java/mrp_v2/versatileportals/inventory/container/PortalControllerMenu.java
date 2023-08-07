@@ -17,23 +17,23 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.network.IContainerFactory;
 
-public class PortalControllerContainer extends AbstractContainerMenu {
+public class PortalControllerMenu extends AbstractContainerMenu {
     public static final int Y_SIZE = 218;
     private final PortalControllerItemStackHandler inventory;
     private final int color;
     private final BlockPos pos;
 
-    public PortalControllerContainer(int id, Inventory playerInventoryIn) {
+    public PortalControllerMenu(int id, Inventory playerInventoryIn) {
         //noinspection ConstantConditions
         this(id, playerInventoryIn, PortalControllerBlockEntity.DEFAULT_PORTAL_COLOR, null);
     }
 
-    public PortalControllerContainer(int id, Inventory playerInventoryIn, int color, BlockPos pos) {
+    public PortalControllerMenu(int id, Inventory playerInventoryIn, int color, BlockPos pos) {
         this(id, playerInventoryIn, new PortalControllerItemStackHandler(null), color, pos);
     }
 
-    public PortalControllerContainer(int id, Inventory playerInventoryIn,
-                                     PortalControllerItemStackHandler inventoryIn, int color, BlockPos pos) {
+    public PortalControllerMenu(int id, Inventory playerInventoryIn,
+                                PortalControllerItemStackHandler inventoryIn, int color, BlockPos pos) {
         super(ObjectHolder.PORTAL_CONTROLLER_CONTAINER_TYPE.get(), id);
         this.inventory = inventoryIn;
         this.color = color;
@@ -102,21 +102,21 @@ public class PortalControllerContainer extends AbstractContainerMenu {
         return true;
     }
 
-    public static class Type extends MenuType<PortalControllerContainer>
-            implements IContainerFactory<PortalControllerContainer> {
+    public static class Type extends MenuType<PortalControllerMenu>
+            implements IContainerFactory<PortalControllerMenu> {
         public Type() {
             super(Type::factory);
         }
 
-        private static PortalControllerContainer factory(int windowId, Inventory playerInv) {
-            return new PortalControllerContainer(windowId, playerInv);
+        private static PortalControllerMenu factory(int windowId, Inventory playerInv) {
+            return new PortalControllerMenu(windowId, playerInv);
         }
 
         @Override
-        public PortalControllerContainer create(int windowId, Inventory playerInv, FriendlyByteBuf extraData) {
+        public PortalControllerMenu create(int windowId, Inventory playerInv, FriendlyByteBuf extraData) {
             int color = extraData.readInt();
             BlockPos pos = extraData.readBlockPos();
-            return new PortalControllerContainer(windowId, playerInv, color, pos);
+            return new PortalControllerMenu(windowId, playerInv, color, pos);
         }
     }
 }

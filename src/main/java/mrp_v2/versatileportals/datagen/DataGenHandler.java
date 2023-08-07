@@ -6,10 +6,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
-@Mod.EventBusSubscriber(modid = VersatilePortals.ID, bus = Mod.EventBusSubscriber.Bus.MOD) public class DataGenHandler
-{
-    @SubscribeEvent public static void gatherDataEvent(final GatherDataEvent event)
-    {
+@Mod.EventBusSubscriber(modid = VersatilePortals.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class DataGenHandler {
+    @SubscribeEvent
+    public static void gatherDataEvent(final GatherDataEvent event) {
         DataGeneratorHelper helper = new DataGeneratorHelper(event, VersatilePortals.ID);
         helper.addLootTables(new LootTables());
         helper.addRecipeProvider(RecipeGenerator::new);
@@ -18,5 +18,6 @@ import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
         helper.addBlockStateProvider(BlockStateGenerator::new);
         helper.addItemModelProvider(ItemModelGenerator::new);
         helper.addLanguageProvider(EN_USTranslationGenerator::new);
+        helper.addBlockTagsProvider(BlockTagsGenerator::new);
     }
 }

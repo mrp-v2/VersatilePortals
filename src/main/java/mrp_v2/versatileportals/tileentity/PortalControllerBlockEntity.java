@@ -5,7 +5,7 @@ import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalFrameUtil;
 import mrp_v2.versatileportals.inventory.PortalControllerItemStackHandler;
-import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
+import mrp_v2.versatileportals.inventory.container.PortalControllerMenu;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.tileentity.util.PortalControllerData;
 import mrp_v2.versatileportals.util.ObjectHolder;
@@ -112,7 +112,7 @@ public class PortalControllerBlockEntity extends BlockEntity
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory playerInventoryIn, Player playerIn) {
-        return new PortalControllerContainer(id, playerInventoryIn, this.inventory, this.portalColor,
+        return new PortalControllerMenu(id, playerInventoryIn, this.inventory, this.portalColor,
                 this.getBlockPos());
     }
 

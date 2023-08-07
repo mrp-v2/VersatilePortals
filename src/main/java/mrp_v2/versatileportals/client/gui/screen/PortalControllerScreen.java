@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
-import mrp_v2.versatileportals.inventory.container.PortalControllerContainer;
+import mrp_v2.versatileportals.inventory.container.PortalControllerMenu;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalControllerScreenClosedPacket;
 import mrp_v2.versatileportals.util.Util;
@@ -23,7 +23,7 @@ import net.minecraftforge.client.gui.widget.ExtendedButton;
 import net.minecraftforge.client.gui.widget.ForgeSlider;
 
 @OnlyIn(Dist.CLIENT)
-public class PortalControllerScreen extends AbstractContainerScreen<PortalControllerContainer> {
+public class PortalControllerScreen extends AbstractContainerScreen<PortalControllerMenu> {
     public static final ResourceLocation GUI_TEXTURE =
             new ResourceLocation(VersatilePortals.ID, "textures/gui/container/portal_controller.png");
     public static final ResourceLocation PORTAL_FRAME_TEXTURE =
@@ -41,10 +41,10 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
     private ForgeSlider colorG;
     private ForgeSlider colorB;
 
-    public PortalControllerScreen(PortalControllerContainer screenContainer, Inventory inv,
+    public PortalControllerScreen(PortalControllerMenu screenContainer, Inventory inv,
                                   Component titleIn) {
         super(screenContainer, inv, titleIn);
-        this.imageHeight = PortalControllerContainer.Y_SIZE;
+        this.imageHeight = PortalControllerMenu.Y_SIZE;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
