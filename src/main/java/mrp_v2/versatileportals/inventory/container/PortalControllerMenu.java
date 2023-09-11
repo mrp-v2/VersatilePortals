@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
@@ -105,7 +106,7 @@ public class PortalControllerMenu extends AbstractContainerMenu {
     public static class Type extends MenuType<PortalControllerMenu>
             implements IContainerFactory<PortalControllerMenu> {
         public Type() {
-            super(Type::factory);
+            super(Type::factory, FeatureFlags.DEFAULT_FLAGS);
         }
 
         private static PortalControllerMenu factory(int windowId, Inventory playerInv) {

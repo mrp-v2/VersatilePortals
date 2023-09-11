@@ -5,28 +5,35 @@ import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class TextureGenerator extends TextureProvider {
-    public TextureGenerator(DataGenerator generator, ExistingFileHelper existingFileHelper, String modId) {
-        super(generator, existingFileHelper, modId);
+    public TextureGenerator(PackOutput output, ExistingFileHelper existingFileHelper, String modId) {
+        super(output, existingFileHelper, modId);
+    }
+
+    private ResourceLocation key(Block block) {
+        return ForgeRegistries.BLOCKS.getKey(block);
     }
 
     @Override
     protected void addTextures(FinishedTextureConsumer finishedTextureConsumer) {
         ResourceLocation netherPortalTextureLoc =
-                new ResourceLocation("block/" + Blocks.NETHER_PORTAL.getRegistryName().getPath());
+                new ResourceLocation("block/" + key(Blocks.NETHER_PORTAL).getPath());
         Texture portalTexture = getTexture(netherPortalTextureLoc);
         makeGrayscale(portalTexture.getTexture());
         adjustLevels(portalTexture.getTexture(), 0.35d);
         finish(portalTexture, new ResourceLocation(VersatilePortals.ID, "block/" + PortalBlock.ID),
                 finishedTextureConsumer);
         ResourceLocation lapisBlockTextureLoc =
-                new ModelResourceLocation("block/" + Blocks.LAPIS_BLOCK.getRegistryName().getPath());
+                ModelResourceLocation.vanilla("block/" + key(Blocks.LAPIS_BLOCK).getPath(), BlockModelShaper.statePropertiesToString(Blocks.LAPIS_BLOCK.defaultBlockState().getValues()));
         Texture portalFrameTexture = getTexture(lapisBlockTextureLoc);
         makeGrayscale(portalFrameTexture.getTexture());
         adjustLevels(portalFrameTexture.getTexture(), 0.35d);

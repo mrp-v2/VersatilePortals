@@ -8,8 +8,10 @@ import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.BasicWorldTeleporter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -27,16 +29,16 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
     public static final String ID = "existing_world_control";
     public static final String COLOR_NBT_ID = "Color";
     public static final String WORLD_ID_NBT_ID = "WorldID";
-    public static final TranslatableComponent DISPLAY_NAME = new TranslatableComponent("item." + VersatilePortals.ID
-            + "." + ID + ".gui.display_name");
-    public static final TranslatableComponent worldDoesNotExist =
-            new TranslatableComponent("item." + VersatilePortals.ID + "." + ID + ".message.worldDoesNotExist"),
+    public static final Component DISPLAY_NAME = MutableComponent.create(new TranslatableContents("item." + VersatilePortals.ID
+            + "." + ID + ".gui.display_name", null, new Object[0]));
+    public static final Component worldDoesNotExist =
+            MutableComponent.create(new TranslatableContents("item." + VersatilePortals.ID + "." + ID + ".message.worldDoesNotExist", null, new Object[0])),
             noTeleportSelf =
-                    new TranslatableComponent("item." + VersatilePortals.ID + "." + ID + ".message.noTeleportSelf");
+                    MutableComponent.create(new TranslatableContents("item." + VersatilePortals.ID + "." + ID + ".message.noTeleportSelf", null, new Object[0]));
 
     public ExistingWorldControlItem() {
         //noinspection ConstantConditions
-        super(properties -> properties.tab(null));
+        super(properties -> properties);
     }
 
     public static int getColorDataFromItem(ItemStack stack) {
@@ -65,7 +67,7 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
         CompoundTag compound = stack.getOrCreateTag();
         compound.putString(WORLD_ID_NBT_ID, worldID.toString());
         stack.setTag(compound);
-        stack.setHoverName(new TextComponent(worldID.getPath()));
+        stack.setHoverName(MutableComponent.create(new LiteralContents(worldID.getPath())));
     }
 
     public static ResourceKey<Level> getTeleportDestination(ItemStack stack) {

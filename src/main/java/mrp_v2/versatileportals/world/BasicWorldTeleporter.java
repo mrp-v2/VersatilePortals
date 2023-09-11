@@ -107,6 +107,10 @@ public class BasicWorldTeleporter implements ITeleporter {
         return this.getPortalInfo(entity);
     }
 
+    private static BlockPos blockPos(double x, double y, double z) {
+        return new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
+    }
+
     @Nullable
     private PortalInfo getPortalInfo(Entity entity) {
         WorldBorder worldborder = this.destinationWorld.getWorldBorder();
@@ -116,7 +120,7 @@ public class BasicWorldTeleporter implements ITeleporter {
         double maxZ = Math.min(2.9999872E7D, worldborder.getMaxZ() - 16.0D);
         double coordinateMultiplier = DimensionType
                 .getTeleportationScale(entity.level.dimensionType(), this.destinationWorld.dimensionType());
-        BlockPos pos = new BlockPos(Mth.clamp(entity.getX() * coordinateMultiplier, minX, maxX), entity.getY(),
+        BlockPos pos = blockPos(Mth.clamp(entity.getX() * coordinateMultiplier, minX, maxX), entity.getY(),
                 Mth.clamp(entity.getZ() * coordinateMultiplier, minZ, maxZ));
         return this.getExistingPortal(pos, coordinateMultiplier)
                 .map((result) -> this.convertTeleportResult(result, entity)).orElseGet(
@@ -137,7 +141,7 @@ public class BasicWorldTeleporter implements ITeleporter {
         int i = coordinateMultiplier == 0.125D ? 16 : 128;
         pointOfInterestManager.ensureLoadedAndValid(this.destinationWorld, searchOrigin, i);
         Optional<PoiRecord> optionalPointOfInterest = pointOfInterestManager.getInSquare(
-                        (pointOfInterestType) -> pointOfInterestType == ObjectHolder.PORTAL_POINT_OF_INTEREST_TYPE.get(),
+                        (pointOfInterestType) -> pointOfInterestType.get() == ObjectHolder.VERSATILE_PORTAL_POI_TYPE.get(),
                         searchOrigin, i, PoiManager.Occupancy.ANY).sorted(Comparator.<PoiRecord>comparingDouble(
                                 (pointOfInterest) -> pointOfInterest.getPos().distSqr(searchOrigin))
                         .thenComparingInt((pointOfInterest) -> pointOfInterest.getPos().getY()))

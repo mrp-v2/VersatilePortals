@@ -5,8 +5,7 @@ import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.network.chat.ChatType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -68,7 +67,7 @@ public class Util {
         if (worldID.isEmpty()) {
             return null;
         }
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(worldID));
+        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(worldID));
     }
 
     public static String getWorldID(Level world) {
@@ -126,6 +125,6 @@ public class Util {
     }
 
     public static void sendMessage(ServerPlayer player, Component message) {
-        player.sendMessage(message, ChatType.GAME_INFO, net.minecraft.Util.NIL_UUID);
+        player.sendSystemMessage(message);
     }
 }

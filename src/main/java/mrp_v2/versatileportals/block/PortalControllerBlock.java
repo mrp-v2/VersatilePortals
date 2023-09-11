@@ -99,7 +99,7 @@ public class PortalControllerBlock extends PortalFrameBlock implements IPortalFr
         PortalControllerBlockEntity portalController = (PortalControllerBlockEntity) worldIn.getBlockEntity(pos);
         if (portalController != null) {
             if (player instanceof ServerPlayer) {
-                NetworkHooks.openGui((ServerPlayer) player, portalController, (buffer) ->
+                NetworkHooks.openScreen((ServerPlayer) player, portalController, (buffer) ->
                 {
                     buffer.writeInt(portalController.getPortalColor());
                     buffer.writeBlockPos(pos);

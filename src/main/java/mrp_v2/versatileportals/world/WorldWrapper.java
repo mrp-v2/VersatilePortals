@@ -8,9 +8,11 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -32,11 +34,11 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.LevelTickAccess;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Predicate;
 
 public class WorldWrapper implements LevelAccessor {
@@ -87,7 +89,7 @@ public class WorldWrapper implements LevelAccessor {
     }
 
     @Override
-    public Random getRandom() {
+    public RandomSource getRandom() {
         return this.world.getRandom();
     }
 
@@ -106,6 +108,11 @@ public class WorldWrapper implements LevelAccessor {
     @Override
     public void levelEvent(@Nullable Player player, int type, BlockPos pos, int data) {
         this.world.levelEvent(player, type, pos, data);
+    }
+
+    @Override
+    public void gameEvent(GameEvent p_220404_, Vec3 p_220405_, GameEvent.Context p_220406_) {
+        this.world.gameEvent(p_220404_, p_220405_, p_220406_);
     }
 
     @Override
@@ -247,5 +254,10 @@ public class WorldWrapper implements LevelAccessor {
     @Override
     public RegistryAccess registryAccess() {
         return this.world.registryAccess();
+    }
+
+    @Override
+    public FeatureFlagSet enabledFeatures() {
+        return this.world.enabledFeatures();
     }
 }

@@ -1,11 +1,39 @@
 {
   "parent": "minecraft:block/block",
-  "textures": {
-    "frame": "versatileportals:block/portal_frame",
-    "particle": "versatileportals:block/portal_frame"
-  },
   "elements": [
     {
+      "faces": {
+        "down": {
+          "cullface": "down",
+          "texture": "#frame",
+          "tintindex": 0
+        },
+        "east": {
+          "cullface": "east",
+          "texture": "#frame",
+          "tintindex": 0
+        },
+        "north": {
+          "cullface": "north",
+          "texture": "#frame",
+          "tintindex": 0
+        },
+        "south": {
+          "cullface": "south",
+          "texture": "#frame",
+          "tintindex": 0
+        },
+        "up": {
+          "cullface": "up",
+          "texture": "#frame",
+          "tintindex": 0
+        },
+        "west": {
+          "cullface": "west",
+          "texture": "#frame",
+          "tintindex": 0
+        }
+      },
       "from": [
         0,
         0,
@@ -15,39 +43,11 @@
         16,
         16,
         16
-      ],
-      "faces": {
-        "down": {
-          "texture": "#frame",
-          "cullface": "down",
-          "tintindex": 0
-        },
-        "up": {
-          "texture": "#frame",
-          "cullface": "up",
-          "tintindex": 0
-        },
-        "north": {
-          "texture": "#frame",
-          "cullface": "north",
-          "tintindex": 0
-        },
-        "south": {
-          "texture": "#frame",
-          "cullface": "south",
-          "tintindex": 0
-        },
-        "west": {
-          "texture": "#frame",
-          "cullface": "west",
-          "tintindex": 0
-        },
-        "east": {
-          "texture": "#frame",
-          "cullface": "east",
-          "tintindex": 0
-        }
-      }
+      ]
     }
-  ]
+  ],
+  "textures": {
+    "frame": "versatileportals:block/portal_frame",
+    "particle": "versatileportals:block/portal_frame"
+  }
 }

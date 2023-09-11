@@ -1,25 +1,27 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": {
+      "tag": "forge:bookshelves"
+    },
+    "E": {
+      "item": "minecraft:enchanting_table"
+    },
+    "F": {
+      "item": "versatileportals:portal_frame"
+    },
+    "R": {
+      "tag": "forge:dusts/redstone"
+    }
+  },
   "pattern": [
     "FBF",
     "BRB",
     "FEF"
   ],
-  "key": {
-    "F": {
-      "item": "versatileportals:portal_frame"
-    },
-    "B": {
-      "tag": "forge:bookshelves"
-    },
-    "R": {
-      "tag": "forge:dusts/redstone"
-    },
-    "E": {
-      "item": "minecraft:enchanting_table"
-    }
-  },
   "result": {
     "item": "versatileportals:portal_controller"
-  }
+  },
+  "show_notification": true
 }

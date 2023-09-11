@@ -8,14 +8,17 @@ import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.TickEvent.WorldTickEvent;
+import net.minecraftforge.event.TickEvent.LevelTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import org.apache.logging.log4j.LogManager;
@@ -26,22 +29,36 @@ import java.util.function.Function;
 @EventBusSubscriber
 public class EventHandler {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final TranslatableComponent noPortalController = new TranslatableComponent(
-            "block." + VersatilePortals.ID + "." + PortalBlock.ID + ".message.noPortalController"), noControlItem =
-            new TranslatableComponent(
+    public static final TranslatableContents noPortalControllerContent = translatable(
+            "block." + VersatilePortals.ID + "." + PortalBlock.ID + ".message.noPortalController"), noControlItemContent =
+            translatable(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.noControlItem"),
-            teleported = new TranslatableComponent(
+            teleportedContent = translatable(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleported");
-    public static final Function<Object[], TranslatableComponent> teleportingInFunction =
-            (args) -> new TranslatableComponent(
+    public static final Function<Object[], TranslatableContents> teleportingInFunctionContent =
+            (args) -> translatable(
                     "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".message.teleportingIn", args);
+    public static final Component noPortalController = component(noPortalControllerContent), noControlItem = component(noControlItemContent), teleported = component(teleportedContent);
+    public static final Function<Object[], Component> teleportingInFunction = (args) -> component(teleportingInFunctionContent.apply(args));
+
+    private static TranslatableContents translatable(String key) {
+        return translatable(key, new Object[0]);
+    }
+
+    private static TranslatableContents translatable(String key, Object... args) {
+        return new TranslatableContents(key, null, args);
+    }
+
+    private static Component component(ComponentContents content) {
+        return MutableComponent.create(content);
+    }
 
     @SubscribeEvent
-    public static void worldTick(final WorldTickEvent event) {
+    public static void worldTick(final LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.START) {
             return;
         }
-        if (event.world instanceof ServerLevel world) {
+        if (event.level instanceof ServerLevel world) {
             Iterable<Entity> relevantEntities = world.getEntities().getAll();
             for (Entity entity : relevantEntities) {
                 if (entity == null) {

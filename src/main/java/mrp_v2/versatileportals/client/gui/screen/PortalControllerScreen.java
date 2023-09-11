@@ -9,12 +9,14 @@ import mrp_v2.versatileportals.inventory.container.PortalControllerMenu;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.network.PortalControllerScreenClosedPacket;
 import mrp_v2.versatileportals.util.Util;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,15 +30,15 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
             new ResourceLocation(VersatilePortals.ID, "textures/gui/container/portal_controller.png");
     public static final ResourceLocation PORTAL_FRAME_TEXTURE =
             new ResourceLocation(VersatilePortals.ID, "textures/block/" + PortalFrameBlock.ID + ".png");
-    public static final TranslatableComponent colorRLabel = new TranslatableComponent(
-            "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.r"), colorGLabel =
-            new TranslatableComponent(
-                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.g"), colorBLabel =
-            new TranslatableComponent(
-                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.b"),
-            controlItemLabel = new TranslatableComponent(
-                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.slotLabel.controlItem"),
-            matchControlItemLabel = new TranslatableComponent("block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.matchControlItemLabel");
+    public static final Component colorRLabel = MutableComponent.create(new TranslatableContents(
+            "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.r", null, new Object[0])), colorGLabel =
+            MutableComponent.create(new TranslatableContents(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.g", null, new Object[0])), colorBLabel =
+            MutableComponent.create(new TranslatableContents(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.color.b", null, new Object[0])),
+            controlItemLabel = MutableComponent.create(new TranslatableContents(
+                    "block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.slotLabel.controlItem", null, new Object[0])),
+            matchControlItemLabel = MutableComponent.create(new TranslatableContents("block." + VersatilePortals.ID + "." + PortalControllerBlock.ID + ".gui.matchControlItemLabel", null, new Object[0]));
     private ForgeSlider colorR;
     private ForgeSlider colorG;
     private ForgeSlider colorB;
@@ -74,7 +76,7 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         RenderSystem.setShaderTexture(0, GUI_TEXTURE);
         int i = this.leftPos;
         int j = this.topPos;
-        this.blit(stack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        blit(stack, i, j, 0, 0, this.imageWidth, this.imageHeight);
         RenderSystem.setShaderColor(this.colorR.getValueInt() / 255F, this.colorG.getValueInt() / 255F, this.colorB.getValueInt() / 255F, 1);
         RenderSystem.setShaderTexture(0, PORTAL_FRAME_TEXTURE);
         blit(stack, i + 135, j + 37, 0, 0, 32, 32, 32, 32);
@@ -85,7 +87,6 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
         PacketHandler.INSTANCE
                 .sendToServer(new PortalControllerScreenClosedPacket(this.getCurrentColor(), this.menu.getPos()));
         super.removed();
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     public int getCurrentColor() {
@@ -93,12 +94,11 @@ public class PortalControllerScreen extends AbstractContainerScreen<PortalContro
     }
 
     protected void addElements(int xStart, int yStart) {
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int sliderYSpacing = 4;
         int sliderYOffset = 19;
         int sliderXOffset = 10;
         int color = this.menu.getColor();
-        TextComponent suffix = new TextComponent("");
+        Component suffix = MutableComponent.create(new LiteralContents(""));
         this.colorR = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset, 120, 20, colorRLabel, suffix, 0, 255,
                         Util.iGetColorR(color), 1, 0, true));

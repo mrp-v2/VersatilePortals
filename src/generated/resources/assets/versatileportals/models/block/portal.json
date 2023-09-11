@@ -1,10 +1,16 @@
 {
-  "textures": {
-    "portal": "versatileportals:block/portal",
-    "particle": "versatileportals:block/portal"
-  },
   "elements": [
     {
+      "faces": {
+        "east": {
+          "texture": "#portal",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#portal",
+          "tintindex": 0
+        }
+      },
       "from": [
         6,
         0,
@@ -14,17 +20,11 @@
         10,
         16,
         16
-      ],
-      "faces": {
-        "west": {
-          "texture": "#portal",
-          "tintindex": 0
-        },
-        "east": {
-          "texture": "#portal",
-          "tintindex": 0
-        }
-      }
+      ]
     }
-  ]
+  ],
+  "textures": {
+    "particle": "versatileportals:block/portal",
+    "portal": "versatileportals:block/portal"
+  }
 }

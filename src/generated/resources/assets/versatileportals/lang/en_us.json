@@ -17,5 +17,5 @@
   "item.versatileportals.existing_world_control.message.noTeleportSelf": "The control item must be for a different dimension",
   "item.versatileportals.existing_world_control.message.worldDoesNotExist": "There is no world matching the control item",
   "item.versatileportals.portal_lighter": "Portal Lighter",
-  "itemGroup.versatileportals": "Versatile Portals"
+  "versatileportals.creativeTab": "Versatile Portals"
 }

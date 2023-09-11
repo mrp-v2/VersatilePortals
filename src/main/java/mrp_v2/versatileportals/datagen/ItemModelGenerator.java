@@ -5,15 +5,15 @@ import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.item.EmptyExistingWorldControlItem;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.item.PortalLighter;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ItemModelGenerator extends ItemModelProvider
 {
-    public ItemModelGenerator(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper)
+    public ItemModelGenerator(PackOutput output, String modid, ExistingFileHelper existingFileHelper)
     {
-        super(generator, modid, existingFileHelper);
+        super(output, modid, existingFileHelper);
     }
 
     @Override protected void registerModels()

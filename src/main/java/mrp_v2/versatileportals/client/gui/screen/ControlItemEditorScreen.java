@@ -8,10 +8,13 @@ import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.network.ControlItemEditedPacket;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.util.Util;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -79,7 +82,7 @@ public class ControlItemEditorScreen extends Screen {
         RenderSystem.setShaderTexture(0, GUI_TEXTURE);
         int i = (this.width - IMAGE_WIDTH) / 2;
         int j = (this.height - IMAGE_HEIGHT) / 2;
-        this.blit(poseStack, i, j, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+        blit(poseStack, i, j, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
         RenderSystem.setShaderColor(this.colorR.getValueInt() / 255F, this.colorG.getValueInt() / 255F, this.colorB.getValueInt() / 255F, 1);
         RenderSystem.setShaderTexture(0, PortalControllerScreen.PORTAL_FRAME_TEXTURE);
         blit(poseStack, i + 135, j + 37, 0, 0, 32, 32, 32, 32);
@@ -98,11 +101,10 @@ public class ControlItemEditorScreen extends Screen {
     }
 
     protected void addElements(int xStart, int yStart) {
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int sliderYSpacing = 4;
         int sliderYOffset = 19;
         int sliderXOffset = 10;
-        TextComponent suffix = new TextComponent("");
+        Component suffix = MutableComponent.create(new LiteralContents(""));
         this.colorR = this.addRenderableWidget(
                 new ForgeSlider(xStart + sliderXOffset, yStart + sliderYOffset, 120, 20, PortalControllerScreen.colorRLabel, suffix, 0, 255,
                         Util.iGetColorR(initialColor), 1, 0, true));

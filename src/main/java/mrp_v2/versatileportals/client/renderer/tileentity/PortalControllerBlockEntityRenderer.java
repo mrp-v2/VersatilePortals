@@ -1,13 +1,13 @@
 package mrp_v2.versatileportals.client.renderer.tileentity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,7 +16,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class PortalControllerBlockEntityRenderer
         implements BlockEntityRenderer<PortalControllerBlockEntity> {
 
+    private final ItemRenderer itemRenderer;
+
     public PortalControllerBlockEntityRenderer(BlockEntityRendererProvider.Context rendererDispatcherIn) {
+        itemRenderer = rendererDispatcherIn.getItemRenderer();
     }
 
     @Override
@@ -26,12 +29,11 @@ public class PortalControllerBlockEntityRenderer
         if (itemStack != ItemStack.EMPTY) {
             poseStack.pushPose();
             poseStack.translate(0.5D, 0.5D, 0.5D);
-            poseStack.mulPose(Vector3f.YP.rotationDegrees(360.0F * (tileEntityIn.ticks + partialTicks) /
+            poseStack.mulPose(Axis.YP.rotation(360.0F * (tileEntityIn.ticks + partialTicks) /
                     PortalControllerBlockEntity.TICKS_PER_RENDER_REVOLUTION));
             poseStack.scale(0.5F, 0.5F, 0.5F);
-            Minecraft.getInstance().getItemRenderer()
-                    .renderStatic(itemStack, ItemTransforms.TransformType.FIXED, combinedLightIn,
-                            combinedOverlayIn, poseStack, bufferIn, 0);
+            itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, combinedLightIn,
+                    combinedOverlayIn, poseStack, bufferIn, tileEntityIn.getLevel(), 0);
             poseStack.popPose();
         }
     }

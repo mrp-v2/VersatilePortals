@@ -1,0 +1,8 @@
+// 1.19.4	2023-09-11T07:32:19.0149996	Block States: versatileportals
+8bd17c64a09e68762b602518c391daa2916ca56f assets/versatileportals/blockstates/portal.json
+ecd6d074792b7f7a753c9b7fb453d83ebf9af124 assets/versatileportals/blockstates/portal_controller.json
+f708ecc17e0e5d5724365ae80ccb37ffe7292181 assets/versatileportals/blockstates/portal_frame.json
+ffb6408d9a38591ea4d8de17664f0947c1f6e13c assets/versatileportals/models/block/portal.json
+567ec6ec6433c75f7dc7b4376e82b851ee80f0cc assets/versatileportals/models/block/portal_controller.json
+fc8fd5f48a2e05e96c306704b333e9a651481b36 assets/versatileportals/models/block/portal_flat.json
+3afc895d166e8577a4342bc21ac18e63c4d6c1d2 assets/versatileportals/models/block/portal_frame.json

@@ -1,10 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "LLL",
-    "LOL",
-    "LLL"
-  ],
+  "category": "building",
   "key": {
     "L": {
       "tag": "forge:gems/lapis"
@@ -13,7 +9,13 @@
       "tag": "forge:obsidian"
     }
   },
+  "pattern": [
+    "LLL",
+    "LOL",
+    "LLL"
+  ],
   "result": {
     "item": "versatileportals:portal_frame"
-  }
+  },
+  "show_notification": true
 }

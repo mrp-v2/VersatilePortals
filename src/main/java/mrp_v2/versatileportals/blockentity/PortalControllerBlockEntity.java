@@ -14,7 +14,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
@@ -27,9 +28,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -38,7 +39,7 @@ public class PortalControllerBlockEntity extends BlockEntity
     public static final String ID = PortalControllerBlock.ID;
     public static final int DEFAULT_PORTAL_COLOR = 0x00FF00;
     public static final int ERROR_PORTAL_COLOR = 0xFFFFFF;
-    public static final int TICKS_PER_RENDER_REVOLUTION = 120;
+    public static final int TICKS_PER_RENDER_REVOLUTION = 6000;
     private static final String DATA_NBT_ID = "PortalControllerData";
     private final PortalControllerItemStackHandler inventory;
     private final LazyOptional<PortalControllerItemStackHandler> inventoryLazyOptional;
@@ -97,7 +98,7 @@ public class PortalControllerBlockEntity extends BlockEntity
     }
 
     public Component getDefaultName() {
-        return new TranslatableComponent(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId());
+        return MutableComponent.create(new TranslatableContents(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get().getDescriptionId(), null, new Object[0]));
     }
 
     @Override
@@ -108,7 +109,7 @@ public class PortalControllerBlockEntity extends BlockEntity
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return this.inventoryLazyOptional.cast();
         }
         return super.getCapability(cap, side);

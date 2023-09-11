@@ -5,22 +5,20 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.PortalFrameBlock;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.core.Direction;
+import net.minecraft.data.PackOutput;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-import net.minecraftforge.client.model.generators.ModelBuilder.ElementBuilder;
-
 public class BlockStateGenerator extends BlockStateProvider
 {
-    public BlockStateGenerator(DataGenerator gen, String modid, ExistingFileHelper exFileHelper)
+    public BlockStateGenerator(PackOutput output, String modid, ExistingFileHelper exFileHelper)
     {
-        super(gen, modid, exFileHelper);
+        super(output, modid, exFileHelper);
     }
 
     @Override protected void registerStatesAndModels()

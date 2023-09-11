@@ -1,31 +1,33 @@
 package mrp_v2.versatileportals.datagen;
 
-import mrp_v2.mrplibrary.datagen.providers.ParticleProvider;
+import mrp_v2.mrplibrary.datagen.providers.ParticleDescriptionProvider;
 import mrp_v2.versatileportals.util.ObjectHolder;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.data.ExistingFileHelper;
 
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
-import mrp_v2.mrplibrary.datagen.providers.ParticleProvider.ParticleBuilder;
-
-public class ParticleGenerator extends ParticleProvider
+public class ParticleGenerator extends ParticleDescriptionProvider
 {
-    protected ParticleGenerator(DataGenerator generator, String modId)
+    protected ParticleGenerator(PackOutput output, String modId, ExistingFileHelper existingFileHelper)
     {
-        super(generator, modId);
+        super(output, modId, existingFileHelper);
     }
 
-    @Override protected void registerParticles(Consumer<ParticleBuilder> consumer)
-    {
-        ResourceLocation[] particleTextures =
-                new ResourceLocation[]{new ResourceLocation("generic_0"), new ResourceLocation("generic_1"),
-                        new ResourceLocation("generic_2"), new ResourceLocation("generic_3"),
-                        new ResourceLocation("generic_4"), new ResourceLocation("generic_5"),
-                        new ResourceLocation("generic_6"), new ResourceLocation("generic_7")};
-        consumer.accept(
-                ParticleProvider.makeBuilder(ObjectHolder.PORTAL_PARTICLE_TYPE.getId()).addTextures(particleTextures));
-        consumer.accept(ParticleProvider.makeBuilder(ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE.getId())
-                .addTextures(particleTextures));
+    @Override
+    protected void addDescriptions() {
+        List<ResourceLocation> particleTextures = new ArrayList<>();
+        particleTextures.add(new ResourceLocation("generic_0"));
+        particleTextures.add(new ResourceLocation("generic_1"));
+        particleTextures.add(new ResourceLocation("generic_2"));
+        particleTextures.add(new ResourceLocation("generic_3"));
+        particleTextures.add(new ResourceLocation("generic_4"));
+        particleTextures.add(new ResourceLocation("generic_5"));
+        particleTextures.add(new ResourceLocation("generic_6"));
+        particleTextures.add(new ResourceLocation("generic_7"));
+        spriteSet(ObjectHolder.PORTAL_PARTICLE_TYPE.get(), particleTextures);
+        spriteSet(ObjectHolder.PORTAL_CONTROLLER_PARTICLE_TYPE.get(), particleTextures);
     }
 }
