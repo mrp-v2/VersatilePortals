@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
@@ -124,7 +125,7 @@ public class Util {
         return mergedArray;
     }
 
-    public static void sendMessage(ServerPlayer player, Component message) {
-        player.sendSystemMessage(message);
+    public static void sendMessage(Player player, Component message) {
+        player.displayClientMessage(message, true);
     }
 }
