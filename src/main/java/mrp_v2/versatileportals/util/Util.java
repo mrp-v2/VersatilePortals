@@ -59,10 +59,6 @@ public class Util {
         return (r << 16) | (g << 8) | b;
     }
 
-    public static IPortalDataCapability getPortalData(Entity entity) {
-        return entity.getCapability(CapabilityHandler.GetPortalDataCapability()).orElse(null);
-    }
-
     @Nullable
     public static ResourceKey<Level> createWorldKey(String worldID) {
         if (worldID.isEmpty()) {

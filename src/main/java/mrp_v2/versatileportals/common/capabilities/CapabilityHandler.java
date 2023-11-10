@@ -11,9 +11,12 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @EventBusSubscriber
 public class CapabilityHandler {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static Capability<IPortalDataCapability> PORTAL_DATA_CAPABILITY = null;
 
     public static Capability<IPortalDataCapability> GetPortalDataCapability() {
@@ -22,7 +25,7 @@ public class CapabilityHandler {
             });
         }
         if (!PORTAL_DATA_CAPABILITY.isRegistered()) {
-            EventHandler.LOGGER.debug("Portal Data Capability was retrieved but it isn't registered!");
+            LOGGER.debug("Portal Data Capability was retrieved but it isn't registered!");
         }
         return PORTAL_DATA_CAPABILITY;
     }

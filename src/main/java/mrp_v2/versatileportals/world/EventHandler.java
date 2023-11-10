@@ -5,6 +5,7 @@ import mrp_v2.versatileportals.block.PortalBlock;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.util.Util;
@@ -28,7 +29,7 @@ import java.util.function.Function;
 
 @EventBusSubscriber
 public class EventHandler {
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
     public static final TranslatableContents noPortalControllerContent = translatable(
             "block." + VersatilePortals.ID + "." + PortalBlock.ID + ".message.noPortalController"), noControlItemContent =
             translatable(
@@ -67,59 +68,60 @@ public class EventHandler {
                 if (!entity.isAlive()) {
                     continue;
                 }
-                IPortalDataCapability portalData = Util.getPortalData(entity);
-                if (portalData == null) {
-                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity);
-                    continue;
-                }
-                if (portalData.getInPortal()) {
-                    portalData.setInPortal(false);
-                    if (portalData.getRemainingPortalCooldown() > 0) {
-                        portalData.setRemainingPortalCooldown(entity.getDimensionChangingDelay());
-                        return;
-                    }
-                    if (portalData.incrementInPortalTime() < entity.getPortalWaitTime()) {
-                        if (entity.getPortalWaitTime() > 1) {
-                            if (entity instanceof ServerPlayer) {
-                                int remainingInPortalTime = entity.getPortalWaitTime() - portalData.getInPortalTime();
-                                Util.sendMessage((ServerPlayer) entity, teleportingInFunction
-                                        .apply(new Object[]{Math.ceil(remainingInPortalTime / 2.0F) / 10.0F}));
+                var lazyData = entity.getCapability(CapabilityHandler.GetPortalDataCapability());
+                lazyData.ifPresent(portalData -> {
+                    if (portalData.getInPortal()) {
+                        portalData.setInPortal(false);
+                        if (portalData.getRemainingPortalCooldown() > 0) {
+                            portalData.setRemainingPortalCooldown(entity.getDimensionChangingDelay());
+                            return;
+                        }
+                        if (portalData.incrementInPortalTime() < entity.getPortalWaitTime()) {
+                            if (entity.getPortalWaitTime() > 1) {
+                                if (entity instanceof ServerPlayer) {
+                                    int remainingInPortalTime = entity.getPortalWaitTime() - portalData.getInPortalTime();
+                                    Util.sendMessage((ServerPlayer) entity, teleportingInFunction
+                                            .apply(new Object[]{Math.ceil(remainingInPortalTime / 2.0F) / 10.0F}));
+                                }
+                            }
+                        } else {
+                            PortalSize portalSize = new PortalSize(world, portalData.getPortalPos(),
+                                    world.getBlockState(portalData.getPortalPos()).getValue(BlockStateProperties.AXIS));
+                            PortalControllerBlockEntity controller = portalSize.getPortalController(world).getLeft();
+                            if (controller == null) {
+                                if (entity instanceof ServerPlayer) {
+                                    Util.sendMessage((ServerPlayer) entity, noPortalController);
+                                }
+                                return;
+                            }
+                            ItemStack portalControlItemStack = controller.getControlItemStack();
+                            IPortalControlItem portalControlItem = null;
+                            if (!portalControlItemStack.isEmpty()) {
+                                if (portalControlItemStack.getItem() instanceof IPortalControlItem) {
+                                    portalControlItem = (IPortalControlItem) portalControlItemStack.getItem();
+                                }
+                            }
+                            if (portalControlItem == null) {
+                                if (entity instanceof ServerPlayer) {
+                                    Util.sendMessage((ServerPlayer) entity, noControlItem);
+                                }
+                                return;
+                            }
+                            portalData.startTeleporting();
+                            Entity teleportedEntity =
+                                    portalControlItem.teleportEntity(entity, world, portalSize, portalControlItemStack);
+                            portalData.finishTeleporting();
+                            if (teleportedEntity instanceof ServerPlayer) {
+                                Util.sendMessage((ServerPlayer) teleportedEntity, teleported);
                             }
                         }
                     } else {
-                        PortalSize portalSize = new PortalSize(world, portalData.getPortalPos(),
-                                world.getBlockState(portalData.getPortalPos()).getValue(BlockStateProperties.AXIS));
-                        PortalControllerBlockEntity controller = portalSize.getPortalController(world).getLeft();
-                        if (controller == null) {
-                            if (entity instanceof ServerPlayer) {
-                                Util.sendMessage((ServerPlayer) entity, noPortalController);
-                            }
-                            return;
-                        }
-                        ItemStack portalControlItemStack = controller.getControlItemStack();
-                        IPortalControlItem portalControlItem = null;
-                        if (!portalControlItemStack.isEmpty()) {
-                            if (portalControlItemStack.getItem() instanceof IPortalControlItem) {
-                                portalControlItem = (IPortalControlItem) portalControlItemStack.getItem();
-                            }
-                        }
-                        if (portalControlItem == null) {
-                            if (entity instanceof ServerPlayer) {
-                                Util.sendMessage((ServerPlayer) entity, noControlItem);
-                            }
-                            return;
-                        }
-                        portalData.startTeleporting();
-                        Entity teleportedEntity =
-                                portalControlItem.teleportEntity(entity, world, portalSize, portalControlItemStack);
-                        portalData.finishTeleporting();
-                        if (teleportedEntity instanceof ServerPlayer) {
-                            Util.sendMessage((ServerPlayer) teleportedEntity, teleported);
-                        }
+                        portalData.decrementRemainingPortalCooldown();
+                        portalData.setInPortalTime(0);
                     }
-                } else {
-                    portalData.decrementRemainingPortalCooldown();
-                    portalData.setInPortalTime(0);
+                });
+                if (!lazyData.isPresent()) {
+                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity);
                 }
             }
         }

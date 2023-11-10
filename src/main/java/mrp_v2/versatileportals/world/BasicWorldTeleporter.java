@@ -3,6 +3,7 @@ package mrp_v2.versatileportals.world;
 import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
+import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
 import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.util.ObjectHolder;
@@ -29,6 +30,8 @@ import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.ITeleporter;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -36,6 +39,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class BasicWorldTeleporter implements ITeleporter {
+    private static final Logger LOGGER = LogManager.getLogger();
     protected final ServerLevel destinationWorld;
     protected final ServerLevel originWorld;
     protected final PortalSize originPortalSize;
@@ -94,9 +98,14 @@ public class BasicWorldTeleporter implements ITeleporter {
     public Entity placeEntity(Entity entityIn, ServerLevel currentWorld, ServerLevel destinationWorld, float yaw,
                               Function<Boolean, Entity> repositionEntity) {
         Entity repositionedEntity = repositionEntity.apply(false); // don't let vanilla make a portal
-        IPortalDataCapability portalData = Util.getPortalData(repositionedEntity);
-        portalData.setRemainingPortalCooldown(repositionedEntity.getDimensionChangingDelay());
-        portalData.setInPortalTime(0);
+        var lazyData = repositionedEntity.getCapability(CapabilityHandler.GetPortalDataCapability());
+        lazyData.ifPresent(data -> {
+            data.setRemainingPortalCooldown(repositionedEntity.getDimensionChangingDelay());
+            data.setInPortalTime(0);
+        });
+        if (!lazyData.isPresent()) {
+            LOGGER.debug("Tried to edit the portal dat for teleported entity {}, but couldn't get the portal data!", repositionEntity);
+        }
         return repositionedEntity;
     }
 
