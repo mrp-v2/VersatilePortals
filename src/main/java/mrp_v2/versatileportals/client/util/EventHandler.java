@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -61,7 +62,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public static void addTab(CreativeModeTabEvent.Register e) {
-        versatilePortalsTab = e.registerCreativeModeTab(new ResourceLocation(VersatilePortals.ID, VersatilePortals.ID), (builder) -> builder.withTabsImage(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM.getKey().location()).title(EN_USTranslationGenerator.VERSATILE_PORTAL_CREATIVE_TAB_LABEL));
+        versatilePortalsTab = e.registerCreativeModeTab(new ResourceLocation(VersatilePortals.ID, VersatilePortals.ID), builder -> builder.title(EN_USTranslationGenerator.VERSATILE_PORTAL_CREATIVE_TAB_LABEL).icon(() -> new ItemStack(ObjectHolder.PORTAL_CONTROLLER_BLOCK.get())).title(EN_USTranslationGenerator.VERSATILE_PORTAL_CREATIVE_TAB_LABEL));
     }
 
     @SubscribeEvent
