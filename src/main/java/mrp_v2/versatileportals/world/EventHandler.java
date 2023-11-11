@@ -6,7 +6,6 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
-import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.IPortalControlItem;
 import mrp_v2.versatileportals.util.Util;
 import net.minecraft.network.chat.Component;
@@ -120,9 +119,6 @@ public class EventHandler {
                         portalData.setInPortalTime(0);
                     }
                 });
-                if (!lazyData.isPresent()) {
-                    LOGGER.debug("Could not get IPortalDataCapability for entity: " + entity);
-                }
             }
         }
     }
