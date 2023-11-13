@@ -186,7 +186,7 @@ repositories {
             url = new URL('https://maven.pkg.github.com/' + dependency.githubAddress)
             credentials {
                 username = 'mrp-v2'
-                if (secretFile.exists() && secretSlurper.hasProperty('github-packages-token')) {
+                if (secretFile.exists() && secretSlurper.containsKey('github-packages-token')) {
                     password = secretSlurper.get('github-packages-token')
                 }
             }
@@ -279,7 +279,7 @@ publishing {
             url = uri('https://maven.pkg.github.com/mrp-v2/' + capitalizedModId)
             credentials {
                 username = 'mrp-v2'
-                if (secretFile.exists() && secretSlurper.hasProperty('github-packages-token')) {
+                if (secretFile.exists() && secretSlurper.containsKey('github-packages-token')) {
                     password = secretSlurper.get('github-packages-token')
                 }
             }
@@ -359,7 +359,7 @@ task publishToGithubAndCurseforge {
 }
 
 curseforge {
-    if (secretFile.exists() && secretSlurper.hasProperty('curseforge-api-token')) {
+    if (secretFile.exists() && secretSlurper.containsKey('curseforge-api-token')) {
         apiKey = secretSlurper.get('curseforge-api-token')
     }
     project {
