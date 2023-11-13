@@ -15,8 +15,9 @@ import javax.annotation.Nullable;
 
 public class PortalDataProvider implements ICapabilitySerializable<CompoundTag> {
     protected final PortalDataHandler portalDataHandler;
-    protected final LazyOptional<IPortalDataCapability> portalDataHandlerLazyOptional;
+    protected LazyOptional<IPortalDataCapability> portalDataHandlerLazyOptional;
     protected final boolean isPlayerEntity;
+    protected final Entity entity;
 
     public PortalDataProvider(AttachCapabilitiesEvent<Entity> event) {
         this(event, new PortalDataHandler());
@@ -25,19 +26,20 @@ public class PortalDataProvider implements ICapabilitySerializable<CompoundTag> 
     protected PortalDataProvider(AttachCapabilitiesEvent<Entity> event, PortalDataHandler dataHandler) {
         this.portalDataHandler = dataHandler;
         this.portalDataHandlerLazyOptional = LazyOptional.of(() -> this.portalDataHandler);
-        isPlayerEntity = event.getObject() instanceof ServerPlayer;
-        event.addListener(this::gaurdedInvalidate);
+        entity = event.getObject();
+        isPlayerEntity = entity instanceof ServerPlayer;
+        event.addListener(this::invalidate);
     }
 
-    private void gaurdedInvalidate() {
-        if (portalDataHandler.isTeleporting() && isPlayerEntity) {
-            return;
-        }
+    private void invalidate() {
         portalDataHandlerLazyOptional.invalidate();
     }
 
     @Override
     public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (isPlayerEntity && !portalDataHandlerLazyOptional.isPresent() && entity.isAlive()) {
+            portalDataHandlerLazyOptional = LazyOptional.of(() -> this.portalDataHandler);
+        }
         return CapabilityHandler.GetPortalDataCapability().orEmpty(cap, portalDataHandlerLazyOptional);
     }
 

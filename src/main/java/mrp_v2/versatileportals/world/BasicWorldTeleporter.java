@@ -4,7 +4,6 @@ import mrp_v2.versatileportals.block.PortalControllerBlock;
 import mrp_v2.versatileportals.block.util.PortalSize;
 import mrp_v2.versatileportals.blockentity.PortalControllerBlockEntity;
 import mrp_v2.versatileportals.common.capabilities.CapabilityHandler;
-import mrp_v2.versatileportals.common.capabilities.IPortalDataCapability;
 import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
@@ -104,7 +103,7 @@ public class BasicWorldTeleporter implements ITeleporter {
             data.setInPortalTime(0);
         });
         if (!lazyData.isPresent()) {
-            LOGGER.debug("Tried to edit the portal dat for teleported entity {}, but couldn't get the portal data!", repositionEntity);
+            LOGGER.debug("Tried to edit portal data for teleported entity {}, but couldn't get the portal data!", repositionEntity);
         }
         return repositionedEntity;
     }
