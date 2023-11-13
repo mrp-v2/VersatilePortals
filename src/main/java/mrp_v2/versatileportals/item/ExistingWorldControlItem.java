@@ -2,11 +2,10 @@ package mrp_v2.versatileportals.item;
 
 import mrp_v2.versatileportals.VersatilePortals;
 import mrp_v2.versatileportals.block.util.PortalSize;
-import mrp_v2.versatileportals.client.gui.screen.ControlItemEditorScreen;
+import mrp_v2.versatileportals.client.util.EventHandler;
 import mrp_v2.versatileportals.util.ObjectHolder;
 import mrp_v2.versatileportals.util.Util;
 import mrp_v2.versatileportals.world.BasicWorldTeleporter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -22,6 +21,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import javax.annotation.Nullable;
 
@@ -98,7 +99,7 @@ public class ExistingWorldControlItem extends BasicSingleItem implements IPortal
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide) {
-            Minecraft.getInstance().setScreen(new ControlItemEditorScreen(getColorDataFromItem(player.getItemInHand(hand)), player, hand));
+            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> EventHandler.OpenControlItemEditorScreen(getColorDataFromItem(player.getItemInHand(hand)), player, hand));
             return InteractionResultHolder.consume(player.getItemInHand(hand));
         }
         return InteractionResultHolder.success(player.getItemInHand(hand));

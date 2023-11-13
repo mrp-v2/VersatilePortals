@@ -1,6 +1,7 @@
 package mrp_v2.versatileportals.client.util;
 
 import mrp_v2.versatileportals.VersatilePortals;
+import mrp_v2.versatileportals.client.gui.screen.ControlItemEditorScreen;
 import mrp_v2.versatileportals.client.gui.screen.PortalControllerScreen;
 import mrp_v2.versatileportals.client.particle.PortalControllerParticle;
 import mrp_v2.versatileportals.client.particle.PortalParticle;
@@ -16,6 +17,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -73,5 +76,9 @@ public class EventHandler {
             e.accept(ObjectHolder.PORTAL_CONTROLLER_BLOCK_ITEM);
             e.accept(ObjectHolder.PORTAL_FRAME_BLOCK_ITEM);
         }
+    }
+
+    public static void OpenControlItemEditorScreen(int initialColor, Player player, InteractionHand hand) {
+        Minecraft.getInstance().setScreen(new ControlItemEditorScreen(initialColor, player, hand));
     }
 }

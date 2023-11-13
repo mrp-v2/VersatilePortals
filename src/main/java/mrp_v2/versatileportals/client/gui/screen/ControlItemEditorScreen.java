@@ -8,7 +8,6 @@ import mrp_v2.versatileportals.item.ExistingWorldControlItem;
 import mrp_v2.versatileportals.network.ControlItemEditedPacket;
 import mrp_v2.versatileportals.network.PacketHandler;
 import mrp_v2.versatileportals.util.Util;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.nbt.IntTag;
@@ -18,9 +17,12 @@ import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.widget.ForgeSlider;
 import org.jetbrains.annotations.NotNull;
 
+@OnlyIn(Dist.CLIENT)
 public class ControlItemEditorScreen extends Screen {
 
     public static final ResourceLocation GUI_TEXTURE =
